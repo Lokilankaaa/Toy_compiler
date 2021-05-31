@@ -98,7 +98,7 @@ namespace TOY_COMPILER {
         MOD,
         DOTDOT,
         SEMI
-    }
+    };
 
 };
 #endif //TOY_COMPILER_TYPES_CUH
