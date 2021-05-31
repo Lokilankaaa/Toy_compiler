@@ -3,4 +3,4 @@ project(toy_compiler)
 
 set(CMAKE_CXX_STANDARD 17)
 
-add_executable(toy_compiler main.cpp scanner.h ast.cpp ast.h types.cuh)
+add_executable(toy_compiler src/main.cpp src/scanner.h src/ast.cpp src/ast.h src/types.cuh)
