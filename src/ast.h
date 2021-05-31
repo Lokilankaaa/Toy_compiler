@@ -181,6 +181,8 @@ namespace TOY_COMPILER {
             n_type = TOY_COMPILER::ASSIGNSTMT;
         }
 
+        void print(std::fstream &fout) override;
+
     protected:
         abstractExpr *lhs;
         abstractExpr *rhs;
@@ -195,6 +197,8 @@ namespace TOY_COMPILER {
             n_type = TOY_COMPILER::FUNCTION;
         }
 
+        void print(std::fstream &fout) override;
+
     protected:
         TOY_COMPILER::Symbol func_symbol;
         bool isProc;
@@ -203,7 +207,20 @@ namespace TOY_COMPILER {
         stmtList *body;
     };
 
+    class rootProgram : public abstracAST {
+    public:
+        rootProgram() {
+            n_type = TOY_COMPILER::PROGRAM;
+        }
 
+        void addFunc(functionNode *f);
+
+        void print(std::fstream &fout) override;
+
+    public:
+        std::vector<functionNode *> funcs;
+        std::vector<abstractStmt *> stmts;
+    };
 }
 
 #endif //TOY_COMPILER_AST_H
