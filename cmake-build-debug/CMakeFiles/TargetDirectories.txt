@@ -1,0 +1,3 @@
+/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/cmake-build-debug/CMakeFiles/edit_cache.dir
+/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/cmake-build-debug/CMakeFiles/toy_compiler.dir
