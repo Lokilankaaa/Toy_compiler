@@ -7,6 +7,7 @@
 
 #include "types.cuh"
 #include <iostream>
+#include <utility>
 #include <vector>
 
 namespace TOY_COMPILER {
@@ -25,14 +26,151 @@ namespace TOY_COMPILER {
         }
     };
 
-    class abstractExpr : public abstracAST {
+    class abstractExpr : public abstractStmt {
     public:
         abstractExpr() {
             n_type = TOY_COMPILER::EXPRESSION;
+            m_value.p = nullptr;
         }
 
     protected:
         TOY_COMPILER::expValue m_value;
+    };
+
+    class abstractTypeDeclNode : public abstracAST {
+    public:
+        abstractTypeDeclNode() {
+            n_type = TOY_COMPILER::SIMPLEDCEL;
+        }
+    };
+
+    // mark class
+    class abstractSimpleDecl {
+    };
+
+    class constNode {
+        // NAME  EQUAL  const_value
+    public:
+        constNode(std::string id, TOY_COMPILER::const_valueTye t) {
+            id = id;
+            const_type = t;
+        }
+
+    protected:
+        std::string id;
+        TOY_COMPILER::const_valueTye const_type;
+    };
+
+    class constDecl : public abstractExpr {
+        // CONST const_expr_list  NAME  EQUAL  const_value  SEMI
+    public:
+        constDecl() {
+            n_type = TOY_COMPILER::CONSTDECL;
+        }
+
+        void print(std::fstream &fout) override;
+
+        void addConstDecl(std::string id, TOY_COMPILER::const_valueTye t);
+
+    protected:
+        std::vector<constNode *> constdecls;
+    };
+
+    class simpleDecl : public abstractTypeDeclNode, public abstractSimpleDecl {
+    public:
+        // simple_type_decl:   sys_type
+        simpleDecl(std::string id, TOY_COMPILER::valType t) : id{std::move(id)}, val_type{t} {
+
+        }
+
+    protected:
+        TOY_COMPILER::valType val_type;
+        std::string id;
+    };
+
+    class rangeDecl : public abstractTypeDeclNode, public abstractSimpleDecl {
+    public:
+        // simple_type_decl:   NAME  DOTDOT  NAME
+        rangeDecl(std::string id, std::string l, std::string r) : id{std::move(id)}, id_l{std::move(l)},
+                                                                  id_r{std::move(r)} {
+            n_type = TOY_COMPILER::RANGEDECL;
+        }
+
+
+        //simple_type_decl:  const_value  DOTDOT  const_value
+        //                |  MINUS  const_value  DOTDOT  const_value
+        //                |  MINUS  const_value  DOTDOT  MINUS  const_value
+        rangeDecl(std::string id, bool m_l, constNode *c_l, bool m_r, constNode *c_r) : id{id}, minus_l{m_l},
+                                                                                        con_l{c_l}, minus_r{m_r},
+                                                                                        con_r{c_r} {
+
+        }
+
+    protected:
+        std::string id;
+        std::string id_l, id_r;
+        constNode *con_l, *con_r;
+        bool minus_l, minus_r;
+    };
+
+    class namesDecl : public abstractTypeDeclNode, public abstractSimpleDecl {
+    public:
+        //simple_type_decl ：  NAME  |  LP  name_list  RP  (can judge whether NAME or name_list by the length of vector)
+        namesDecl(std::string id, std::vector<std::string> names) : id{std::move(id)}, names{std::move(names)} {
+            n_type = TOY_COMPILER::NAMEDECL;
+        }
+
+    protected:
+        std::string id;
+        std::vector<std::string> names;
+    };
+
+    class arrayDecl : public abstractTypeDeclNode {
+    public:
+        //ARRAY  LB  simple_type_decl  RB  OF  type_decl
+        arrayDecl(std::string id, std::vector<abstractSimpleDecl *> &sim_types,
+                  std::vector<abstractTypeDeclNode *> &type_decl) : id{std::move(id)}, sim_types{sim_types},
+                                                                    type_decl{type_decl} {
+            n_type = TOY_COMPILER::ARRAYDECL;
+        }
+
+    protected:
+        std::string id;
+        std::vector<abstractSimpleDecl *> sim_types;
+        std::vector<abstractTypeDeclNode *> type_decl;
+    };
+
+    //TODO: RECORD 妹看懂
+//    class recordDecl: public abstractTypeDeclNode {
+//    public:
+//        recordDecl() {
+//            n_type = TOY_COMPILER::RECORDDECL;
+//        }
+//    protected:
+//        std::map<> records
+//    };
+
+    class varNode {
+    public:
+        varNode(std::string id, abstractTypeDeclNode *inferType) : id{std::move(id)} {
+
+        }
+
+    protected:
+        std::string id;
+
+    };
+
+    class varDecl : public abstractTypeDeclNode {
+    public:
+        varDecl() {
+            n_type = TOY_COMPILER::VARDECL;
+        }
+
+        void addDecl(varNode *);
+
+    protected:
+        std::vector<varNode *> decls;
     };
 
     class mathExpr : public abstractExpr {
@@ -54,7 +192,7 @@ namespace TOY_COMPILER {
             n_type = TOY_COMPILER::STMTLIST;
         }
 
-        bool addStmt(abstractStmt *stmt);
+        void addStmt(abstractStmt *stmt);
 
         void print(std::fstream &fout) override;
 
@@ -70,13 +208,13 @@ namespace TOY_COMPILER {
             n_type = TOY_COMPILER::IFSTMT;
         }
 
+        void print(std::fstream &fout) override;
+
     protected:
         // if cond then execStmt [else elseStmt]
         mathExpr *cond;
         abstractStmt *execStmt;
         abstractStmt *elseStmt;
-
-        void print(std::fstream &fout) override;
     };
 
     class repeatStmt : public abstractStmt {
@@ -124,17 +262,6 @@ namespace TOY_COMPILER {
         abstractStmt *stmt;
     };
 
-    class constNode : public abstracAST {
-        //TODO: add const node
-    public:
-        constNode(TOY_COMPILER::expValue v) : m_value{v} {}
-
-        TOY_COMPILER::expValue get_value() const { return m_value; }
-
-    protected:
-        TOY_COMPILER::expValue m_value;
-    };
-
     class caseExpr {
     public:
         // if case_
@@ -144,7 +271,7 @@ namespace TOY_COMPILER {
 
     class caseStmt : public abstractStmt {
     public:
-        caseStmt(mathExpr *cond) : case_cond{cond} {
+        explicit caseStmt(mathExpr *cond) : case_cond{cond} {
             n_type = TOY_COMPILER::CASESTMT;
         }
 
@@ -160,7 +287,7 @@ namespace TOY_COMPILER {
 
     class gotoStmt : public abstractStmt {
     public:
-        gotoStmt(int l) : label{l} {
+        explicit gotoStmt(int l) : label{l} {
             n_type = TOY_COMPILER::GOTOSTMT;
         }
 
@@ -177,7 +304,7 @@ namespace TOY_COMPILER {
 
 
     public:
-        assignStmt(abstractExpr *l, abstractExpr *r) : lhs{l}, rhs{r} {
+        explicit assignStmt(abstractExpr *l, abstractExpr *r) : lhs{l}, rhs{r} {
             n_type = TOY_COMPILER::ASSIGNSTMT;
         }
 
@@ -190,8 +317,9 @@ namespace TOY_COMPILER {
 
     class functionNode : public abstracAST {
     public:
-        functionNode(std::string name, std::vector<abstractExpr *> *agrs, stmtList *body, bool isProc, bool isSys)
-                : func_symbol{name}, argList{agrs}, body{body} {
+        functionNode(std::string name, bool isfunc, std::vector<abstractExpr *> *args, stmtList *body, bool isProc,
+                     bool isSys)
+                : func_symbol{name, isfunc}, argList{args}, body{body} {
             isProc = isProc;
             isSys = isSys;
             n_type = TOY_COMPILER::FUNCTION;
@@ -215,11 +343,16 @@ namespace TOY_COMPILER {
 
         void addFunc(functionNode *f);
 
+        void addStmt(abstractStmt *stmt);
+
+        void addDecl(abstractTypeDeclNode *decl);
+
         void print(std::fstream &fout) override;
 
     public:
         std::vector<functionNode *> funcs;
         std::vector<abstractStmt *> stmts;
+        std::vector<abstractTypeDeclNode *> decls;
     };
 }
 

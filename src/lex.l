@@ -26,8 +26,7 @@ using token = TOY_COMPILER::Parser::token;
 /* comments scanner */
 %x COMMENT
 
-/* enable scanner to generate debug output. disable this for release
- * versions. */
+/* enable scanner to generate debug output. disable this for release versions. */
 %option debug
 
 /* enable c++ scanner class generation */
@@ -56,7 +55,6 @@ for         { return token::FOR; }
 function    { return token::FUNCTION; }
 goto        { return token::GOTO; }
 if          { return token::IF; }
-in          { return token::IN; }
 mod         { return token::MOD; }
 not         { return token::NOT; }
 of          { return token::OF; }
@@ -66,14 +64,12 @@ procedure   { return token::PROCEDURE; }
 program     { return token::PROGRAM; }
 record      { return token::RECORD; }
 repeat      { return token::REPEAT; }
-set         { return token::SET; }
 then        { return token::THEN; }
 to          { return token::TO; }
 type        { return token::TYPE; }
 until       { return token::UNTIL; }
 var         { return token::VAR; }
 while       { return token::WHILE; }
-with        { return token::WITH; }
 
     /* system constant*/
 false       { yylval->build<bool>(false); return token::BOOL; }

@@ -11,8 +11,12 @@ namespace TOY_COMPILER {
     class Symbol {
     protected:
         std::string name;
+        bool isfunc;
+
     public:
-        Symbol(std::string &name) : name{name} {}
+        Symbol(std::string &name, bool isfunc) : name{name}, isfunc{isfunc} {
+
+        }
 
         std::string get_name() { return name; }
     };
@@ -22,6 +26,7 @@ namespace TOY_COMPILER {
         double real_value;
         bool bool_value;
         char char_value;
+        void * p = nullptr;
     };
 
     enum passBy {
@@ -41,8 +46,14 @@ namespace TOY_COMPILER {
         REPEATSTMT,
         ASSIGNSTMT,
         EXPRESSION,
-        STMT
-
+        STMT,
+        CONSTDECL,
+        SIMPLEDCEL,
+        ARRAYDECL,
+        RECORDDECL,
+        RANGEDECL,
+        NAMEDECL,
+        VARDECL,
     };
 
     enum valType {
@@ -56,6 +67,11 @@ namespace TOY_COMPILER {
         TRUE,
         FALSE,
         MAXINT
+    };
+
+    union const_valueTye{
+        valType d_type;
+        sysCON sys_type;
     };
 
     enum sysFUNC {
