@@ -70,7 +70,7 @@ class Symbol {
         MAXINT
     };
 
-    union const_valueTye{
+    union const_valueType{
         valType d_type;
         sysCON sys_type;
     };
