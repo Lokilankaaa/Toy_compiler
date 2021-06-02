@@ -6,9 +6,10 @@
 #define TOY_COMPILER_TYPES_CUH
 
 #include <string>
+#include "ast.h"
 
 namespace TOY_COMPILER {
-    class Symbol {
+class Symbol {
     protected:
         std::string name;
         bool isfunc;

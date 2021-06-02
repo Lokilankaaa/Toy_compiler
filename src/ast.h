@@ -11,15 +11,17 @@
 #include <vector>
 
 namespace TOY_COMPILER {
-    class abstracAST {
+    class abstractAST {
     public:
-        virtual void print(std::fstream &fout) = 0;
+        virtual void print(std::fstream &fout) {
 
-        abstracAST *father = nullptr;
+        }
+
+        abstractAST *father = nullptr;
         TOY_COMPILER::ASTType n_type;
     };
 
-    class abstractStmt : public abstracAST {
+    class abstractStmt : public abstractAST {
     public:
         abstractStmt() {
             n_type = TOY_COMPILER::STMT;
@@ -35,9 +37,10 @@ namespace TOY_COMPILER {
 
     protected:
         TOY_COMPILER::expValue m_value;
+        TOY_COMPILER::valType res_type;
     };
 
-    class abstractTypeDeclNode : public abstracAST {
+    class abstractTypeDeclNode : public abstractAST {
     public:
         abstractTypeDeclNode() {
             n_type = TOY_COMPILER::SIMPLEDCEL;
@@ -140,15 +143,27 @@ namespace TOY_COMPILER {
         std::vector<abstractTypeDeclNode *> type_decl;
     };
 
-    //TODO: RECORD 妹看懂
-//    class recordDecl: public abstractTypeDeclNode {
-//    public:
-//        recordDecl() {
-//            n_type = TOY_COMPILER::RECORDDECL;
-//        }
-//    protected:
-//        std::map<> records
-//    };
+    class record {
+    public:
+        record(std::vector<std::string> ns, std::vector<abstractTypeDeclNode *> ts) {
+            record = std::make_pair(ns, ts);
+        }
+
+    protected:
+        std::pair<std::vector<std::string>, std::vector<abstractTypeDeclNode *> > record
+    };
+
+    class recordDecl : public abstractTypeDeclNode {
+    public:
+        recordDecl() {
+            n_type = TOY_COMPILER::RECORDDECL;
+        }
+
+        void addRecord(record r);
+
+    protected:
+        std::vector<record *> records
+    };
 
     class varNode {
     public:
@@ -180,13 +195,15 @@ namespace TOY_COMPILER {
 
         mathExpr(TOY_COMPILER::opType t, mathExpr *l, mathExpr *r) : type{t}, left{l}, right{r} {}
 
+        TOY_COMPILER::valType getValue();
+
     protected:
         TOY_COMPILER::opType type;
-        mathExpr *left;
-        mathExpr *right;
+        abstractExpr *left;
+        abstractExpr *right;
     };
 
-    class stmtList : public abstracAST {
+    class stmtList : public abstractAST {
     public:
         stmtList() {
             n_type = TOY_COMPILER::STMTLIST;
@@ -262,7 +279,7 @@ namespace TOY_COMPILER {
         abstractStmt *stmt;
     };
 
-    class caseExpr {
+    class caseNode {
     public:
         // if case_
         constNode *case_;
@@ -282,7 +299,7 @@ namespace TOY_COMPILER {
     protected:
         // CASE expression OF case_expr_list  END
         mathExpr *case_cond;
-        std::vector<caseExpr *> case_expr_list;
+        std::vector<caseNode *> case_expr_list;
     };
 
     class gotoStmt : public abstractStmt {
@@ -315,7 +332,7 @@ namespace TOY_COMPILER {
         abstractExpr *rhs;
     };
 
-    class functionNode : public abstracAST {
+    class functionNode : public abstractAST {
     public:
         functionNode(std::string name, bool isfunc, std::vector<abstractExpr *> *args, stmtList *body, bool isProc,
                      bool isSys)
@@ -335,7 +352,7 @@ namespace TOY_COMPILER {
         stmtList *body;
     };
 
-    class rootProgram : public abstracAST {
+    class rootProgram : public abstractAST {
     public:
         rootProgram() {
             n_type = TOY_COMPILER::PROGRAM;
