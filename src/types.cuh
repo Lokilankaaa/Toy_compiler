@@ -6,15 +6,15 @@
 #define TOY_COMPILER_TYPES_CUH
 
 #include <string>
-#include "ast.h"
 
 namespace TOY_COMPILER {
+
     union expValue {
         int int_value;
         double real_value;
         bool bool_value;
         char char_value;
-        void *p = nullptr;
+        void * p = nullptr;
     };
 
     enum passBy {
@@ -57,7 +57,7 @@ namespace TOY_COMPILER {
         MAXINT
     };
 
-    union const_valueType {
+    union const_valueType{
         valType d_type;
         sysCON sys_type;
     };
@@ -102,6 +102,22 @@ namespace TOY_COMPILER {
         MOD,
         DOTDOT,
         SEMI
+    };
+
+    enum symbolVal {
+        INTEGER_S,
+        REAL_S,
+        CHAR_S,
+        ARRAY_S,
+        VOID_S
+    };
+
+    enum symbolType {
+        VAR_S,
+        CONST_S,
+        TYPE_S,
+        RANGE_S,
+        FUNCTION_S
     };
 
 };

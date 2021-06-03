@@ -1,8 +1,11 @@
 #pragma once
-#include<iostream>
-#include<string>
-#include"SPL_Define.h"
-#include"ast.h"
+#include <iostream>
+#include <string>
+#include "types.cuh"
+#include "ast.h"
+#include <list>
+#define SPL_LIST std::list<class Symbol>
+#define SPL_TABLE std::map<std::string, class SymbolTable*>
 
 typedef class Symbol {	//for symbol except functions
 public :
@@ -36,7 +39,42 @@ public :
 	}
 } Symbol;
 
-typedef class FunctionSymbol {	//only for function symbol
+class SymbolList {	//a list of symbol
+public:
+    std::list<class Symbol> list;	//list for symbol
+    std::list<class FunctionSymbol> functionList;	//list for function symbols
+    int insertSym(Symbol s);	//add a symbol
+    int insertFunction(FunctionSymbol function);	//add a function
+    int deleteSym(std::string delname);	//maybe useless
+    Symbol findSym(std::string name);	//find a sym in the list
+    FunctionSymbol findFunction(std::string name);	//find a function in the list
+
+};
+
+class SymbolTable {
+public:
+    SymbolList *table[100];	//a hash table, each is a list
+    SymbolTable *parentTable;	//if it is a function/scope table, it will point to the scope defines it
+    int scope;
+    std::string tablename; //which function the table belong
+    int insertSym(Symbol s);	//insert a symbol
+    int insertFunction(FunctionSymbol fun);	//insert a function symbol
+    int deleteSym(std::string delname);	//maybe useless
+    ~SymbolTable();
+    SymbolTable(std::string tablename);	//create a new table with name
+    SymbolTable(std::string tablename, SymbolTable *parent);	//create a new table with name and a parent table
+    Symbol findSym(std::string name);	//find a symbol in this table and its parents table.
+    std::string error; //Useless. Maybe changed in future.
+private:
+    int string_hash(std::string str) {	//for string hash
+        unsigned long hashresult= 0;
+        for (size_t i = 0; i < str.size(); i++)
+            hashresult = 5 * hashresult + str[i];
+        return size_t(hashresult%100);
+    }
+};
+
+class FunctionSymbol {	//only for function symbol
 public:
 	int null;
 	std::string functionName;
@@ -55,40 +93,5 @@ public:
 		this->returnType = returnType;
 	}
 };
-
-typedef class SymbolList {	//a list of symbol
-public:
-	std::list<class Symbol> list;	//list for symbol
-	std::list<class FunctionSymbol> functionList;	//list for function symbols
-	int insertSym(Symbol s);	//add a symbol
-	int insertFunction(FunctionSymbol function);	//add a function
-	int deleteSym(std::string delname);	//maybe useless
-	Symbol findSym(std::string name);	//find a sym in the list
-	FunctionSymbol findFunction(std::string name);	//find a function in the list
-
-} SymbolList;
-
-typedef class SymbolTable {
-public:
-	SymbolList *table[100];	//a hash table, each is a list
-	SymbolTable *parentTable;	//if it is a function/scope table, it will point to the scope defines it
-	int scope;
-	std::string tablename; //which function the table belong
-	int insertSym(Symbol s);	//insert a symbol
-	int insertFunction(FunctionSymbol fun);	//insert a function symbol
-	int deleteSym(std::string delname);	//maybe useless
-	~SymbolTable();
-	SymbolTable(std::string tablename);	//create a new table with name
-	SymbolTable(std::string tablename, SymbolTable *parent);	//create a new table with name and a parent table
-	Symbol findSym(std::string name);	//find a symbol in this table and its parents table.
-	std::string error; //Useless. Maybe changed in future.
-private:
-	int string_hash(std::string str) {	//for string hash
-		unsigned long hashresult= 0;
-		for (size_t i = 0; i < str.size(); i++)
-			hashresult = 5 * hashresult + str[i];
-		return size_t(hashresult%100);
-	}
-} SymbolTable;
 
 /*in the semantic class, I have a map for <string, SymbolTable*> to save the tables for the functions*/

@@ -79,9 +79,9 @@ int SymbolList::deleteSym(std::string delname) {
 	return 1;
 }
 int SymbolList::insertFunction(FunctionSymbol function) {
-	std::list<class FunctionSymbol>::iterator fun = this->functionList.begin;
+	std::list<class FunctionSymbol>::iterator fun = this->functionList.begin();
 	std::string name = function.functionName;
-	while (fun != this->functionList.end) {
+	while (fun != this->functionList.end()) {
 		if ((*fun).functionName == name)return -1;
 		fun++;
 	}
@@ -89,8 +89,8 @@ int SymbolList::insertFunction(FunctionSymbol function) {
 }
 
 FunctionSymbol SymbolList::findFunction(std::string name) {
-	std::list<class FunctionSymbol>::iterator fun = this->functionList.begin;
-	while (fun != this->functionList.end) {
+	std::list<class FunctionSymbol>::iterator fun = this->functionList.begin();
+	while (fun != this->functionList.end()) {
 		if ((*fun).functionName == name)return *fun;
 		fun++;
 	}
