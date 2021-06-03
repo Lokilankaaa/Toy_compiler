@@ -3,4 +3,4 @@ project(toy_compiler)
 
 set(CMAKE_CXX_STANDARD 17)
 
-add_executable(toy_compiler main.cpp src/scanner.h src/ast.cpp src/ast.h src/types.cuh src/symtab.cpp src/symtab.h)
+add_executable(toy_compiler main.cpp src/scanner.h src/ast.h src/types.cuh src/symtab.cpp src/symtab.h)

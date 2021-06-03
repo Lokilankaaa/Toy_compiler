@@ -10,7 +10,7 @@
 #include <utility>
 #include <vector>
 
-#define GETTER(var, method_name) decltype(var) method_name() const;
+#define GETTER(var, method_name) decltype(var) method_name() const
 
 namespace TOY_COMPILER {
     class abstractAST {
@@ -56,14 +56,17 @@ namespace TOY_COMPILER {
     class constNode {
         // NAME  EQUAL  const_value
     public:
-        constNode(std::string id, TOY_COMPILER::const_valueTye t) {
-            id = id;
-            const_type = t;
+        constNode(std::string id, TOY_COMPILER::const_valueTye t) : id{std::move(id)}, const_type{t} {
+
         }
 
-        GETTER(id, getId)
+        GETTER(id, getId) {
+            return id;
+        }
 
-        GETTER(const_type, getType)
+        GETTER(const_type, getType) {
+            return const_type;
+        }
 
     protected:
         std::string id;
@@ -79,9 +82,13 @@ namespace TOY_COMPILER {
 
         void print(std::fstream &fout) override;
 
-        void addConstDecl(std::string id, TOY_COMPILER::const_valueTye t);
+        void addConstDecl(const std::string &id, TOY_COMPILER::const_valueTye t) {
+            constdecls.push_back(new constNode(id, t));
+        }
 
-        GETTER(constdecls, getDecls)
+        GETTER(constdecls, getDecls) {
+            return constdecls;
+        }
 
     protected:
         std::vector<constNode *> constdecls;
@@ -94,7 +101,13 @@ namespace TOY_COMPILER {
 
         }
 
-        GETTER(id, getId)
+        GETTER(id, getId) {
+            return id;
+        }
+
+        GETTER(val_type, getval_type) {
+            return val_type;
+        }
 
     protected:
         TOY_COMPILER::valType val_type;
@@ -104,7 +117,8 @@ namespace TOY_COMPILER {
     class rangeDecl : public abstractTypeDeclNode, public abstractSimpleDecl {
     public:
         // simple_type_decl:   NAME  DOTDOT  NAME
-        rangeDecl(std::string id, std::string l, std::string r) : id{std::move(id)}, id_l{std::move(l)},
+        rangeDecl(std::string id, std::string l, std::string r) : id{std::move(id)},
+                                                                  id_l{std::move(l)},
                                                                   id_r{std::move(r)} {
             n_type = TOY_COMPILER::RANGEDECL;
         }
@@ -113,25 +127,36 @@ namespace TOY_COMPILER {
         //simple_type_decl:  const_value  DOTDOT  const_value
         //                |  MINUS  const_value  DOTDOT  const_value
         //                |  MINUS  const_value  DOTDOT  MINUS  const_value
-        rangeDecl(std::string id, bool m_l, const_valueType c_l, bool m_r, const_valueType c_r) : id{id}, minus_l{m_l},
+        rangeDecl(std::string id, bool m_l, const_valueType c_l, bool m_r, const_valueType c_r) : id{std::move(id)},
+                                                                                                  minus_l{m_l},
                                                                                                   con_l{c_l},
                                                                                                   minus_r{m_r},
                                                                                                   con_r{c_r} {
 
         }
 
-        GETTER(id, getId)
+        GETTER(id, getId) {
+            return id;
+        }
 
-        GETTER(con_l, getLeftRange)
+        GETTER(con_l, getLeftRange) {
+            return con_l;
+        }
 
-        GETTER(con_r, getRightRange)
+        GETTER(con_r, getRightRange) {
+            return con_r;
+        }
 
-        GETTER(minus_l, getLeftSign)
+        GETTER(minus_l, getLeftSign) {
+            return minus_l;
+        }
 
-        GETTER(minus_r, getRightSign)
+        GETTER(minus_r, getRightSign) {
+            return minus_r;
+        }
 
     protected:
-        std::string id;
+        std::string id, id_l, id_r;
         TOY_COMPILER::const_valueType *con_l, *con_r;
         bool minus_l, minus_r;
     };
@@ -143,11 +168,17 @@ namespace TOY_COMPILER {
             n_type = TOY_COMPILER::NAMEDECL;
         }
 
-        void addName(std::string name);
+        void addName(const std::string &name) {
+            names.push_back(name);
+        }
 
-        GETTER(id, getId);
+        GETTER(id, getId) {
+            return id;
+        }
 
-        GETTER(names, getNames)
+        GETTER(names, getNames) {
+            return names;
+        }
 
     protected:
         std::string id;
@@ -163,11 +194,17 @@ namespace TOY_COMPILER {
             n_type = TOY_COMPILER::ARRAYDECL;
         }
 
-        GETTER(id, getId);
+        GETTER(id, getId) {
+            return id;
+        }
 
-        GETTER(sim_type, getSimpleType)
+        GETTER(sim_type, getSimpleType) {
+            return sim_type;
+        }
 
-        GETTER(type_decl, getTypeDecl)
+        GETTER(type_decl, getTypeDecl) {
+            return type_decl;
+        }
 
     protected:
         std::string id;
@@ -177,14 +214,16 @@ namespace TOY_COMPILER {
 
     class record {
     public:
-        record(std::vector<std::string> ns, std::vector<abstractTypeDeclNode *> ts) {
-            record = std::make_pair(ns, ts);
+        record(const std::vector<std::string> &ns, const std::vector<abstractTypeDeclNode *> &ts) {
+            _record = std::make_pair(ns, ts);
         }
 
-        record &getDetail() const;
+        GETTER(_record, getDetail) {
+            return _record;
+        }
 
     protected:
-        std::pair<std::vector<std::string>, std::vector<abstractTypeDeclNode *> > record
+        std::pair<std::vector<std::string>, std::vector<abstractTypeDeclNode *> > _record;
     };
 
     class recordDecl : public abstractTypeDeclNode {
@@ -193,12 +232,16 @@ namespace TOY_COMPILER {
             n_type = TOY_COMPILER::RECORDDECL;
         }
 
-        void addRecord(record r);
+        void addRecord(record r) {
+            records.push_back(&r);
+        }
 
-        decltype(records) &getRecords() const;
+        GETTER(records, getRecords) {
+            return records;
+        }
 
     protected:
-        std::vector<record *> records
+        std::vector<record *> records;
     };
 
     class varNode {
@@ -207,7 +250,14 @@ namespace TOY_COMPILER {
 
         }
 
-        decltype()
+        GETTER(id, getId) {
+            return id;
+        }
+
+        GETTER(varType, getVarType) {
+            return varType;
+        }
+
     protected:
         std::string id;
         abstractTypeDeclNode *varType;
@@ -219,16 +269,16 @@ namespace TOY_COMPILER {
             n_type = TOY_COMPILER::VARDECL;
         }
 
-        void addDecl(varNode *);
+        void addDecl(varNode *v) {
+            decls.push_back(v);
+        }
 
-        decltype(decls) &getDecls() const;
+        GETTER(decls, getDecls) {
+            return decls;
+        }
 
     protected:
         std::vector<varNode *> decls;
-    };
-
-    class variableNode : abstractExpr {
-
     };
 
     class mathExpr : public abstractExpr {
@@ -238,11 +288,17 @@ namespace TOY_COMPILER {
 
         mathExpr(TOY_COMPILER::opType t, mathExpr *l, mathExpr *r) : type{t}, left{l}, right{r} {}
 
-        GETTER(left, getLeftChild)
+        GETTER(left, getLeftChild) {
+            return left;
+        }
 
-        GETTER(right, getRightChild)
+        GETTER(right, getRightChild) {
+            return right;
+        }
 
-        GETTER(type, getOp)
+        GETTER(type, getOp) {
+            return type;
+        }
 
     protected:
         TOY_COMPILER::opType type;
@@ -256,9 +312,13 @@ namespace TOY_COMPILER {
             n_type = TOY_COMPILER::STMTLIST;
         }
 
-        void addStmt(abstractStmt *stmt);
+        void addStmt(abstractStmt *stmt) {
+            m_stmtList.push_back(stmt);
+        }
 
-        decltype(m_stmtList) &getStmtLists() const;
+        GETTER(m_stmtList, getStmtList) {
+            return m_stmtList;
+        }
 
         void print(std::fstream &fout) override;
 
@@ -276,11 +336,17 @@ namespace TOY_COMPILER {
 
         void print(std::fstream &fout) override;
 
-        GETTER(cond, getCond)
+        GETTER(cond, getCond) {
+            return cond;
+        }
 
-        GETTER(execStmt, getExecStmt)
+        GETTER(execStmt, getExecStmt) {
+            return execStmt;
+        }
 
-        GETTER(elseStmt, getElseStmt)
+        GETTER(elseStmt, getElseStmt) {
+            return elseStmt;
+        }
 
     protected:
         // if cond then execStmt [else elseStmt]
@@ -297,9 +363,13 @@ namespace TOY_COMPILER {
 
         void print(std::fstream &fout) override;
 
-        GETTER(cond, getCond)
+        GETTER(cond, getCond) {
+            return cond;
+        }
 
-        GETTER(stmtlist, getStmtList)
+        GETTER(stmtlist, getStmtList) {
+            return stmtlist;
+        }
 
     protected:
         //repeat stmtlists until cond
@@ -315,13 +385,17 @@ namespace TOY_COMPILER {
 
         void print(std::fstream &fout) override;
 
-        GETTER(cond, getCond)
+        GETTER(cond, getCond) {
+            return cond;
+        }
 
-        GETTER(stmt, getStmt)
+        GETTER(stmtlist, getStmtlist) {
+            return stmtlist;
+        }
 
     protected:
         // while cond do stmt
-        abstractStmt *stmt;
+        stmtList *stmtlist;
         mathExpr *cond;
     };
 
@@ -334,20 +408,28 @@ namespace TOY_COMPILER {
 
         void print(std::fstream &fout) override;
 
-        GETTER(from, getFrom)
+        GETTER(from, getFrom) {
+            return from;
+        }
 
-        GETTER(to, getTo)
+        GETTER(to, getTo) {
+            return to;
+        }
 
-        GETTER(direction, getDirection)
+        GETTER(direction, getDirection) {
+            return direction;
+        }
 
-        GETTER(stmt, getStmt)
+        GETTER(stmtlist, getStmtlist) {
+            return stmtlist;
+        }
 
     protected:
         //FOR  ID  ASSIGN  from  direction  to  DO stmt
         mathExpr *from;
         mathExpr *to;
         bool direction;
-        abstractStmt *stmt;
+        stmtList *stmtlist;
     };
 
     class caseNode {
@@ -365,11 +447,17 @@ namespace TOY_COMPILER {
 
         void print(std::fstream &fout) override;
 
-        void addCase(caseExpr *case_expr) const;
+        void addCase(caseNode *case_expr) const {
+            case_expr_list.push_back(case_expr);
+        }
 
-        GETTER(case_cond, getCond)
+        GETTER(case_cond, getCond) {
+            return cond
+        }
 
-        GETTER(case_expr_list, &getCases)
+        GETTER(case_expr_list, getCases) {
+            return case_expr_list;
+        }
 
     protected:
         // CASE expression OF case_expr_list  END
@@ -385,7 +473,9 @@ namespace TOY_COMPILER {
 
         void print(std::fstream &fout) override;
 
-        int getLabel();
+        int getLabel() {
+            return label;
+        }
 
     protected:
         int label;
@@ -404,9 +494,13 @@ namespace TOY_COMPILER {
 
         void print(std::fstream &fout) override;
 
-        GETTER(lhs, getLhs)
+        GETTER(lhs, getLhs) {
+            return lhs;
+        }
 
-        GETTER(rhs, getRhs)
+        GETTER(rhs, getRhs) {
+            return rhs;
+        }
 
     protected:
         abstractExpr *lhs;
@@ -415,9 +509,9 @@ namespace TOY_COMPILER {
 
     class functionNode : public abstractAST {
     public:
-        functionNode(std::string name, bool isfunc, std::vector<abstractExpr *> *args, stmtList *body, bool isProc,
-                     bool isSys)
-                : func_symbol{name, isfunc}, argList{args}, body{body} {
+        functionNode(std::string id, std::vector<abstractExpr *> *args, stmtList *body, bool isproc,
+                     bool issys)
+                : id{std::move(id)}, _isSys{issys}, _isProc{isproc}, argList{args}, body{body} {
             isProc = isProc;
             isSys = isSys;
             n_type = TOY_COMPILER::FUNCTION;
@@ -425,20 +519,30 @@ namespace TOY_COMPILER {
 
         void print(std::fstream &fout) override;
 
-        GETTER(func_symbol, getFuncSymbol)
+        bool isProc() const {
+            return _isProc;
+        }
 
-        bool isProc() const;
+        bool isSys() const {
+            return _isSys;
+        }
 
-        bool isSys() const;
+        GETTER(id, getId) {
+            return id;
+        }
 
-        GETTER(argList, getArgs)
+        GETTER(argList, getArgs) {
+            return argList;
+        }
 
-        GETTER(body, getBody)
+        GETTER(body, getBody) {
+            return body;
+        }
 
     protected:
-        TOY_COMPILER::Symbol func_symbol;
-        bool isProc;
-        bool isSys;
+        std::string id;
+        bool _isProc;
+        bool _isSys;
         std::vector<abstractExpr *> *argList;
         stmtList *body;
     };
@@ -449,23 +553,35 @@ namespace TOY_COMPILER {
             n_type = TOY_COMPILER::PROGRAM;
         }
 
-        void addFunc(functionNode *f);
+        void addFunc(functionNode *f) {
+            funcs.push_back(f);
+        }
 
-        void addStmt(abstractStmt *stmt);
+        void addStmt(abstractStmt *stmt) {
+            stmts.push_back(stmt);
+        }
 
-        void addDecl(abstractTypeDeclNode *decl);
+        void addDecl(abstractTypeDeclNode *decl) {
+            decls.push_back(decl);
+        }
 
         void print(std::fstream &fout) override;
 
-        GETTER(funcs, &getFuncs)
+        GETTER(funcs, &getFuncs) {
+            return funcs;
+        }
 
-        GETTER(stmts, &getStmts)
+        GETTER(stmts, &getStmts) {
+            return stmts;
+        }
 
-        GETTER(decls, &getDecls)
+        GETTER(decls, &getDecls) {
+            return decls;
+        }
 
     public:
         std::vector<functionNode *> funcs;
-        std::vector<abstractStmt *> stmts;
+        stmtList stmts;
         std::vector<abstractTypeDeclNode *> decls;
     };
 }

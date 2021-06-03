@@ -9,25 +9,12 @@
 #include "ast.h"
 
 namespace TOY_COMPILER {
-class Symbol {
-    protected:
-        std::string name;
-        bool isfunc;
-
-    public:
-        Symbol(std::string &name, bool isfunc) : name{name}, isfunc{isfunc} {
-
-        }
-
-        std::string get_name() { return name; }
-    };
-
     union expValue {
         int int_value;
         double real_value;
         bool bool_value;
         char char_value;
-        void * p = nullptr;
+        void *p = nullptr;
     };
 
     enum passBy {
@@ -70,7 +57,7 @@ class Symbol {
         MAXINT
     };
 
-    union const_valueType{
+    union const_valueType {
         valType d_type;
         sysCON sys_type;
     };
