@@ -52,6 +52,34 @@ namespace TOY_COMPILER {
     class abstractSimpleDecl {
     };
 
+    class literal : public abstractExpr {
+    protected:
+        TOY_COMPILER::expValue _value;
+        TOY_COMPILER::const_valueType _t;
+    public:
+        literal(TOY_COMPILER::expValue v, TOY_COMPILER::const_valueType t) : _t{t} {
+            n_type = TOY_COMPILER::LITERAL;
+            if (_t.sys_type == MAXINT) {
+                _value.int_value = INT_MAX;
+            } else if (_t.sys_type == TRUE) {
+                _value.bool_value = true;
+            } else if (_t.sys_type == FALSE) {
+                _value.bool_value = false;
+            } else {
+                _value = v;
+            }
+        }
+
+        GETTER(_t, getType) {
+            return _t;
+        }
+
+        GETTER(_value, getValue) {
+            return _value;
+        }
+
+    };
+
     class constNode {
         // NAME  EQUAL  const_value
     protected:
@@ -281,6 +309,35 @@ namespace TOY_COMPILER {
 
         GETTER(decls, getDecls) {
             return decls;
+        }
+    };
+
+    class typeDefDecl : public abstractTypeDeclNode {
+    protected:
+        std::string type_name;
+        abstractTypeDeclNode *new_type;
+    public:
+        typeDefDecl(std::string name, abstractTypeDeclNode *ntype) : type_name{std::move(name)}, new_type{ntype} {
+            n_type = TOY_COMPILER::TYPEDEF;
+        }
+
+        GETTER(type_name, getTypeName) {
+            return type_name;
+        }
+
+        GETTER(new_type, getNewType) {
+            return new_type;
+        }
+    };
+
+    class variableNode : public abstractExpr {
+    protected:
+        std::string id;
+    public:
+        variableNode(std::string name) : id{std::move(name)} {}
+
+        GETTER(id, getId) {
+            return id;
         }
     };
 

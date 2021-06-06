@@ -42,6 +42,8 @@ namespace TOY_COMPILER {
         RANGEDECL,
         NAMEDECL,
         VARDECL,
+        LITERAL,
+        TYPEDEF,
     };
 
     enum valType {

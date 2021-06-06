@@ -19,7 +19,7 @@
 namespace TOY_COMPILER  {
     class Scanner: public yyFlexLexer {
       public:
-        Scanner(const std::string &filename);
+        Scanner(const std::fstream &fin);
 //        Scanner(Marker::Driver &driver) : m_driver(driver) {}
 
 //        virtual int TOY_COMPILER::Scanner::yylex(

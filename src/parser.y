@@ -17,17 +17,15 @@
 /* write out a header file containing the token defines */
 
 %locations
-%define api.namespace {SPL}
-%define api.parser.class {SPL_Parser}
+%define api.namespace {TOY_COMPILER}
+%define api.parser.class {Parser}
 
 %code requires{
     namespace TOY_COMPILER  {
-        class Driver;
         class Scanner;
     }
-    #include "spl_ast.hpp"
-    #include "spl_symtab.hpp"
-    #include "spl_compiler.hpp"
+    #include "ast.h"
+    #include "symtab.h"
 
 // The following definitions is missing when %locations isn't used
 # ifndef YY_NULLPTR
@@ -37,14 +35,9 @@
 #   define YY_NULLPTR 0
 #  endif
 # endif
-
-#define checkTypeEqual(left_type, right_type) (left_type == right_type)
-#define checkTypeUnequal(left_type, right_type) (left_type != right_type)
 }
 
 %parse-param { Scanner &scanner }
-%parse-param { Driver  &driver  }
-
 %code{
     #include <iostream>
     #include <cstdlib>
@@ -52,8 +45,6 @@
     #include <string>
     #include <vector>
     /* include for all driver functions */
-    #include "driver.hpp"
-    #include "exception.hpp"
 
 #undef yylex
 #define yylex scanner.yylex
@@ -62,7 +53,7 @@
 %define api.value.type variant
 %define parse.assert
 
-
+// define the priority of operators
 %right  ASSIGN
 %left   OR
 %left   AND
@@ -91,7 +82,6 @@
 %token  PROGRAM
 %token  RECORD
 %token  REPEAT
-%token  SET
 %token  THEN
 %token  TYPE
 %token  UNTIL
@@ -111,7 +101,6 @@
 %token  <int>           INTEGER
 %token  <double>        REAL
 %token  <char>          CHAR
-%token  <std::string>   STRING
 %token  <std::string>   ID
 
 %token  PLUS MINUS MUL DIV MOD AND OR NOT EQUAL UNEQUAL GE GT LE LT ASSIGN
