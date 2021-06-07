@@ -127,16 +127,19 @@
 %type   <repeatStmt*> repeat_stmt
 %type   <forStmt*> for_stmt
 %type   <gotoStmt*> goto_stmt
-%type   <AST_Func*> proc_stmt
+%type   <functionNode*> proc_stmt
 %type   <stmtList *> compound_stmt
 %type   <caseNode*> case_expr
 %type   <caseStmt*> case_expr_list
 %type   <stmtList*> stmt_list
 %type   <std::vector<abstractStmt*>*> args_list
 
-%type   <Symbol*> type_decl simple_type_decl array_type_decl record_type_decl
-%type   <SymbolListType*> field_decl field_decl_list
-%type   <SymbolListType*> parameters para_decl_list para_type_list
+%type   <typeDefDecl*> type_decl 
+%type   <simpleDecl*> simple_type_decl
+%type   <arrayDecl*> array_type_decl
+%type   <recordDecl *> record_type_decl
+%type   <field*> field_decl field_decl_list
+%type   <std::vector<parameters *>*> parameters para_decl_list para_type_list
 %type   <std::vector<std::string>*> name_list var_para_list val_para_list
 
 
@@ -144,7 +147,8 @@
 program:
         program_head  routine  DOT
         {
-
+            auto s = new Symbol($1, $2);
+            symtab->addSymbol(s);
         }
         ;
 
@@ -152,27 +156,33 @@ program_head:
         PROGRAM  ID  SEMI
         {
             $$ = new std::string($2); // program head can be just a string
-            driver.symtab.pushScope($2); // push a symbol
         }
         ;
 routine:
         routine_head  routine_body
         {
-           driver.astmng.addFunc($2, driver.symtab.getCurrentScopeIndex(), 0);
+            $$ = new rootProgram();
+            $$->getDecls = std::move(*($1.first));
+            $$->getFunc = std::move(*($1.second));
+            $$->getStmt = std::move(*($2));
         }
         ;
 
 sub_routine:
         routine_head  routine_body
         {
-            driver.astmng.addFunc($2, driver.symtab.getCurrentScopeIndex(), driver.symtab.getPrevScopeIndex());
+
         }
         ;
 
 routine_head:
         label_part  const_part  type_part  var_part  routine_part
         {
-        	// do nothing
+        	auto decls = new std::vector<abstractDeclNode *>();
+            decls->push_back($2);
+            decls->push_back($3);
+            decls->push_back($4);
+            $$ = std::make_pair(decls, $5);
         }
         ;
 
@@ -184,7 +194,7 @@ label_part:
 const_part:
         CONST  const_expr_list
         {
-
+            $$ = $2;
         }
         |
         {
@@ -194,24 +204,20 @@ const_part:
 const_expr_list:
         const_expr_list  ID  EQUAL  const_value  SEMI
         {
-            Symbol* symbol = new Symbol($2, CONST, $4->valType, driver.symtab.getCurrentScopeIndex());
-            symbol->relevantASTNode = $4;
-            driver.symtab.addVariable(symbol);
+            $$->addConstDecl($2, $4);
         }
         |  ID  EQUAL  const_value  SEMI
         {
-             // 检查变量是否已经被定义过， 没定义过则添加到符号表
-            Symbol* symbol =  new Symbol($1, CONST, $3->valType, driver.symtab.getCurrentScopeIndex());
-            symbol->relevantASTNode = $3;
-            driver.symtab.addVariable(symbol);
+            $$->addConstDecl($1, $3);
         }
         ;
 
 const_value:
         INTEGER
         {
-            $$ = new AST_Const($1);
-            $$->valType = INT;
+            auto t = new const_valueType();
+            t->d_type = TOY_COMPILER::INTEGER;
+            $$ = new literal($1, t);
         }
         |  REAL
         {
@@ -222,11 +228,6 @@ const_value:
         {
             $$ = new AST_Const($1);
             $$->valType = CHAR;
-        }
-        |  STRING
-        {
-            $$ = new AST_Const($1);
-            $$->valType = STRING;
         }
         |  BOOL
         {
@@ -1156,20 +1157,9 @@ factor:
 
 args_list: 
         args_list  COMMA  expression {
-            $1->push_back($3);
-            $$ = $1;
         }
         | expression {
-            $$ = new std::vector<AST_Exp*>();
-            $$->push_back($1);
         }
         ;
 
 %%
-
-// TODO: error detection
-
-void SPL::SPL_Parser::error( const location_type &l, const std::string &err_message )
-{
-   std::cout << "spl.exe: error: " << err_message << " at " << l << "\n";
-}

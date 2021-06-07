@@ -75,15 +75,15 @@ namespace TOY_COMPILER {
         // NAME  EQUAL  const_value
     protected:
         std::string id;
-        TOY_COMPILER::const_valueType const_type;
+        literal *val;
 
     public:
-        constNode(std::string id, TOY_COMPILER::const_valueType t)
-                : id{std::move(id)}, const_type{t} {}
+        constNode(std::string id, literal *v)
+                : id{std::move(id)}, val{v} {}
 
         GETTER(id, getId) { return id; }
 
-        GETTER(const_type, getType) { return const_type; }
+        GETTER(val, getType) { return val; }
     };
 
     class constDecl : public abstractExpr {
@@ -96,8 +96,8 @@ namespace TOY_COMPILER {
 
         void print(std::fstream &fout) override;
 
-        void addConstDecl(const std::string &id, TOY_COMPILER::const_valueType t) {
-            constdecls.push_back(new constNode(id, t));
+        void addConstDecl(const std::string &id, literal *v) {
+            constdecls.push_back(new constNode(id, v));
         }
 
         GETTER(constdecls, getDecls) { return constdecls; }

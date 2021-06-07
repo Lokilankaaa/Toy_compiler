@@ -1,5 +1,6 @@
 #include <iostream>
 #include "src/driver.h"
+#include "src/ast.h"
 
 int main() {
     std::cout << "Hello, World!" << std::endl;
