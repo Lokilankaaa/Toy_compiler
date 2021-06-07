@@ -85,13 +85,9 @@ namespace TOY_COMPILER {
     };
 
     enum opType {
-        LP,
-        RP,
-        LB,
-        RB,
+        LPLB,
+        RPRB,
         DOT,
-        COMMA,
-        COLON,
         MUL,
         DIV,
         UNEQUAL,
