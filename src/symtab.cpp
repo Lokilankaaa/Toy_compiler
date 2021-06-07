@@ -1,6 +1,6 @@
 #include "symtab.h"
 
-Symbol::Symbol(std::string name, TOY_COMPILER::symbolVal valType, TOY_COMPILER::symbolType symbolType, TOY_COMPILER::abstractAST *node, TOY_COMPILER::symbolVal elementType, int arrayLength, int scopeIndex){
+Symbol::Symbol(std::string name, TOY_COMPILER::valType valType, TOY_COMPILER::symbolType symbolType, TOY_COMPILER::abstractAST *node, TOY_COMPILER::valType elementType, int arrayLength, int scopeIndex){
 	this->name = name;
 	this->symbolType = valType;
 	this->symbolClass = symbolType;
@@ -13,7 +13,7 @@ Symbol::Symbol(std::string name, TOY_COMPILER::symbolVal valType, TOY_COMPILER::
 	this->null = 0;
 }
 
-Symbol::Symbol(std::string name, TOY_COMPILER::symbolVal valType, TOY_COMPILER::symbolType symbolType, TOY_COMPILER::abstractAST *node, TOY_COMPILER::symbolVal elementType, int beginIndex, int endIndex, int scopeIndex) {
+Symbol::Symbol(std::string name, TOY_COMPILER::valType valType, TOY_COMPILER::symbolType symbolType, TOY_COMPILER::abstractAST *node, TOY_COMPILER::valType elementType, int beginIndex, int endIndex, int scopeIndex) {
 	this->name = name;
 	this->symbolType = valType;
 	this->symbolClass = symbolType;
@@ -27,7 +27,7 @@ Symbol::Symbol(std::string name, TOY_COMPILER::symbolVal valType, TOY_COMPILER::
 }
 
 
-Symbol::Symbol(std::string name, TOY_COMPILER::symbolVal valType, TOY_COMPILER::symbolType symbolType, TOY_COMPILER::abstractAST *node, int scopeIndex) {
+Symbol::Symbol(std::string name, TOY_COMPILER::valType valType, TOY_COMPILER::symbolType symbolType, TOY_COMPILER::abstractAST *node, int scopeIndex) {
 	this->name = name;
 	this->symbolType = valType;
 	this->symbolClass = symbolType;
@@ -36,7 +36,7 @@ Symbol::Symbol(std::string name, TOY_COMPILER::symbolVal valType, TOY_COMPILER::
 	this->null = 0;
 }
 
-Symbol::Symbol(std::string name, TOY_COMPILER::symbolType symbolType, TOY_COMPILER::abstractAST *node, int beginIndex, int endIndex, int scopeIndex) {
+Symbol::Symbol(std::string name, TOY_COMPILER::valType valType, TOY_COMPILER::symbolType symbolType, TOY_COMPILER::abstractAST *node, int beginIndex, int endIndex, int scopeIndex) {
 	this->name = name;
 	this->symbolClass = symbolType;
 	this->node = node;

@@ -52,7 +52,8 @@ namespace TOY_COMPILER {
         BOOLEAN,
         INTEGER,
         REAL,
-        CHAR
+        CHAR,
+		VOID
     };
 
     enum sysCON {
@@ -108,13 +109,6 @@ namespace TOY_COMPILER {
         SEMI
     };
 
-    enum symbolVal {
-        INTEGER_S,
-        REAL_S,
-        CHAR_S,
-        ARRAY_S,
-        VOID_S
-    };
 
     enum symbolType {
         VAR_S,

@@ -10,14 +10,14 @@
 typedef class Symbol {	//for symbol except functions
 public :
 	std::string name;
-	TOY_COMPILER::symbolVal symbolType;	//what is the type of the val:INTEGER,REAL,BOOLEAN,CHAR,ARRAY
+	TOY_COMPILER::valType symbolType;	//what is the type of the val:INTEGER,REAL,BOOLEAN,CHAR
 	TOY_COMPILER::symbolType symbolClass;	//what is the symbol:CONST,VAR,TYPE,RANGE
 
 	int assigned; //if 1 means has been assigned, used for const
 	int scopeIndex;
 	TOY_COMPILER::abstractAST * node;	//related nodes
 
-	TOY_COMPILER::symbolVal elementType;	//if is array, the element type
+	TOY_COMPILER::valType elementType;	//if is array, the element type
 	int arrayLevel;		//don't know if it will be used(?)
 	int arrayLength;	//how many elements
 	int beginIndex;		//for range
@@ -26,10 +26,10 @@ public :
 	std::string error;
 
 	int null;
-	Symbol(std::string name, TOY_COMPILER::symbolVal valType, TOY_COMPILER::symbolType symbolType, TOY_COMPILER::abstractAST *node, TOY_COMPILER::symbolVal elementType, int beginIndex, int endIndex, int scopeIndex);	//add a array with range
-	Symbol(std::string name, TOY_COMPILER::symbolVal valType, TOY_COMPILER::symbolType symbolType, TOY_COMPILER::abstractAST *node, TOY_COMPILER::symbolVal elementType, int arrayLength, int scopeIndex);	//add a array with length
-	Symbol(std::string name, TOY_COMPILER::symbolType symbolType, TOY_COMPILER::abstractAST *node, int beginIndex, int endIndex, int scopeIndex); //add a range
-	Symbol(std::string name, TOY_COMPILER::symbolVal valType, TOY_COMPILER::symbolType symbolType, TOY_COMPILER::abstractAST *node, int scopeIndex);	//add a integer/real/boolean/char
+	Symbol(std::string name, TOY_COMPILER::valType valType, TOY_COMPILER::symbolType symbolType, TOY_COMPILER::abstractAST *node, TOY_COMPILER::valType elementType, int beginIndex, int endIndex, int scopeIndex);	//add a array with range
+	Symbol(std::string name, TOY_COMPILER::valType valType, TOY_COMPILER::symbolType symbolType, TOY_COMPILER::abstractAST *node, TOY_COMPILER::valType elementType, int arrayLength, int scopeIndex);	//add a array with length
+	Symbol(std::string name, TOY_COMPILER::valType valType, TOY_COMPILER::symbolType symbolType, TOY_COMPILER::abstractAST *node, int beginIndex, int endIndex, int scopeIndex); //add a range
+	Symbol(std::string name, TOY_COMPILER::valType valType, TOY_COMPILER::symbolType symbolType, TOY_COMPILER::abstractAST *node, int scopeIndex);	//add a integer/real/boolean/char
 	Symbol();
 	int SetAssigned() {
 		this->assigned = 1;	//if assigned a const
@@ -79,7 +79,7 @@ public:
 	int null;
 	std::string functionName;
 	std::vector<Symbol> args;
-	TOY_COMPILER::symbolVal returnType;	//if it is function, the type of return val
+	TOY_COMPILER::valType returnType;	//if it is function, the type of return val
 	SymbolTable *functionTable;	//every function give a divided table
 
 	TOY_COMPILER::abstractAST * *node;	//related AST nodes
@@ -89,7 +89,7 @@ public:
 	int AddArgs(Symbol s) {	//add a argment
 		this->args.push_back(s);
 	}
-	int SetRet(TOY_COMPILER::symbolVal returnType) {	//set the return type.
+	int SetRet(TOY_COMPILER::valType returnType) {	//set the return type.
 		this->returnType = returnType;
 	}
 };
