@@ -117,22 +117,22 @@
 
 %type   <bool> direction
 %type	<std::string*> program_head
-%type   <AST_Compound*> routine_body
-%type   <AST_Exp*> factor term expr expression
-%type   <AST_Const*> const_value
-%type   <AST_Assign*> assign_stmt
-%type 	<AST_Stmt*> else_clause stmt non_label_stmt
-%type 	<AST_If*> if_stmt case_stmt
-%type   <AST_While*> while_stmt
-%type   <AST_Repeat*> repeat_stmt
-%type   <AST_For*> for_stmt
-%type   <AST_Goto*> goto_stmt
+%type   <rootProgram*> routine_body
+%type   <mathExpr*> factor term expr expression
+%type   <literal*> const_value
+%type   <assignStmt*> assign_stmt
+%type 	<abstractStmt*> else_clause stmt non_label_stmt
+%type 	<ifStmt*> if_stmt case_stmt
+%type   <whileStmt*> while_stmt
+%type   <repeatStmt*> repeat_stmt
+%type   <forStmt*> for_stmt
+%type   <gotoStmt*> goto_stmt
 %type   <AST_Func*> proc_stmt
-%type   <AST_Compound*> compound_stmt
-%type   <caseUnit*> case_expr
-%type   <std::vector<caseUnit*>*> case_expr_list
-%type   <std::vector<AST_Stmt*>*> stmt_list
-%type   <std::vector<AST_Exp*>*> args_list
+%type   <stmtList *> compound_stmt
+%type   <caseNode*> case_expr
+%type   <caseStmt*> case_expr_list
+%type   <stmtList*> stmt_list
+%type   <std::vector<abstractStmt*>*> args_list
 
 %type   <Symbol*> type_decl simple_type_decl array_type_decl record_type_decl
 %type   <SymbolListType*> field_decl field_decl_list

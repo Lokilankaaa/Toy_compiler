@@ -110,12 +110,6 @@ string      { yylval->build<int>(5); return token::SYS_TYPE; }
     /* character */
 '(\\.|''|[^'\n])'       { yylval->build<char>(yytext[1]); return token::CHAR; }
 
-    /* string */
-\"(\\.|\"\"|[^\"\n])*\" {
-    std::string s(yytext);
-    yylval->build<std::string>(s.substr(1, s.size()-2));
-    return token::STRING;
-    }
 
     /* operator */
 "+"     { return token::PLUS; }
@@ -146,11 +140,6 @@ string      { yylval->build<int>(5); return token::SYS_TYPE; }
     /* identifier */
 [A-Za-z][A-Za-z0-9_]*   { yylval->build<std::string>(yytext); return token::ID; }
 
-    /* comments (C-like) */
-"//".*\n                { loc->lines(); }
-"/*"                    { BEGIN COMMENT; }
-<COMMENT>"*/"           { BEGIN INITIAL; }
-<COMMENT>([^*]|\n)+|.   { }
     /* update line number */
 \n                      { loc->lines(); }
 

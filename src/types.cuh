@@ -34,6 +34,7 @@ namespace TOY_COMPILER {
         REPEATSTMT,
         ASSIGNSTMT,
         EXPRESSION,
+        FUNCCALL,
         STMT,
         CONSTDECL,
         SIMPLEDCEL,
@@ -44,6 +45,7 @@ namespace TOY_COMPILER {
         VARDECL,
         LITERAL,
         TYPEDEF,
+        PARALIST
     };
 
     enum valType {
