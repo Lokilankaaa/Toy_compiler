@@ -195,30 +195,31 @@ namespace TOY_COMPILER {
         GETTER(type_decl, getTypeDecl) { return type_decl; }
     };
 
-    class record {
+    class field {
     protected:
-        std::pair<std::vector<std::string>, std::vector<abstractTypeDeclNode *>>
-                _record;
+        std::vector<std::string> *namelist;
+        abstractTypeDeclNode * type;
 
     public:
-        record(const std::vector<std::string> &ns,
-               const std::vector<abstractTypeDeclNode *> &ts) {
-            _record = std::make_pair(ns, ts);
+        field(std::vector<std::string> *ns,
+               abstractTypeDeclNode * t):namelist{ns},  type{t}{
         }
 
-        GETTER(_record, getDetail) { return _record; }
+        GETTER(namelist, getNamelist) { return namelist; }
+
+        GETTER(type, getType) { return type; }
     };
 
     class recordDecl : public abstractTypeDeclNode {
     protected:
-        std::vector<record *> records;
+        std::vector<field *> fields;
 
     public:
         recordDecl() { n_type = TOY_COMPILER::RECORDDECL; }
 
-        void addRecord(record r) { records.push_back(&r); }
+        void addRecord(field r) { fields.push_back(&r); }
 
-        GETTER(records, getRecords) { return records; }
+        GETTER(fields, getFields) { return fields; }
     };
 
     class varNode {
@@ -311,7 +312,7 @@ namespace TOY_COMPILER {
         abstractExpr *right;
 
     public:
-        // +, -, *, /, , %, &, |, !, -(num), >, >=, <, <=, <>
+        // +, -, *, /, , %, &, |, !, -(num), >, >=, <, <=, <>, [], .
         void print(std::fstream &fout) override;
 
         mathExpr(TOY_COMPILER::opType t, mathExpr *l, mathExpr *r)
