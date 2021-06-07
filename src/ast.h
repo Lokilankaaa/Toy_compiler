@@ -269,8 +269,9 @@ namespace TOY_COMPILER {
         std::vector<std::string> names; //names specifies whether it's nameslist or name if the length is not 0
         bool isrange; //isrange specifies whether it's range decl or sys_type
         rangeDecl *range;
+        TOY_COMPILER::valType type;
     public:
-        parameter(TOY_COMPILER::passBy b, bool isrange, std::vector<std::string> ns, rangeDecl *r):names{std::move(ns)}, by{b}, isrange{isrange}, range{r} {}
+        parameter(TOY_COMPILER::passBy b, bool isrange, std::vector<std::string> ns, rangeDecl *r, TOY_COMPILER::valType t):names{std::move(ns)}, by{b}, isrange{isrange}, range{r}, type{t} {}
 
         GETTER(by, getPassBy) {
             return by;
@@ -286,6 +287,10 @@ namespace TOY_COMPILER {
 
         GETTER(range, getRange) {
             return range;
+        }
+
+        GETTER(type, getType) {
+            return type;
         }
     };
 
