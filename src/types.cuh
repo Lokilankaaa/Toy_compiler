@@ -53,7 +53,8 @@ namespace TOY_COMPILER {
         INTEGER,
         REAL,
         CHAR,
-		VOID
+		VOID,
+		COMP
     };
 
     enum sysCON {
@@ -115,7 +116,9 @@ namespace TOY_COMPILER {
         CONST_S,
         TYPE_S,
         RANGE_S,
-        FUNCTION_S
+        FUNCTION_S,
+		NAME_S,
+		ELEMENT_S
     };
 
 };

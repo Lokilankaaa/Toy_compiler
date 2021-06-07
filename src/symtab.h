@@ -7,11 +7,15 @@
 #define SPL_LIST std::list<class Symbol>
 #define SPL_TABLE std::map<std::string, class SymbolTable*>
 
-typedef class Symbol {	//for symbol except functions
+class Symbol {	//for symbol except functions
 public :
-	std::string name;
+	std::string id;	//id of the symbol
+	std::string name;	//name for element
 	TOY_COMPILER::valType symbolType;	//what is the type of the val:INTEGER,REAL,BOOLEAN,CHAR
 	TOY_COMPILER::symbolType symbolClass;	//what is the symbol:CONST,VAR,TYPE,RANGE
+	std::vector<Symbol> memberList;
+
+	TOY_COMPILER::sysCON constSys;	//only for const
 
 	int assigned; //if 1 means has been assigned, used for const
 	int scopeIndex;
@@ -26,10 +30,13 @@ public :
 	std::string error;
 
 	int null;
-	Symbol(std::string name, TOY_COMPILER::valType valType, TOY_COMPILER::symbolType symbolType, TOY_COMPILER::abstractAST *node, TOY_COMPILER::valType elementType, int beginIndex, int endIndex, int scopeIndex);	//add a array with range
-	Symbol(std::string name, TOY_COMPILER::valType valType, TOY_COMPILER::symbolType symbolType, TOY_COMPILER::abstractAST *node, TOY_COMPILER::valType elementType, int arrayLength, int scopeIndex);	//add a array with length
-	Symbol(std::string name, TOY_COMPILER::valType valType, TOY_COMPILER::symbolType symbolType, TOY_COMPILER::abstractAST *node, int beginIndex, int endIndex, int scopeIndex); //add a range
-	Symbol(std::string name, TOY_COMPILER::valType valType, TOY_COMPILER::symbolType symbolType, TOY_COMPILER::abstractAST *node, int scopeIndex);	//add a integer/real/boolean/char
+	Symbol(std::string id, TOY_COMPILER::valType valType, TOY_COMPILER::symbolType symbolType, TOY_COMPILER::abstractAST *node, TOY_COMPILER::valType elementType, int beginIndex, int endIndex, int scopeIndex);	//add a array with range
+	Symbol(std::string id, TOY_COMPILER::valType valType, TOY_COMPILER::symbolType symbolType, TOY_COMPILER::abstractAST *node, TOY_COMPILER::valType elementType, int arrayLength, int scopeIndex);	//add a array with length
+	Symbol(std::string id, TOY_COMPILER::valType valType, TOY_COMPILER::symbolType symbolType, TOY_COMPILER::abstractAST *node, int beginIndex, int endIndex, int scopeIndex); //add a range
+	Symbol(std::string id, TOY_COMPILER::const_valueType valType, TOY_COMPILER::symbolType symbolType, TOY_COMPILER::abstractAST *node, int scopeIndex); //add a const
+	Symbol(std::string id, TOY_COMPILER::valType valType, TOY_COMPILER::symbolType symbolType, TOY_COMPILER::abstractAST *node, int scopeIndex);	//add a integer/real/boolean/char/complex
+	Symbol(std::string id, TOY_COMPILER::abstractAST *node, int scopeIndex);
+	Symbol(std::string name);	//create a symbol only with name, for the element of name declaration
 	Symbol();
 	int SetAssigned() {
 		this->assigned = 1;	//if assigned a const
@@ -37,7 +44,13 @@ public :
 	bool IsAssigned() {
 		return assigned;	//To know if a const has been assigned
 	}
-} Symbol;
+	int addMem(Symbol s) {	//used to add member
+		memberList.push_back(s);
+	}
+	int changeType(TOY_COMPILER::valType type) {	//used to change the type of the symbol
+		symbolType = type;
+	}
+};
 
 class SymbolList {	//a list of symbol
 public:
@@ -46,8 +59,8 @@ public:
     int insertSym(Symbol s);	//add a symbol
     int insertFunction(FunctionSymbol function);	//add a function
     int deleteSym(std::string delname);	//maybe useless
-    Symbol findSym(std::string name);	//find a sym in the list
-    FunctionSymbol findFunction(std::string name);	//find a function in the list
+    Symbol findSym(std::string id);	//find a sym in the list
+    FunctionSymbol findFunction(std::string id);	//find a function in the list
 
 };
 
@@ -61,9 +74,9 @@ public:
     int insertFunction(FunctionSymbol fun);	//insert a function symbol
     int deleteSym(std::string delname);	//maybe useless
     ~SymbolTable();
-    SymbolTable(std::string tablename);	//create a new table with name
-    SymbolTable(std::string tablename, SymbolTable *parent);	//create a new table with name and a parent table
-    Symbol findSym(std::string name);	//find a symbol in this table and its parents table.
+    SymbolTable(std::string tablename);	//create a new table with id
+    SymbolTable(std::string tablename, SymbolTable *parent);	//create a new table with id and a parent table
+    Symbol findSym(std::string id);	//find a symbol in this table and its parents table.
     std::string error; //Useless. Maybe changed in future.
 private:
     int string_hash(std::string str) {	//for string hash
@@ -85,7 +98,7 @@ public:
 	TOY_COMPILER::abstractAST * *node;	//related AST nodes
 
 	FunctionSymbol();
-	FunctionSymbol(std::string functionName);	//insert a function only with name, add args and result value with functions below
+	FunctionSymbol(std::string functionName);	//insert a function only with id, add args and result value with functions below
 	int AddArgs(Symbol s) {	//add a argment
 		this->args.push_back(s);
 	}

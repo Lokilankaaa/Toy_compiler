@@ -1,7 +1,7 @@
 #include "symtab.h"
 
-Symbol::Symbol(std::string name, TOY_COMPILER::valType valType, TOY_COMPILER::symbolType symbolType, TOY_COMPILER::abstractAST *node, TOY_COMPILER::valType elementType, int arrayLength, int scopeIndex){
-	this->name = name;
+Symbol::Symbol(std::string id, TOY_COMPILER::valType valType, TOY_COMPILER::symbolType symbolType, TOY_COMPILER::abstractAST *node, TOY_COMPILER::valType elementType, int arrayLength, int scopeIndex){
+	this->id = id;
 	this->symbolType = valType;
 	this->symbolClass = symbolType;
 	this->node = node;
@@ -13,8 +13,8 @@ Symbol::Symbol(std::string name, TOY_COMPILER::valType valType, TOY_COMPILER::sy
 	this->null = 0;
 }
 
-Symbol::Symbol(std::string name, TOY_COMPILER::valType valType, TOY_COMPILER::symbolType symbolType, TOY_COMPILER::abstractAST *node, TOY_COMPILER::valType elementType, int beginIndex, int endIndex, int scopeIndex) {
-	this->name = name;
+Symbol::Symbol(std::string id, TOY_COMPILER::valType valType, TOY_COMPILER::symbolType symbolType, TOY_COMPILER::abstractAST *node, TOY_COMPILER::valType elementType, int beginIndex, int endIndex, int scopeIndex) {
+	this->id = id;
 	this->symbolType = valType;
 	this->symbolClass = symbolType;
 	this->node = node;
@@ -27,8 +27,8 @@ Symbol::Symbol(std::string name, TOY_COMPILER::valType valType, TOY_COMPILER::sy
 }
 
 
-Symbol::Symbol(std::string name, TOY_COMPILER::valType valType, TOY_COMPILER::symbolType symbolType, TOY_COMPILER::abstractAST *node, int scopeIndex) {
-	this->name = name;
+Symbol::Symbol(std::string id, TOY_COMPILER::valType valType, TOY_COMPILER::symbolType symbolType, TOY_COMPILER::abstractAST *node, int scopeIndex) {
+	this->id = id;
 	this->symbolType = valType;
 	this->symbolClass = symbolType;
 	this->node = node;
@@ -36,8 +36,19 @@ Symbol::Symbol(std::string name, TOY_COMPILER::valType valType, TOY_COMPILER::sy
 	this->null = 0;
 }
 
-Symbol::Symbol(std::string name, TOY_COMPILER::valType valType, TOY_COMPILER::symbolType symbolType, TOY_COMPILER::abstractAST *node, int beginIndex, int endIndex, int scopeIndex) {
-	this->name = name;
+Symbol::Symbol(std::string id, TOY_COMPILER::const_valueType valType, TOY_COMPILER::symbolType symbolType, TOY_COMPILER::abstractAST *node, int scopeIndex) {
+	this->id = id;
+	this->symbolType = valType.d_type;
+	this->constSys = valType.sys_type;
+	this->symbolClass = symbolType;
+	this->node = node;
+	this->scopeIndex = scopeIndex;
+	this->null = 0;
+}
+
+Symbol::Symbol(std::string id, TOY_COMPILER::valType valType, TOY_COMPILER::symbolType symbolType, TOY_COMPILER::abstractAST *node, int beginIndex, int endIndex, int scopeIndex) {
+	this->id = id;
+	this->symbolType = valType;
 	this->symbolClass = symbolType;
 	this->node = node;
 	this->beginIndex = beginIndex;
@@ -46,6 +57,18 @@ Symbol::Symbol(std::string name, TOY_COMPILER::valType valType, TOY_COMPILER::sy
 	this->null = 0;
 }
 
+Symbol::Symbol(std::string id, TOY_COMPILER::abstractAST *node, int scopeIndex) {
+	this->id = id;
+	this->node = node;
+	this->scopeIndex = scopeIndex;
+	this->null = 0;
+}
+
+Symbol::Symbol(std::string name) {
+	this->name = name;
+	this->symbolClass = TOY_COMPILER::ELEMENT_S;
+	this->null = 0;
+}
 
 
 Symbol::Symbol() {
@@ -70,7 +93,7 @@ int SymbolList::insertSym(Symbol s) {
 int SymbolList::deleteSym(std::string delname) {
 	std::list<class Symbol>::iterator s = this->list.begin();
 	while (s != this->list.end()) {
-		if (s->name == delname) {
+		if (s->id == delname) {
 			this->list.erase(s);
 			return 0;
 		}
@@ -80,33 +103,33 @@ int SymbolList::deleteSym(std::string delname) {
 }
 int SymbolList::insertFunction(FunctionSymbol function) {
 	std::list<class FunctionSymbol>::iterator fun = this->functionList.begin();
-	std::string name = function.functionName;
+	std::string id = function.functionName;
 	while (fun != this->functionList.end()) {
-		if ((*fun).functionName == name)return -1;
+		if ((*fun).functionName == id)return -1;
 		fun++;
 	}
 	this->functionList.push_front(function);
 }
 
-FunctionSymbol SymbolList::findFunction(std::string name) {
+FunctionSymbol SymbolList::findFunction(std::string id) {
 	std::list<class FunctionSymbol>::iterator fun = this->functionList.begin();
 	while (fun != this->functionList.end()) {
-		if ((*fun).functionName == name)return *fun;
+		if ((*fun).functionName == id)return *fun;
 		fun++;
 	}
 	return FunctionSymbol();
 }
 
-Symbol SymbolList::findSym(std::string name) {
+Symbol SymbolList::findSym(std::string id) {
 	std::list<class Symbol>::iterator sym = this->list.begin();
 	while (sym != this->list.end()) {
-		if (sym->name == name)return *sym;
+		if (sym->id == id)return *sym;
 	}
 	return Symbol();
 }
 	
 int SymbolTable::insertSym(Symbol s){	
-	int hashresult = SymbolTable::string_hash(s.name);
+	int hashresult = SymbolTable::string_hash(s.id);
 	SymbolList *list = this->table[hashresult];
 	if (list == NULL)list = new SymbolList();
 	list->insertSym(s);
@@ -153,12 +176,12 @@ SymbolTable::SymbolTable(std::string tablename, SymbolTable *parent) {
 	this->scope = parent->scope+1;
 }
 
-Symbol SymbolTable::findSym(std::string name) {
+Symbol SymbolTable::findSym(std::string id) {
 	SymbolTable *Symtable = this;
 	Symbol SymbolResult=Symbol();
-	int index = this->string_hash(name);
+	int index = this->string_hash(id);
 	while (Symtable != NULL) {
-		SymbolResult=Symtable->table[index]->findSym(name);
+		SymbolResult=Symtable->table[index]->findSym(id);
 		if (!SymbolResult.null)break;
 		Symtable = Symtable->parentTable;
 	}
