@@ -44,7 +44,10 @@
     #include <fstream>
     #include <string>
     #include <vector>
+    #include <algorithm>
     /* include for all driver functions */
+
+    extern GlobalSymbol *globalsymtab;
 
 #undef yylex
 #define yylex scanner.yylex
@@ -148,7 +151,7 @@ program:
         program_head  routine  DOT
         {
             auto s = new Symbol($1, $2);
-            symtab->addSymbol(s);
+            globalSymtable->addSymbol(s);
         }
         ;
 
@@ -179,9 +182,12 @@ routine_head:
         label_part  const_part  type_part  var_part  routine_part
         {
         	auto decls = new std::vector<abstractDeclNode *>();
-            decls->push_back($2);
-            decls->push_back($3);
-            decls->push_back($4);
+            auto f = [=](abstractDeclNode *d) {
+                decls->push_back(d);
+            }
+            for_each($2->begin(), $2->end(), f);
+            for_each($3->begin(), $3->end(), f);
+            for_each($4->begin(), $4->end(), f);
             $$ = std::make_pair(decls, $5);
         }
         ;
@@ -216,34 +222,55 @@ const_value:
         INTEGER
         {
             auto t = new const_valueType();
+            auto v = new expValue();
             t->d_type = TOY_COMPILER::INTEGER;
-            $$ = new literal($1, t);
+            v->int_value = $1;
+            $$ = new literal(v, t);
         }
         |  REAL
         {
-            $$ = new AST_Const($1);
-            $$->valType = REAL;
+            auto t = new const_valueType();
+            auto v = new expValue();
+            t->d_type = TOY_COMPILER::REAL;
+            v->real_value = $1;
+            $$ = new literal(v, t);
         }
         |  CHAR
         {
-            $$ = new AST_Const($1);
-            $$->valType = CHAR;
+            auto t = new const_valueType();
+            auto v = new expValue();
+            t->d_type = TOY_COMPILER::CHAR;
+            v->char_value = $1;
+            $$ = new literal(v, t);
         }
         |  BOOL
         {
-            $$ = new AST_Const($1);
-            $$->valType = BOOL;
+            auto t = new const_valueType();
+            auto v = new expValue();
+            t->d_type = TOY_COMPILER::BOOLEAN;
+            v->bool_value = $1;
+            $$ = new literal(v, t);
         }
         |  SYS_CON
         {
-            $$ = new AST_Const($1);
+            auto t = new const_valueType();
+            auto v = new expValue();
+            if($1 == false) {
+                t->sys_type = TOY_COMPILER::FALSE;
+            } else if($1 == true) {
+                t->sys_type = TOY_COMPILER::TRUE;
+            } else if($1 == 2147483647) {
+                t->sys_type = TOY_COMPILER::MAXINT;
+            }
+            v->bool_value = $1;
+            $$ = new literal(v, t);
         }
         ;
 
 type_part:
         TYPE type_decl_list
         {
-
+            $$ = $2;
         }
         |
         {
@@ -254,7 +281,7 @@ type_part:
 type_decl_list:
         type_decl_list  type_definition
         {
-
+            $$->
         }
         |  type_definition
         {

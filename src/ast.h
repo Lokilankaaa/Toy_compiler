@@ -21,6 +21,9 @@ namespace TOY_COMPILER {
         TOY_COMPILER::ASTType n_type;
     };
 
+    //mark class
+    class abstractSubroutine{};
+
     class abstractStmt : public abstractAST {
     public:
         abstractStmt() { n_type = TOY_COMPILER::STMT; }
@@ -506,11 +509,11 @@ namespace TOY_COMPILER {
         bool _isProc;
         bool _isSys;
         std::vector<parameter *> *paralist;
-        stmtList *body;
+        abstractSubroutine *body;
 
     public:
         functionNode(std::string id, std::vector<parameter *> *args,
-                     stmtList *body, bool isproc, bool issys)
+                     abstractSubroutine *body, bool isproc, bool issys)
                 : id{std::move(id)}, _isSys{issys}, _isProc{isproc}, paralist{args},
                   body{body} {
             n_type = TOY_COMPILER::FUNCTION;
@@ -529,7 +532,7 @@ namespace TOY_COMPILER {
         GETTER(body, getBody) { return body; }
     };
 
-    class rootProgram : public abstractAST {
+    class rootProgram : public abstractAST, abstractSubroutine {
     public:
         std::vector<functionNode *> funcs;
         stmtList stmts;
@@ -551,6 +554,7 @@ namespace TOY_COMPILER {
         GETTER(stmts, getStmts) { return stmts; }
 
         GETTER(decls, getDecls) { return decls; }
+
     };
 } // namespace TOY_COMPILER
 
