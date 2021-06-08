@@ -155,18 +155,21 @@ namespace TOY_COMPILER {
     class namesDecl : public abstractTypeDeclNode, public abstractSimpleDecl {
     protected:
         std::vector<std::string> names;
+        bool isnamelist;
 
     public:
         // simple_type_decl ：  NAME  |  LP  name_list  RP  (can judge whether NAME
         // or name_list by the length of vector)
-        namesDecl( std::vector<std::string> names)
-                :names{std::move(names)} {
+        namesDecl( std::vector<std::string> names, bool islist)
+                :names{std::move(names)}, isnamelist{islist} {
             n_type = TOY_COMPILER::NAMEDECL;
         }
 
         void addName(const std::string &name) { names.push_back(name); }
 
         GETTER(names, getNames) { return names; }
+
+        GETTER(isnamelist, getIsNamelist) { return isnamelist; }
     };
 
     class arrayDecl : public abstractTypeDeclNode {
@@ -263,8 +266,13 @@ namespace TOY_COMPILER {
         bool isrange; //isrange specifies whether it's range decl or sys_type
         rangeDecl *range;
         TOY_COMPILER::valType type;
+        bool isnamelist;
     public:
-        parameter(TOY_COMPILER::passBy b, bool isrange, std::vector<std::string> ns, rangeDecl *r, TOY_COMPILER::valType t):names{std::move(ns)}, by{b}, isrange{isrange}, range{r}, type{t} {}
+        parameter(TOY_COMPILER::passBy b, bool isrange, std::vector<std::string> ns, rangeDecl *r, TOY_COMPILER::valType t, bool islist):names{std::move(ns)}, by{b}, isrange{isrange}, range{r}, type{t}, isnamelist{islist} {}
+
+        GETTER(isnamelist, getIsNamelist) {
+            return isnamelist;
+        }
 
         GETTER(by, getPassBy) {
             return by;
@@ -292,7 +300,9 @@ namespace TOY_COMPILER {
         std::string id;
 
     public:
-        variableNode(std::string name) : id{std::move(name)} {}
+        variableNode(std::string name) : id{std::move(name)} {
+            n_type = TOY_COMPILER::VARIABLE;
+        }
 
         GETTER(id, getId) { return id; }
     };
@@ -308,7 +318,9 @@ namespace TOY_COMPILER {
         void print(std::fstream &fout) override;
 
         mathExpr(TOY_COMPILER::opType t, mathExpr *l, mathExpr *r)
-                : type{t}, left{l}, right{r} {}
+                : type{t}, left{l}, right{r} {
+            n_type = TOY_COMPILER::MATHEXPR;
+        }
 
         GETTER(left, getLeftChild) { return left; }
 

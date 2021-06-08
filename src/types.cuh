@@ -45,7 +45,9 @@ namespace TOY_COMPILER {
         VARDECL,
         LITERAL,
         TYPEDEF,
-        PARALIST
+        PARALIST,
+        VARIABLE,
+        MATHEXPR
     };
 
     enum valType {
