@@ -495,20 +495,17 @@ parameters:
         }
         |
         {
-            $$ = new SymbolListType;
         }
         ;
 
 para_decl_list:
         para_decl_list  SEMI  para_type_list
         {
-            $1->insert($1->end(), $3->begin(), $3->end());
-            delete $3;
-            $$ = $1;
+            
         }
         | para_type_list
         {
-            $$ = $1;
+            $$ = 
         }
         ;
 

@@ -36,7 +36,6 @@ class abstractExpr : public abstractStmt {
         m_value.p = nullptr;
     }
 
-  protected:
     TOY_COMPILER::expValue m_value;
     TOY_COMPILER::valType res_type;
 };
