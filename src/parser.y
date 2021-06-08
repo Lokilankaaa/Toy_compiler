@@ -140,10 +140,12 @@
 %type   <typeDefDecl*> type_decl 
 %type   <simpleDecl*> simple_type_decl
 %type   <arrayDecl*> array_type_decl
-%type   <recordDecl *> record_type_decl
-%type   <field*> field_decl field_decl_list
-%type   <std::vector<parameters *>*> parameters para_decl_list para_type_list
-%type   <std::vector<std::string>*> name_list var_para_list val_para_list
+%type   <recordDecl *> record_type_decl field_decl_list
+%type   <field*> field_decl
+%type   <parameter *> parameters 
+%type   <std::vector<parameters *>*> para_decl_list para_type_list  var_para_list val_para_list
+%type   <std::vector<std::string>*> name_list
+%type   <std::tuple<std::string, <std::vector<parameters *>*>, abstractSimpleDecl *>> function_head
 
 
 %%
@@ -214,6 +216,7 @@ const_expr_list:
         }
         |  ID  EQUAL  const_value  SEMI
         {
+            $$ = new constDecl();
             $$->addConstDecl($1, $3);
         }
         ;
@@ -281,19 +284,21 @@ type_part:
 type_decl_list:
         type_decl_list  type_definition
         {
-            $$->
+            $$->addTypeDef($2);
         }
         |  type_definition
         {
-
+            $$ = new typeDefDecl();
+            $$->addTypeDef($1);
         }
         ;
 
 type_definition:
         ID  EQUAL  type_decl  SEMI
         {
-            $3->name = $1;
-            driver.symtab.addType($3);
+            auto ns = new std::vector<std::string>();
+            ns->push_back($1);
+            $$ = new varNode(ns, $3);
         }
         ;
 
@@ -315,120 +320,94 @@ type_decl:
 simple_type_decl:
         SYS_TYPE
         {
-            $$ = new Symbol("", TYPE, (SPL_TYPE)$1, driver.symtab.getCurrentScopeIndex());
+            $$ = new simpleDecl($1);
+
         }
         |  ID
         {
-            Symbol* symbol = driver.symtab.lookupType($1.c_str());
-            std::string errorMsg = "spl.exe: error: undefined symbol \"" + $1 + "\"";
-            Assert(symbol != nullptr, errorMsg.c_str());
-            $$ = new Symbol(*symbol);
-            $$->name = "";
+            auto name = new std::vector<std::string>();
+            name.push_back($1);
+
+            $$ = new namesDecl(*name, false);
         }
         |  LP  name_list  RP
         {
-            // TODO: enumeration type
+            auto names = new std::vector<std::string>();
+            auto f = [=](std::string &name) {
+                names.push_back(name);
+            }
+            for_each($2->begin(), $2->end(), f);
+            $$ = new namesDecl(*names, false);
         }
         |  const_value  DOTDOT  const_value
         {
-            // TODO: subrange type
+            $$ = new rangeDecl(false, $1, false, $3);
         }
         |  MINUS  const_value  DOTDOT  const_value
         {
-
+            $$ = new rangeDecl(true, $1, false, $3);
         }
         |  MINUS  const_value  DOTDOT  MINUS  const_value
         {
-
+            $$ = new rangeDecl(true, $1, true, $3);
         }
         |  ID  DOTDOT  ID
         {
-
+            $$ = new rangeDecl($1, $3);
         }
         ;
 
 array_type_decl:
-        ARRAY  LB  INTEGER  RB  OF  type_decl
+        ARRAY  LB  simple_type_decl  RB  OF  type_decl
         {
-            Assert($3 >= 1, "spl.exe: error: illegal array index");
-            SPL_TYPE elementType = $6->symbolType;
-            Symbol* symbol = new Symbol("", TYPE, ARRAY, driver.symtab.getCurrentScopeIndex());
-            symbol->elementType = elementType;
-            symbol->scalarSize = $3;
-//            if (elementType >= BOOL && elementType <= STRING)
-//                delete $6;
-//            else
-                symbol->elementTypePtr = $6;
-            $$ = symbol;
+            $$ = new arrayDecl($3, $6);
         }
         ;
 
 record_type_decl:
         RECORD  field_decl_list  _END
         {
-            Symbol* symbol = new Symbol("", TYPE, RECORD, driver.symtab.getCurrentScopeIndex());
-            SymbolMapType* subSymbolMap = new SymbolMapType;
-            for(size_t i = 0; i < $2->size(); i++)
-            {
-                std::string name = (*$2)[i]->name;
-                std::string errorMsg =
-                "spl.exe: error: ignoring redeclaration of symbol \"" + name + "\".";
-                Assert(subSymbolMap->find(name) == subSymbolMap->end(), errorMsg.c_str());
-                (*subSymbolMap)[name] = (*$2)[i];
-            }
-            symbol->subSymbolMap = subSymbolMap;
-            symbol->subSymbolList = $2;
-            $$ = symbol;
+            $$ = $2;
         }
         ;
 
 field_decl_list:
         field_decl_list  field_decl
         {
-            $1->insert($1->end(), $2->begin(), $2->end());
-            delete $2;
             $$ = $1;
+            $$->addRecord($2);
         }
         |  field_decl
         {
-            $$ = $1;
+            $$ = new recordDecl();
+            $$->addRecord($1);
         }
         ;
 
 field_decl:
         name_list  COLON  type_decl  SEMI
         {
-            SymbolListType* subSymbolList = new SymbolListType;
-            for(size_t i = 0; i < $1->size(); i++)
-            {
-                Symbol* symbol = new Symbol(*$3);
-                symbol->name = (*$1)[i];
-                subSymbolList->push_back(symbol);
-            }
-            delete $1;
-            delete $3;
-            $$ = subSymbolList;
+            $$ = new field($1, $3);
         }
         ;
 
 name_list:
         name_list  COMMA  ID
         {
-            $1->push_back($3);
             $$ = $1;
+            $$->push_back($3);
         }
         |  ID
         {
-            std::vector<std::string>* newlist = new std::vector<std::string>();
-            newlist->push_back($1);
-            $$ = newlist;
+            $$ = new std::vector<std::string>();
+            $$->push_back($1);
         }
         ;
 
 var_part:
         VAR  var_decl_list
         {
-
+            $$ = $2;
         }
         |
         {
@@ -438,47 +417,42 @@ var_part:
 var_decl_list:
         var_decl_list  var_decl
         {
-
+            $$ = $1;
+            $$->addDecl($2);
         }
         |  var_decl
         {
-
+            $$ = new varDecl();
+            $$->addDecl($1);
         }
         ;
 
 var_decl:
         name_list  COLON  type_decl  SEMI
         {
-            for(size_t i = 0; i < $1->size(); i++)
-            {
-                Symbol* symbol = new Symbol(*$3);
-                symbol->name = (*$1)[i];
-                symbol->scopeIndex = driver.symtab.getCurrentScopeIndex();
-                //std::cout << symbol->name << " " << driver.symtab.getCurrentScopeIndex() << "\n";
-                symbol->symbolClass = VAR;
-                driver.symtab.addVariable(symbol);
-            }
-            delete $1;
-            delete $3;
+            $$ = new varNode($1, $3);
         }
         ;
 
 routine_part:
         routine_part  function_decl
         {
-            driver.symtab.popScope();
+            $$ = $1;
+            $$->push_back($2);
         }
         |  routine_part  procedure_decl
         {
-            driver.symtab.popScope();
+            $$ = $1;
+            $$->push_back($2);
         }
         |  function_decl
         {
-            driver.symtab.popScope();
+            $$ = new std::vector<functionNode *>();
+            $$->push_back($1);
         }
         |  procedure_decl
         {
-            driver.symtab.popScope();
+            //TODO: 
         }
         |
         {
@@ -488,73 +462,29 @@ routine_part:
 
 function_decl:
         function_head  SEMI  sub_routine  SEMI {
-        	// 检查是否有返回值节点 很麻烦...
+        	$$ = new functionNode(get<0>($1), get<1>($1), $3, get<2>($1));
         }
         ;
 
 function_head:
         FUNCTION  ID  parameters  COLON  simple_type_decl
         {
-            Symbol* symbol = new Symbol($2, FUNC, $5->symbolType, driver.symtab.getCurrentScopeIndex());
-            SymbolMapType* subSymbolMap = new SymbolMapType;
-            for(size_t i = 0; i < $3->size(); i++)
-            {
-                std::string name = (*$3)[i]->name;
-                std::string errorMsg =
-                "spl.exe: error: ignoring redeclaration of symbol \"" + name + "\".";
-                Assert(subSymbolMap->find(name) == subSymbolMap->end(), errorMsg.c_str());
-                (*subSymbolMap)[name] = (*$3)[i];
-            }
-            symbol->subSymbolMap = subSymbolMap;
-            symbol->subSymbolList = $3;
-//            if ($5->symbolType >= BOOL && $5->symbolType <= STRING)
-//                delete $5;
-//            else
-            symbol->returnTypePtr = $5;
-
-            driver.symtab.addFunction(symbol);
-            // new scope
-            driver.symtab.pushScope($2);
-
-            // 默认添加function名字到symbo table中作为一个变量
-            driver.symtab.addVariable(new Symbol($2, VAR, $5->symbolType, driver.symtab.getPrevScopeIndex()));
-            for(size_t i = 0; i < $3->size(); i++){
-            	(*$3)[i]->scopeIndex = driver.symtab.getCurrentScopeIndex();
-                driver.symtab.addVariable((*$3)[i]);
-            }
+            $$ = std::make_tuple($2, $3, $5);
 
         }
         ;
 
 procedure_decl:
-        procedure_head  SEMI  sub_routine  SEMI {}
+        procedure_head  SEMI  sub_routine  SEMI 
+        {
+            $$ = new functionNode(get<0>($1), get<1>($1), $3);
+        }
         ;
 
 procedure_head:
         PROCEDURE ID parameters
         {
-            Symbol* symbol = new Symbol($2, FUNC, UNKNOWN, driver.symtab.getCurrentScopeIndex());
-            SymbolMapType* subSymbolMap = new SymbolMapType;
-            for(size_t i = 0; i < $3->size(); i++)
-            {
-                std::string name = (*$3)[i]->name;
-                std::string errorMsg =
-                "spl.exe: error: ignoring redeclaration of symbol \"" + name + "\".";
-                Assert(subSymbolMap->find(name) == subSymbolMap->end(), errorMsg.c_str());
-                (*subSymbolMap)[name] = (*$3)[i];
-                // set parentscope
-            }
-            symbol->subSymbolMap = subSymbolMap;
-            symbol->subSymbolList = $3;
-
-            driver.symtab.addFunction(symbol);
-            // new scope
-            driver.symtab.pushScope($2);
-            for(size_t i = 0; i < $3->size(); i++) {
-            	(*$3)[i]->scopeIndex = driver.symtab.getCurrentScopeIndex();
-            	driver.symtab.addVariable((*$3)[i]);
-            }
-
+            $$ = std::make_tuple($2, $3);
         }
         ;
 
