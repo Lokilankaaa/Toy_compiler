@@ -45,7 +45,6 @@ namespace TOY_COMPILER {
         VARDECL,
         LITERAL,
         TYPEDEF,
-        PARALIST,
         VARIABLE,
         MATHEXPR
     };

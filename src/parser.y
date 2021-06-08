@@ -501,55 +501,38 @@ parameters:
 para_decl_list:
         para_decl_list  SEMI  para_type_list
         {
-            
+            $$ = $1;
+            $$->push_back($3);
         }
         | para_type_list
         {
-            $$ = 
+            $$ = new std::vector<parameter *>();
+            $$->push_back($1);
         }
         ;
 
 para_type_list:
         var_para_list COLON  simple_type_decl
         {
-            std::vector<Symbol*>* newlist = new std::vector<Symbol*>();
-            for(size_t i = 0; i < $1->size(); i++)
-            {
-                Symbol* symbol = new Symbol(*$3);
-                symbol->name = (*$1)[i];
-                symbol->symbolClass = VAR;
-                symbol->paraType = REFER;
-                newlist->push_back(symbol);
-            }
-            delete $3;
-            $$ = newlist;
+            $$ = new parameter(TOY_COMPILER::REFER, *($1), $3);
         }
         |  val_para_list  COLON  simple_type_decl
         {
-            std::vector<Symbol*>* newlist = new std::vector<Symbol*>();
-            for(size_t i = 0; i < $1->size(); i++)
-            {
-                Symbol* symbol = new Symbol(*$3);
-                symbol->name = (*$1)[i];
-                symbol->symbolClass = VAR;
-                newlist->push_back(symbol);
-            }
-            delete $3;
-            $$ = newlist;
+            $$ = new parameter(TOY_COMPILER::VALUE, *($1), $3);
         }
         ;
 
 var_para_list:
         VAR  name_list
         {
-            $$ = $2;
+            $$ = $2
         }
         ;
 
 val_para_list:
         name_list
         {
-            $$ = $1;
+            $$ = $1
         }
         ;
 
@@ -558,14 +541,14 @@ routine_body:
         ;
 
 compound_stmt:
-        _BEGIN  stmt_list  _END {$$ = new AST_Compound($2);}
+        _BEGIN  stmt_list  _END {$$ = $2;}
         ;
 
 stmt_list:
         stmt_list  stmt  SEMI {$1->push_back($2); $$ = $1;}
-        |  {$$ = new std::vector<AST_Stmt*>();}
+        |  {$$ = new stmtList();}
         ;
-// todo
+// TODO: add label to symtab
 stmt:
         INTEGER  COLON  non_label_stmt {$$ = $3; /*add the label into the symtable*/ }
         |  non_label_stmt {$$ = $1;}
@@ -583,116 +566,59 @@ non_label_stmt:
         | goto_stmt {$$ = $1;}
         ;
 
-// todo: add symbol share between nodes
 assign_stmt:
-        ID  ASSIGN  expression {
-		auto sym = driver.symtab.lookupVariable($1.c_str());
-		if(!sym) {
-			throw splException{@1.begin.line, @1.begin.column , "variable '" + $1 + "' is not declared in this scope.\n"};
-		}
-		if(checkTypeUnequal(sym->symbolType,$3->valType)) {
-			throw splException{@1.begin.line, @1.begin.column, "invaild conversion from '" + typeToString($3->valType) + "' to '" + typeToString(sym->symbolType) + "'.\n"};
-		}
-		AST_Sym* lhs = new AST_Sym($1, sym->scopeIndex, sym);
-		$$ = new AST_Assign(lhs, $3);
-		lhs->valType = $3->valType;
+        ID  ASSIGN  expression 
+        {
+            auto l = new variableNode($1);
+            $$ = new assignStmt(l, $3);
         }
-        | ID LB expression RB ASSIGN expression {
-        // 查看类型是否匹配
-	    auto sym = driver.symtab.lookupVariable($1.c_str());
-	    if(!sym) {
-		throw splException{@1.begin.line, @1.begin.column , "variable '" + $1 + "' is not declared in this scope.\n"};
-	    }
-
-	    if($3->valType != INT) {
-		throw splException{@1.begin.line, @1.begin.column , "index of array '" + $1 + "' must be type INT, get " + typeToString($3->valType) +".\n"};
-             }
-
-            AST_Array* lhs = new AST_Array(new AST_Sym($1, sym->scopeIndex, sym), $3);
-            $$ = new AST_Assign(lhs, $6);
+        | ID LB expression RB ASSIGN expression 
+        {
+            auto l = new mathExpr(TOY_COMPILER::LBRB, new variableNode($1), $3);
+            $$ = new assignStmt(l, $6);
         }
-        | ID  DOT  ID  ASSIGN  expression {
-        auto sym = driver.symtab.lookupVariable($1.c_str());
-	if(!sym) {
-		throw splException{@1.begin.line, @1.begin.column , "variable '" + $1 + "' is not declared in this scope.\n"};
-	}
-	if(sym->symbolType != RECORD) {
-		throw splException{@1.begin.line, @1.begin.column , "variable '" + $1 + "' is not record type.\n"};
-	}
-	auto members = sym->subSymbolMap;
-	if(members == nullptr) {
-		throw splException{@1.begin.line, @1.begin.column , "variable '" + $1 + "' has not members.\n"};
-	}
-	auto member = members->find($3);
-	if(member == members->end()) {
-		throw splException{@1.begin.line, @1.begin.column , "variable '" + $1 + "' has not member " + $3 +"\n"};
-	}
-
-	if(member->second->symbolType != $5->valType) {
-		throw splException{@1.begin.line, @1.begin.column , "invaild conversion from '" + typeToString($5->valType) + "' to '" + typeToString(member->second->symbolType) + "'.\n"};
-	}
-
-
-        AST_Dot* lhs = new AST_Dot(
-                       	new AST_Sym($1, sym->scopeIndex, sym),
-                       	new AST_Sym($3, member->second->scopeIndex, member->second));
-        $$ = new AST_Assign(lhs, $5);
-        $$->valType = member->second->symbolType;
+        | ID  DOT  ID  ASSIGN  expression 
+        {
+            auto l = new mathExpr(TOY_COMPILER::DOT, new variableNode($1), new variableNode($3));
+            $$ = new assignStmt(l, $5);
         }
         ;
 
 proc_stmt:
         ID  LP  RP
-	{
-	auto sym = driver.symtab.lookupFunction($1.c_str());
-	if(!sym) {
-		// 函数未定义
-		throw splException{@1.begin.line, @1.begin.column , "procedure '" + $1 + "' is not declared in this scope.\n"};
-	}
-	std::vector<AST_Exp*>* emptyVec = new std::vector<AST_Exp*>();
-	$$ = new AST_Func(true, $1, emptyVec, sym->scopeIndex, sym);
-	}
-        |  ID  LP  args_list  RP {
-        auto sym = driver.symtab.lookupFunction($1.c_str());
-	if(!sym) {
-		// 函数未定义
-		throw splException{@1.begin.line, @1.begin.column , "procedure '" + $1 + "' is not declared in this scope.\n"};
-	}
-
-	auto args_list = sym->subSymbolList;
-	if(args_list->size()!=$3->size()){
-		// 传入参数数目与定义不一致
-		throw splException{@1.begin.line, @1.begin.column ,
-		"function or procedure '" + $1 + "' expect " + std::to_string(args_list->size()) + " arguments, got " + std::to_string($3->size()) +".\n"};
-	}
-	int size = $3->size();
-	for(auto i = 0 ; i < size ; i ++ ){
-		// 检查数据类型是否一致
-		if(checkTypeUnequal($3->at(i)->valType, args_list->at(i)->symbolType)){
-			throw splException{@3.begin.line, @3.begin.column ,
-			"function or procedure '" + $1 + "' expect type '" + typeToString(args_list->at(i)->symbolType) + "', got type '"+ typeToString($3->at(i)->valType) +"'.\n"};
-		}
-	}
-        $$ = new AST_Func(true, $1, $3, 0, sym);
+        {
+            $$ = new functionCall($1, nullptr);
+        }
+        |  ID  LP  args_list  RP 
+        {
+            $$ = new functionCall($1, $3);
         }
         |  SYS_PROC  LP  RP
-	{
-	std::vector<AST_Exp*>* emptyVec = new std::vector<AST_Exp*>();
-	$$ = new AST_Func($1, emptyVec);
-	}
-        |  SYS_PROC  LP  args_list  RP {
-        $$ = new AST_Func($1, $3);
+        {
+            if ($1 == 8) {
+                $$ = new functionCall("write", nullptr);
+            } else if ($1 == 9) {
+                $$ = new functionCall("writeln", nullptr);
+            }
         }
+        |  SYS_PROC  LP  args_list  RP 
+        {
+            if ($1 == 8) {
+                $$ = new functionCall("write", $3);
+            } else if ($1 == 9) {
+                $$ = new functionCall("writeln", $3);
+            }
+        }
+// TODO: add factor class
         |  READ  LP  factor  RP
-	{
-//                std::vector<AST_Exp*>* factorVec = new std::vector<AST_Exp*>();
-//                factorVec->push_back($3);
-//                $$ = new AST_Func($1, factorVec);
-	}
+        {
+            $$ = new functionCall("read", $3);
+        }
         ;
 
 if_stmt:
-        IF  expression  THEN  stmt  else_clause {$$ = new AST_If($2, $4, $5);}
+        IF  expression  THEN  stmt  else_clause 
+        {$$ = new ifStmt($2, $4, $5);}
         ;
 
 else_clause:
@@ -701,29 +627,21 @@ else_clause:
         ;
 
 repeat_stmt:
-        REPEAT  stmt_list  UNTIL  expression {$$ = new AST_Repeat($2, $4);}
+        REPEAT  stmt_list  UNTIL  expression 
+        {$$ = new repeatStmt($4, $2);}
         ;
 
 while_stmt:
         WHILE  expression  DO stmt {
-        $$ = new AST_While($2, $4);
+        $$ = new whileStmt($2, $4);
         }
         ;
 
 for_stmt:
-        FOR  ID  ASSIGN  expression  direction  expression  DO stmt {
-        	// todo 查询变量是否存在
-	    auto sym = driver.symtab.lookupVariable($2.c_str());
+        FOR  ID  ASSIGN  expression  direction  expression  DO stmt 
+        {
+        	
 
-	    if(!sym) {
-		throw splException{@1.begin.line, @1.begin.column , "variable '" + $2 + "' is not declared in this scope.\n"};
-	    }
-
-	    if(checkTypeUnequal(sym->symbolType,$4->valType)) {
-            	throw splException{@1.begin.line, @1.begin.column, "invaild conversion from '" + typeToString($4->valType) + "' to '" + typeToString(sym->symbolType) + "'.\n"};
-            }
-            AST_Assign* init = new AST_Assign(new AST_Sym($2, 0, sym), $4);
-            $$ = new AST_For(init, $5, $6, $8);
         }
         ;
 
