@@ -109,40 +109,35 @@ namespace TOY_COMPILER {
     class simpleDecl : public abstractTypeDeclNode, public abstractSimpleDecl {
     protected:
         TOY_COMPILER::valType val_type;
-        std::string id;
 
     public:
         // simple_type_decl:   sys_type
-        simpleDecl(std::string id, TOY_COMPILER::valType t)
-                : id{std::move(id)}, val_type{t} {}
-
-        GETTER(id, getId) { return id; }
+        simpleDecl(TOY_COMPILER::valType t)
+                :val_type{t} {}
 
         GETTER(val_type, getval_type) { return val_type; }
     };
 
     class rangeDecl : public abstractTypeDeclNode, public abstractSimpleDecl {
     protected:
-        std::string id, id_l, id_r;
+        std::string id_l, id_r;
         TOY_COMPILER::const_valueType *con_l, *con_r;
         bool minus_l, minus_r;
 
     public:
         // simple_type_decl:   NAME  DOTDOT  NAME
-        rangeDecl(std::string id, std::string l, std::string r)
-                : id{std::move(id)}, id_l{std::move(l)}, id_r{std::move(r)} {
+        rangeDecl(std::string l, std::string r)
+                : id_l{std::move(l)}, id_r{std::move(r)} {
             n_type = TOY_COMPILER::RANGEDECL;
         }
 
         // simple_type_decl:  const_value  DOTDOT  const_value
         //                |  MINUS  const_value  DOTDOT  const_value
         //                |  MINUS  const_value  DOTDOT  MINUS  const_value
-        rangeDecl(std::string id, bool m_l, const_valueType *c_l, bool m_r,
+        rangeDecl(bool m_l, const_valueType *c_l, bool m_r,
                   const_valueType *c_r)
-                : id{std::move(id)}, minus_l{m_l}, con_l{c_l}, minus_r{m_r}, con_r{
+                :minus_l{m_l}, con_l{c_l}, minus_r{m_r}, con_r{
                 c_r} {}
-
-        GETTER(id, getId) { return id; }
 
         GETTER(con_l, getLeftRange) { return con_l; }
 
@@ -159,39 +154,33 @@ namespace TOY_COMPILER {
 
     class namesDecl : public abstractTypeDeclNode, public abstractSimpleDecl {
     protected:
-        std::string id;
         std::vector<std::string> names;
 
     public:
         // simple_type_decl ：  NAME  |  LP  name_list  RP  (can judge whether NAME
         // or name_list by the length of vector)
-        namesDecl(std::string id, std::vector<std::string> names)
-                : id{std::move(id)}, names{std::move(names)} {
+        namesDecl( std::vector<std::string> names)
+                :names{std::move(names)} {
             n_type = TOY_COMPILER::NAMEDECL;
         }
 
         void addName(const std::string &name) { names.push_back(name); }
-
-        GETTER(id, getId) { return id; }
 
         GETTER(names, getNames) { return names; }
     };
 
     class arrayDecl : public abstractTypeDeclNode {
     protected:
-        std::string id;
         abstractSimpleDecl *sim_type;
         abstractTypeDeclNode *type_decl;
 
     public:
         // ARRAY  LB  simple_type_decl  RB  OF  type_decl
-        arrayDecl(std::string id, abstractSimpleDecl *sim_types,
+        arrayDecl(abstractSimpleDecl *sim_types,
                   abstractTypeDeclNode *type_decl)
-                : id{std::move(id)}, sim_type{sim_types}, type_decl{type_decl} {
+                :sim_type{sim_types}, type_decl{type_decl} {
             n_type = TOY_COMPILER::ARRAYDECL;
         }
-
-        GETTER(id, getId) { return id; }
 
         GETTER(sim_type, getSimpleType) { return sim_type; }
 
@@ -253,16 +242,16 @@ namespace TOY_COMPILER {
 
     class typeDefDecl : public abstractTypeDeclNode {
     protected:
-        std::string type_name;
-        abstractTypeDeclNode *new_type;
+        std::vector<varNode *> *new_type;
 
     public:
-        typeDefDecl(std::string name, abstractTypeDeclNode *ntype)
-                : type_name{std::move(name)}, new_type{ntype} {
+        typeDefDecl() {
             n_type = TOY_COMPILER::TYPEDEF;
         }
 
-        GETTER(type_name, getTypeName) { return type_name; }
+        void addTypeDef(varNode * d) {
+            new_type->push_back(d);
+        }
 
         GETTER(new_type, getNewType) { return new_type; }
     };
