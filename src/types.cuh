@@ -45,8 +45,8 @@ namespace TOY_COMPILER {
         VARDECL,
         LITERAL,
         TYPEDEF,
-        VARIABLE,
-        MATHEXPR
+		VARIABLE,
+		MATHEXPR
     };
 
     enum valType {
@@ -55,7 +55,12 @@ namespace TOY_COMPILER {
         REAL,
         CHAR,
 		VOID,
-		COMP
+		COMP,
+		RANGE,
+		ARRAY,
+		NAME,
+		RECORD,
+		ERROR
     };
 
     enum sysCON {
@@ -111,11 +116,13 @@ namespace TOY_COMPILER {
     enum symbolType {
         VAR_S,
         CONST_S,
-        TYPE_S,
-        RANGE_S,
+        RECORD_S,
+		RANGE_S,
         FUNCTION_S,
 		NAME_S,
-		ELEMENT_S
+		ARRAY_S,
+		ELEMENT_S,
+		SIMPLE_S
     };
 
 };

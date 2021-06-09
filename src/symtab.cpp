@@ -12,61 +12,47 @@ namespace TOY_COMPILER {
 		this->SymTable.insert(std::map<std::string, class SymbolTable*>::value_type(tablename, NewSymTable));
 	}
 
-	Symbol::Symbol(std::string id, TOY_COMPILER::valType valType, TOY_COMPILER::symbolType symbolType, TOY_COMPILER::abstractAST *node, TOY_COMPILER::valType elementType, int arrayLength, int scopeIndex) {
-		this->id = id;
-		this->symbolType = valType;
-		this->symbolClass = symbolType;
-		this->node = node;
-		this->elementType = elementType;
-		this->arrayLength = arrayLength;
-		this->beginIndex = 0;
-		this->endIndex = beginIndex + arrayLength;
-		this->scopeIndex = scopeIndex;
-		this->null = 0;
-	}
-
-	Symbol::Symbol(std::string id, TOY_COMPILER::valType valType, TOY_COMPILER::symbolType symbolType, TOY_COMPILER::abstractAST *node, TOY_COMPILER::valType elementType, int beginIndex, int endIndex, int scopeIndex) {
-		this->id = id;
-		this->symbolType = valType;
-		this->symbolClass = symbolType;
-		this->node = node;
-		this->elementType = elementType;
-		this->arrayLength = endIndex - beginIndex + 1;
-		this->beginIndex = beginIndex;
-		this->endIndex = endIndex;
-		this->scopeIndex = scopeIndex;
-		this->null = 0;
-	}
-
 
 	Symbol::Symbol(std::string id, TOY_COMPILER::valType valType, TOY_COMPILER::symbolType symbolType, TOY_COMPILER::abstractAST *node, int scopeIndex) {
 		this->id = id;
-		this->symbolType = valType;
-		this->symbolClass = symbolType;
+		this->valType = valType;
+		this->symbolType = symbolType;
 		this->node = node;
 		this->scopeIndex = scopeIndex;
 		this->null = 0;
+		this->istype = 0;
 	}
 
-	Symbol::Symbol(std::string id, TOY_COMPILER::const_valueType valType, TOY_COMPILER::symbolType symbolType, TOY_COMPILER::abstractAST *node, int scopeIndex) {
+	Symbol::Symbol(std::string id, literal* constvalue, TOY_COMPILER::symbolType symbolType, TOY_COMPILER::abstractAST *node, int scopeIndex) {
 		this->id = id;
-		this->symbolType = valType.d_type;
-		this->constSys = valType.sys_type;
-		this->symbolClass = symbolType;
+		this->const_value = constvalue->getValue;
+		this->const_t = constvalue->getType;
+		this->symbolType = symbolType;
 		this->node = node;
 		this->scopeIndex = scopeIndex;
 		this->null = 0;
+		this->istype = 0;
 	}
 
-	Symbol::Symbol(std::string id, TOY_COMPILER::valType valType, TOY_COMPILER::symbolType symbolType, TOY_COMPILER::abstractAST *node, int beginIndex, int endIndex, int scopeIndex) {
+	Symbol::Symbol(TOY_COMPILER::valType valType, TOY_COMPILER::symbolType symbolType, TOY_COMPILER::abstractAST *node, int beginIndex, int endIndex, int scopeIndex) {
 		this->id = id;
-		this->symbolType = valType;
-		this->symbolClass = symbolType;
+		this->valType = valType;
+		this->symbolType = symbolType;
 		this->node = node;
 		this->beginIndex = beginIndex;
 		this->endIndex = endIndex;
 		this->scopeIndex = scopeIndex;
 		this->null = 0;
+		this->istype = 0;
+	}
+
+	Symbol::Symbol(TOY_COMPILER::valType valType, TOY_COMPILER::symbolType symbolType, TOY_COMPILER::abstractAST *node, int scope) {
+		this->valType = valType;
+		this->symbolType = symbolType;
+		this->node = node;
+		this->scopeIndex = scopeIndex;
+		this->null = 0;
+		this->istype = 0;
 	}
 
 	Symbol::Symbol(std::string id, TOY_COMPILER::abstractAST *node, int scopeIndex) {
@@ -74,17 +60,61 @@ namespace TOY_COMPILER {
 		this->node = node;
 		this->scopeIndex = scopeIndex;
 		this->null = 0;
+		this->istype = 0;
 	}
 
 	Symbol::Symbol(std::string name) {
 		this->name = name;
-		this->symbolClass = TOY_COMPILER::ELEMENT_S;
+		this->symbolType = TOY_COMPILER::ELEMENT_S;
 		this->null = 0;
+		this->istype = 0;
 	}
 
+	Symbol::Symbol(TOY_COMPILER::valType valType, std::string TypeName) {
+		this->valType = valType;
+		this->TypeName = TypeName;
+		this->istype = 0;
+	}
+
+	Symbol::Symbol(TOY_COMPILER::valType valType) {
+		this->valType = valType;
+		this->istype = 0;
+	}
 
 	Symbol::Symbol() {
 		this->null = 1;
+		this->istype = 0;
+		this->valType = ERROR;
+	}
+
+	int Symbol::setArray(Symbol indexSymbol, Symbol elementSymbol) {
+		if (indexSymbol.symbolType != RANGE_S || indexSymbol.symbolType != NAME_S) {
+			setIndex(elementSymbol);
+			setElement(indexSymbol);
+		}
+		else {
+			setIndex(indexSymbol);
+			setElement(elementSymbol);
+		}
+	}
+
+	int Symbol::setIndex(Symbol indexSymbol) {
+		if (indexSymbol.symbolType == RANGE_S) {
+			this->Index = new Symbol(indexSymbol);
+			this->beginIndex = indexSymbol.beginIndex;
+			this->endIndex = indexSymbol.endIndex;
+			this->arrayLength = indexSymbol.arrayLength;
+			return 0;
+		}
+		if(indexSymbol.symbolType==NAME_S){
+			this->Index = new Symbol(indexSymbol);
+			this->arrayLength = this->Index->memberList.size();
+			return 0;
+		}
+	}
+
+	int Symbol::setElement(Symbol elementSymbol) {
+			this->Element = new Symbol(elementSymbol);
 	}
 
 
@@ -194,6 +224,18 @@ namespace TOY_COMPILER {
 		int index = this->string_hash(id);
 		while (Symtable != NULL) {
 			SymbolResult = Symtable->table[index]->findSym(id);
+			if (!SymbolResult.null)break;
+			Symtable = Symtable->parentTable;
+		}
+		return SymbolResult;
+	}
+
+	FunctionSymbol SymbolTable::findFunc(std::string functionId) {
+		SymbolTable *Symtable = this;
+		FunctionSymbol SymbolResult = FunctionSymbol();
+		int index = this->string_hash(functionId);
+		while (Symtable != NULL) {
+			SymbolResult = Symtable->table[index]->findFunction(functionId);
 			if (!SymbolResult.null)break;
 			Symtable = Symtable->parentTable;
 		}
