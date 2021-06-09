@@ -150,10 +150,11 @@
 
 %%
 program:
+// TODO: add ast root to symtab
         program_head  routine  DOT
         {
-            auto s = new Symbol($1, $2);
-            globalSymtable->addSymbol(s);
+            auto t = globalsymtab->newSymTable($1);
+            globalsymtab->SymTable.insert()
         }
         ;
 
@@ -548,9 +549,12 @@ stmt_list:
         stmt_list  stmt  SEMI {$1->push_back($2); $$ = $1;}
         |  {$$ = new stmtList();}
         ;
-// TODO: add label to symtab
 stmt:
-        INTEGER  COLON  non_label_stmt {$$ = $3; /*add the label into the symtable*/ }
+        INTEGER  COLON  non_label_stmt 
+        {
+            $$ = $3;
+            globalsymtab->Label.insert($1, $3);
+        }
         |  non_label_stmt {$$ = $1;}
         ;
 
@@ -640,8 +644,7 @@ while_stmt:
 for_stmt:
         FOR  ID  ASSIGN  expression  direction  expression  DO stmt 
         {
-        	
-
+            $$ = new forStmt($2, $4, $6, $5, $8);
         }
         ;
 
@@ -651,386 +654,165 @@ direction:
         ;
 
 case_stmt:
-        CASE expression OF case_expr_list  _END {
-            Assert(!$4->empty(), "");
-            $$ = new AST_If(new AST_Math(EQUAL_, $2, $4->at(0)->val),
-                                       $4->at(0)->stmt,
-                                       nullptr);
-            if($4->size() > 1){
-                AST_If* track = $$;
-                for(unsigned int i=1; i<$4->size(); i++, track=(AST_If*)track->getDoElse()){
-                    track->addRight(new AST_If(new AST_Math(EQUAL_, $2, $4->at(i)->val),
-                                               $4->at(i)->stmt,
-                                               nullptr));
-                }
-                //the last null pointer refers to 'default'
-            }
+        CASE expression OF case_expr_list  _END 
+        {
+            $$ = $4;
+            $$->addCond($2);
         }
         ;
 
 case_expr_list:
-        case_expr_list  case_expr {$1->push_back($2); $$ = $1;}
-        |  case_expr {$$ = new std::vector<caseUnit*>(); $$->push_back($1);}
+        case_expr_list  case_expr 
+        {
+            $$ = $1;
+            $$->addCase($2);
+        }
+        |  case_expr 
+        {
+            $$ = new caseStmt();
+            $$->addCase($1);
+        }
         ;
 
 case_expr:
-        const_value  COLON  stmt  SEMI {$$ = new caseUnit($1, $3);}
-        |  ID  COLON  stmt  SEMI {
-        auto sym = driver.symtab.lookupVariable($1.c_str());
-	if(!sym) {
-		throw splException{@1.begin.line, @1.begin.column , "variable '" + $1 + "' is not declared in this scope.\n"};
-	}
-        $$ = new caseUnit(new AST_Sym($1, 0, sym),$3);
+        const_value  COLON  stmt  SEMI 
+        {
+            $$ = new caseNode($1, $3);
+        }
+        |  ID  COLON  stmt  SEMI 
+        {
+            $$ = new caseNode(new variableNode($1), $3);
         }
         ;
 
 goto_stmt:
-        GOTO  INTEGER {$$ = new AST_Goto($2);}
+        GOTO  INTEGER {$$ = new gotoStmt($2);}
         ;
 
 expression:
-        expression  GE  expr {
-        $$ = new AST_Math(GE_, $1, $3);
-        if(checkTypeUnequal($1->valType,SPL_TYPE::INT) && checkTypeUnequal($1->valType,SPL_TYPE::REAL)){
-		// 类型不匹配
-		throw splException{@1.begin.line, @1.begin.column ,
-			"operator '>=' expect type 'INT' or 'REAL', got '" + typeToString($1->valType) + "'.\n"};
-	}
-	if(checkTypeUnequal($3->valType ,SPL_TYPE::INT) && checkTypeUnequal($3->valType,SPL_TYPE::REAL)){
-		// 类型不匹配
-		throw splException{@3.begin.line, @3.begin.column ,
-			"operator '>=' expect type 'INT' or 'REAL', got '" + typeToString($3->valType) + "'.\n"};
-	}
-
-	$$->valType = SPL_TYPE::BOOL;
-        }
-        |  expression  GT  expr {
-        $$ = new AST_Math(GT_, $1, $3);
-        if(checkTypeUnequal($1->valType, SPL_TYPE::INT) && checkTypeUnequal($1->valType ,SPL_TYPE::REAL)){
-		// 类型不匹配
-		throw splException{@1.begin.line, @1.begin.column ,
-			"operator '>' expect type 'INT' or 'REAL', got '" + typeToString($1->valType) + "'.\n"};
-	}
-	if(checkTypeUnequal($3->valType,SPL_TYPE::INT) && checkTypeUnequal($3->valType ,SPL_TYPE::REAL)){
-		// 类型不匹配
-		throw splException{@3.begin.line, @3.begin.column ,
-			"operator '>' expect type 'INT' or 'REAL', got '" + typeToString($3->valType) + "'.\n"};
-	}
-
-	$$->valType = SPL_TYPE::BOOL;
-        }
-        |  expression  LE  expr {
-        $$ = new AST_Math(LE_, $1, $3);
-        if(checkTypeUnequal($1->valType ,SPL_TYPE::INT) && checkTypeUnequal($1->valType, SPL_TYPE::REAL)){
-		// 类型不匹配
-		throw splException{@1.begin.line, @1.begin.column ,
-			"operator '<=' expect type 'INT' or 'REAL', got '" + typeToString($1->valType) + "'.\n"};
-	}
-	if(checkTypeUnequal($3->valType, SPL_TYPE::INT) && checkTypeUnequal($3->valType, SPL_TYPE::REAL)){
-		// 类型不匹配
-		throw splException{@3.begin.line, @3.begin.column ,
-			"operator '<=' expect type 'INT' or 'REAL', got '" + typeToString($3->valType) + "'.\n"};
-	}
-
-	$$->valType = SPL_TYPE::BOOL;
-        }
-        |  expression  LT  expr {
-        $$ = new AST_Math(LT_, $1, $3);
-        if(checkTypeUnequal($1->valType,SPL_TYPE::INT) && checkTypeUnequal($1->valType, SPL_TYPE::REAL)){
-		// 类型不匹配
-		throw splException{@1.begin.line, @1.begin.column ,
-                	"operator '<' expect type 'INT' or 'REAL', got '" + typeToString($1->valType) + "'.\n"};
-	}
-	if(checkTypeUnequal($3->valType,SPL_TYPE::INT) && checkTypeUnequal($3->valType, SPL_TYPE::REAL)){
-		// 类型不匹配
-		throw splException{@3.begin.line, @3.begin.column ,
-			"operator '<' expect type 'INT' or 'REAL', got '" + typeToString($3->valType) + "'.\n"};
-	}
-
-	$$->valType = SPL_TYPE::BOOL;
+        expression  GE  expr 
+        {
 
         }
-        |  expression  EQUAL  expr {
-        $$ = new AST_Math(EQUAL_, $1, $3);
-        if(checkTypeUnequal($1->valType, $3->valType)){
-		// 类型不匹配
-		throw splException{@1.begin.line, @1.begin.column ,
-		"operator '==' expect two operands with same type .\n"};
-	}
-	$$->valType = SPL_TYPE::BOOL;
-        }
-        |  expression  UNEQUAL  expr {
-        $$ = new AST_Math(UNEQUAL_, $1, $3);
-        if(checkTypeUnequal($1->valType, $3->valType)){
-
-		throw splException{@3.begin.line, @3.begin.column ,
-                "operator '!=' expect two operands with same type .\n"};
-	}
-
-        $$->valType = SPL_TYPE::BOOL;
+        |  expression  GT  expr 
+        {
 
         }
-        |  expr {$$ = $1;}
+        |  expression  LE  expr 
+        {
+
+        }
+        |  expression  LT  expr 
+        {
+
+
+        }
+        |  expression  EQUAL  expr 
+        {
+
+        }
+        |  expression  UNEQUAL  expr 
+        {
+
+        }
+        |  expr 
+        {
+            $$ = new mathExpr
+        }
         ;
 
 expr:
-        expr  PLUS  term {
-        $$ = new AST_Math(PLUS_, $1, $3);
-        if(checkTypeUnequal($1->valType, SPL_TYPE::INT) && checkTypeUnequal($1->valType ,SPL_TYPE::REAL)){
+        expr  PLUS  term 
+        {
 
-	// 类型不匹配
-		throw splException{@1.begin.line, @1.begin.column ,
-		"operator '+' expect type 'INT' or 'REAL', got '" + typeToString($1->valType) + "'.\n"};
-	}
-
-	if(checkTypeUnequal($3->valType,SPL_TYPE::INT) && checkTypeUnequal($3->valType,SPL_TYPE::REAL)){
-
-	// 类型不匹配
-		throw splException{@3.begin.line, @3.begin.column,
-		"operator '+' expect type 'INT' or 'REAL', got '" + typeToString($3->valType) + "'.\n"};
-	}
-
-	if(checkTypeEqual($1->valType, SPL_TYPE::REAL) || checkTypeEqual($3->valType, SPL_TYPE::REAL)) {
-		$$->valType = SPL_TYPE::REAL;
-	}else{
-		$$->valType = SPL_TYPE::INT;
-	}
         }
-        |  expr  MINUS  term {
-        $$ = new AST_Math(MINUS_, $1, $3);
-        if(checkTypeUnequal($1->valType ,SPL_TYPE::INT) && checkTypeUnequal($1->valType, SPL_TYPE::REAL)){
+        |  expr  MINUS  term 
+        {
 
-	// 类型不匹配
-		throw splException{@1.begin.line, @1.begin.column,
-		"operator '-' expect type 'INT' or 'REAL', got '" + typeToString($1->valType) + "'.\n"};
-	}
-
-	if(checkTypeUnequal($3->valType ,SPL_TYPE::INT) && checkTypeUnequal($3->valType, SPL_TYPE::REAL)){
-
-	// 类型不匹配
-		throw splException{@3.begin.line, @3.begin.column,
-		"operator '-' expect type 'INT' or 'REAL', got '" + typeToString($3->valType) + "'.\n"};
-	}
-	if(checkTypeEqual($1->valType, SPL_TYPE::REAL) || checkTypeEqual($3->valType, SPL_TYPE::REAL)) {
-		$$->valType = SPL_TYPE::REAL;
-	}else{
-		$$->valType = SPL_TYPE::INT;
-	}
         }
-        |  expr  OR  term {
-        $$ = new AST_Math(OR_, $1, $3);
-        if(checkTypeUnequal($1->valType, SPL_TYPE::BOOL)){
+        |  expr  OR  term 
+        {
 
-	// 类型不匹配
-		throw splException{@1.begin.line, @1.begin.column ,
-		"operator 'OR' expect type 'BOOL', got '" + typeToString($1->valType) + "'.\n"};
-	}
-
-	if(checkTypeUnequal($3->valType, SPL_TYPE::BOOL)){
-
-	// 类型不匹配
-		throw splException{@3.begin.line, @3.begin.column ,
-		"operator 'OR' expect type 'BOOL', got '" + typeToString($3->valType) + "'.\n"};
-	}
-	$$->valType = SPL_TYPE::BOOL;
         }
         |  term {$$ = $1;}
         ;
 
 term:
-        term  MUL  factor {
-        $$ = new AST_Math(MUL_, $1, $3);
-        if(checkTypeUnequal($1->valType, SPL_TYPE::INT) && checkTypeUnequal($1->valType,SPL_TYPE::REAL)){
-	// 类型不匹配
-		throw splException{@1.begin.line, @1.begin.column ,
-		"operator '*' expect type 'INT' or 'REAL', got '" + typeToString($1->valType) + "'.\n"};
-	}
+        term  MUL  factor 
+        {
 
-	if(checkTypeUnequal($3->valType, SPL_TYPE::INT) && checkTypeUnequal($3->valType, SPL_TYPE::REAL)){
-
-	// 类型不匹配
-		throw splException{@3.begin.line, @3.begin.column ,
-		"operator '*' expect type 'INT' or 'REAL', got '" + typeToString($3->valType) + "'.\n"};
-	}
-	if(checkTypeEqual($1->valType, SPL_TYPE::REAL) || checkTypeEqual($3->valType, SPL_TYPE::REAL)) {
-		$$->valType = SPL_TYPE::REAL;
-	}else{
-		$$->valType = SPL_TYPE::INT;
-	}
         }
-        |  term  DIV  factor {
-        $$ = new AST_Math(DIV_, $1, $3);
-        if(checkTypeUnequal($1->valType ,SPL_TYPE::INT) && checkTypeUnequal($1->valType, SPL_TYPE::REAL)){
-	// 类型不匹配
-		throw splException{@1.begin.line, @1.begin.column ,
-		"operator '/' expect type 'INT' or 'REAL', got '" + typeToString($1->valType) + "'.\n"};
-	}
+        |  term  DIV  factor 
+        {
 
-	if(checkTypeUnequal($3->valType, SPL_TYPE::INT) && checkTypeUnequal($3->valType, SPL_TYPE::REAL)){
-	// 类型不匹配
-		throw splException{@3.begin.line, @3.begin.column ,
-		"operator '/' expect type 'INT' or 'REAL', got '" + typeToString($3->valType) + "'.\n"};
-	}
-	if(checkTypeEqual($1->valType, SPL_TYPE::REAL) || checkTypeEqual($3->valType,SPL_TYPE::REAL)) {
-		$$->valType = SPL_TYPE::REAL;
-	}else{
-		$$->valType = SPL_TYPE::INT;
-	}
-	}
-        |  term  MOD  factor {
-        $$ = new AST_Math(MOD_, $1, $3);
-        if(checkTypeUnequal($1->valType,SPL_TYPE::INT )){
+	    }
+        |  term  MOD  factor 
+        {
 
-         	// 类型不匹配
-         	throw splException{@1.begin.line, @1.begin.column ,
-			"operator 'MOD' expect type 'INT', got '" + typeToString($1->valType) + "'.\n"};
-		}
-        if(checkTypeUnequal($3->valType, SPL_TYPE::INT )){
-
-		// 类型不匹配
-		throw splException{@3.begin.line, @3.begin.column ,
-			"operator 'MOD' expect type 'INT', got '" + typeToString($3->valType) + "'.\n"};
-	}
-	$$->valType = SPL_TYPE::INT;
         }
-        |  term  AND  factor {
-        $$ = new AST_Math(AND_, $1, $3);
-        if(checkTypeUnequal($1->valType, SPL_TYPE::BOOL)){
-         	// 类型不匹配
-         	throw splException{@1.begin.line, @1.begin.column ,
-                		"operator 'AND' expect type 'BOOL', got '" + typeToString($1->valType) + "'.\n"};
-         	}
-        if(checkTypeUnequal($3->valType ,SPL_TYPE::BOOL)){
+        |  term  AND  factor 
+        {
 
-		// 类型不匹配
-		throw splException{@3.begin.line, @3.begin.column ,
-		"operator 'AND' expect type 'BOOL', got '" + typeToString($3->valType) + "'.\n"};
-	}
-	$$->valType = SPL_TYPE::BOOL;
         }
 
         |  factor {$$ = $1;}
         ;
 
 factor:
-        ID {
-        // 检查sym table查看table的类型
-        auto sym = driver.symtab.lookupVariable($1.c_str());
-        if(!sym) {
-        	throw splException{@1.begin.line, @1.begin.column , "variable '" + $1 + "' is not declared in this scope.\n"};
-        }
-        $$ = new AST_Sym($1, sym->scopeIndex, sym);
-        $$->valType = sym->symbolType;
+        ID 
+        {
+
         }
         |  ID  LP  RP
         {
-        // 检查sym table 查看func的返回值类型
-        auto sym = driver.symtab.lookupFunction($1.c_str());
-        if(!sym) {
-                // 函数未定义
-		throw splException{@1.begin.line, @1.begin.column , "function or procedure '" + $1 + "' is not declared in this scope.\n"};
-        }
-	std::vector<AST_Exp*>* emptyVec = new std::vector<AST_Exp*>();
-	$$ = new AST_Func(false, $1, emptyVec, sym->scopeIndex, sym);
-        $$->valType = sym->symbolType;
-        }
-        |  ID  LP  args_list  RP {
-        // 检查sym table 查看func的返回值类型
-        auto sym = driver.symtab.lookupFunction($1.c_str());
-	if(!sym) {
-		// 函数未定义
-		throw splException{@1.begin.line, @1.begin.column , "function or procedure '" + $1 + "' is not declared in this scope.\n"};
-	}
-	if(sym->symbolType == UNKNOWN) {
-		// procedure 不可以做为函数右值
-		throw splException{@1.begin.line, @1.begin.column , "procedure '" + $1 + "' can not be used as rvalue.\n"};
 
-	}
-	// 查看参数列表的类型是否一致
-	auto args_list = sym->subSymbolList;
-	if(args_list->size()!=$3->size()){
-		// 传入参数数目与定义不一致
-		throw splException{@1.begin.line, @1.begin.column ,
-		"function or procedure '" + $1 + "' expect " + std::to_string(args_list->size()) + " arguments, got " + std::to_string($3->size()) +".\n"};
-	}
-	int size = $3->size();
-	for(auto i = 0 ; i < size ; i ++ ){
-		// 检查数据类型是否一致
-		if(checkTypeUnequal($3->at(i)->valType, args_list->at(i)->symbolType)){
-			throw splException{@3.begin.line, @3.begin.column ,
-                        "function or procedure '" + $1 + "' expect type '" + typeToString(args_list->at(i)->symbolType) + "', got type '"+ typeToString($3->at(i)->valType) +"'.\n"};
-		}
-
-		// 检查是否传递常量或者临时变量给引用类型
-		if(args_list->at(i)->paraType == REFER && $3->at(i)->nodeType != AST_SYM) {
-			throw splException{@3.begin.line, @3.begin.column ,
-                        "can not pass temp result or literal as reference in function or procedure '" + $1 + "'n" };
-		}
-	}
-        $$ = new AST_Func(false, $1, $3, sym->scopeIndex, sym);
-        // 推导为返回值的数据类型
-        $$->valType = sym->symbolType;
+        }
+        |  ID  LP  args_list  RP 
+        {
+        
         }
         |  SYS_FUNCT  LP  RP
-	{
-            std::vector<AST_Exp*>* emptyVec = new std::vector<AST_Exp*>();
-            $$ = new AST_Func($1, emptyVec);
-	}
-        |  SYS_FUNCT  LP  args_list  RP {
-        	$$ = new AST_Func($1, $3);
+        {
+                
         }
-        |  const_value {
-        $$ = $1;
+        |  SYS_FUNCT  LP  args_list  RP 
+        {
+        	
         }
-        |  LP  expression  RP {$$ = $2;}
-        |  NOT  factor {
-        $$ = new AST_Math(NOT_, $2, nullptr);
-        $$->valType = SPL_TYPE::BOOL;
+        |  const_value 
+        {
+        
         }
-        |  MINUS  factor {
-        $$ = new AST_Math(MINUS__, $2, nullptr);
-        $$->valType = $2->valType;
+        |  LP  expression  RP 
+        {}
+        |  NOT  factor 
+        {
+
         }
-        |  ID  LB  expression  RB {
-        auto sym = driver.symtab.lookupVariable($1.c_str());
-	if(!sym) {
-		// 函数未定义
-		throw splException{@1.begin.line, @1.begin.column , "variable '" + $1 + "' is not declared in this scope.\n"};
-	}
-	if($3->valType != INT) {
-		throw splException{@1.begin.line, @1.begin.column , "index of array '" + $1 + "' must be type INT, get " + typeToString($3->valType) +".\n"};
-	}
-        $$ = new AST_Array(new AST_Sym($1, sym->scopeIndex, sym),$3);
-        $$->valType = INT;
+        |  MINUS  factor 
+        {
+
         }
-        |  ID  DOT  ID {
-        auto sym = driver.symtab.lookupVariable($1.c_str());
-	if(!sym) {
-		throw splException{@1.begin.line, @1.begin.column , "variable '" + $1 + "' is not declared in this scope.\n"};
-	}
-	$$ = new AST_Sym($1, sym->scopeIndex, sym);
-	if(sym->symbolType != RECORD) {
-		throw splException{@1.begin.line, @1.begin.column , "variable '" + $1 + "' is not record type.\n"};
-	}
-	auto members = sym->subSymbolMap;
-	if(members == nullptr) {
-		throw splException{@1.begin.line, @1.begin.column , "variable '" + $1 + "' has not members.\n"};
-	}
-	auto member = members->find($3);
-	if(member == members->end()) {
-		throw splException{@1.begin.line, @1.begin.column , "variable '" + $1 + "' has not member " + $3 +"\n"};
-	}
-        $$ = new AST_Dot(
-	new AST_Sym($1, sym->scopeIndex, sym),
-	new AST_Sym($3, member->second->scopeIndex, member->second));
-	$$->valType = member->second->symbolType;
-	}
+        |  ID  LB  expression  RB 
+        {
+
+        }
+        |  ID  DOT  ID 
+        {
+
+	    }
         ;
 
 args_list: 
-        args_list  COMMA  expression {
+        args_list  COMMA  expression 
+        {
+            $$ = $1;
+            $$->push_back($3);
         }
-        | expression {
+        | expression 
+        {
+            $$ = new std::vector<abstractStmt *>();
+            $$->push_back($1);
         }
         ;
 

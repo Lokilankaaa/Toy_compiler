@@ -378,18 +378,22 @@ namespace TOY_COMPILER {
     class forStmt : public abstractStmt {
     protected:
         // FOR  ID  ASSIGN  from  direction  to  DO stmt
+        std::string id;
         mathExpr *from;
         mathExpr *to;
         bool direction;
-        stmtList *stmtlist;
+        abstractStmt *stmt;
 
     public:
-        forStmt(mathExpr *from, mathExpr *to, bool direction, stmtList *stmts)
-                : from{from}, to{to}, direction{direction}, stmtlist{stmts} {
+        forStmt(std::string i, mathExpr *from, mathExpr *to, bool direction,
+                abstractStmt *s)
+                : id{i}, from{from}, to{to}, direction{direction}, stmt{s} {
             n_type = TOY_COMPILER::FORSTMT;
         }
 
         void print(std::fstream &fout) override;
+
+        GETTER(id, getId) { return id; }
 
         GETTER(from, getFrom) { return from; }
 
@@ -397,16 +401,16 @@ namespace TOY_COMPILER {
 
         GETTER(direction, getDirection) { return direction; }
 
-        GETTER(stmtlist, getStmtlist) { return stmtlist; }
+        GETTER(stmt, getStmtlist) { return stmt; }
     };
 
     class caseNode {
     public:
-        constNode *case_;
+        abstractExpr *case_;
         abstractStmt *stmt;
 
         // if case_
-        caseNode(constNode *c, abstractStmt *s) : case_{c}, stmt{s} {}
+        caseNode(abstractExpr *c, abstractStmt *s) : case_{c}, stmt{s} {}
     };
 
     class caseStmt : public abstractStmt {
@@ -416,8 +420,12 @@ namespace TOY_COMPILER {
         std::vector<caseNode *> case_expr_list;
 
     public:
-        explicit caseStmt(mathExpr *cond) : case_cond{cond} {
+        caseStmt() {
             n_type = TOY_COMPILER::CASESTMT;
+        }
+
+        void addCond(mathExpr *cond) {
+            case_cond = cond;
         }
 
         void print(std::fstream &fout) override;
