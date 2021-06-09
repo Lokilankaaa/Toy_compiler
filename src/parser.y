@@ -121,11 +121,12 @@
 %type   <bool> direction
 %type	<std::string*> program_head
 %type   <rootProgram*> routine_body
-%type   <mathExpr*> factor term expr expression
+%type   <abstractExpr *> factor term expr expression
 %type   <literal*> const_value
 %type   <assignStmt*> assign_stmt
 %type 	<abstractStmt*> else_clause stmt non_label_stmt
-%type 	<ifStmt*> if_stmt case_stmt
+%type 	<ifStmt*> if_stmt
+%type   <caseStmt*> case_stmt
 %type   <whileStmt*> while_stmt
 %type   <repeatStmt*> repeat_stmt
 %type   <forStmt*> for_stmt
@@ -692,47 +693,46 @@ goto_stmt:
 expression:
         expression  GE  expr 
         {
-
+            $$ = new mathExpr(TOY_COMPILER::GE, $1, $3);
         }
         |  expression  GT  expr 
         {
-
+            $$ = new mathExpr(TOY_COMPILER::GT, $1, $3);
         }
         |  expression  LE  expr 
         {
-
+            $$ = new mathExpr(TOY_COMPILER::LE, $1, $3);
         }
         |  expression  LT  expr 
         {
-
-
+            $$ = new mathExpr(TOY_COMPILER::LT, $1, $3);
         }
         |  expression  EQUAL  expr 
         {
-
+            $$ = new mathExpr(TOY_COMPILER::EQUAL, $1, $3);
         }
         |  expression  UNEQUAL  expr 
         {
-
+            $$ = new mathExpr(TOY_COMPILER::UNEQUAL, $1, $3);
         }
         |  expr 
         {
-            $$ = new mathExpr
+            $$ = $1;
         }
         ;
 
 expr:
         expr  PLUS  term 
         {
-
+            $$ = new mathExpr(TOY_COMPILER::PLUS, $1, $3);
         }
         |  expr  MINUS  term 
         {
-
+            $$ = new math(TOY_COMPILER::MINUS, $1, $3);
         }
         |  expr  OR  term 
         {
-
+            $$ = new mathExpr(TOY_COMPILER::OR, $1, $3);
         }
         |  term {$$ = $1;}
         ;
@@ -740,23 +740,23 @@ expr:
 term:
         term  MUL  factor 
         {
-
+            $$ = new mathExpr(TOY_COMPILER::MUL, $1, $3);
         }
         |  term  DIV  factor 
         {
-
+            $$ = new mathExpr(TOY_COMPILER::DIV, $1, $3);
 	    }
         |  term  MOD  factor 
         {
-
+            $$ = new mathExpr(TOY_COMPILER::MOD, $1, $3);
         }
         |  term  AND  factor 
         {
-
+            $$ = new mathExpr(TOY_COMPILER::AND, $1, $3);
         }
         |  factor
         {
-            $$
+            $$ = $1;
         }
         ;
 

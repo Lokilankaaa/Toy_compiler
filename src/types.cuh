@@ -14,12 +14,11 @@ namespace TOY_COMPILER {
         double real_value;
         bool bool_value;
         char char_value;
-        void * p = nullptr;
+        void *p = nullptr;
     };
 
     enum passBy {
-        VALUE,
-        REFER
+        VALUE, REFER
     };
 
     enum ASTType {
@@ -45,8 +44,8 @@ namespace TOY_COMPILER {
         VARDECL,
         LITERAL,
         TYPEDEF,
-		VARIABLE,
-		MATHEXPR
+        VARIABLE,
+        MATHEXPR
     };
 
     enum valType {
@@ -54,22 +53,20 @@ namespace TOY_COMPILER {
         INTEGER,
         REAL,
         CHAR,
-		VOID,
-		COMP,
-		RANGE,
-		ARRAY,
-		NAME,
-		RECORD,
-		ERROR
+        VOID,
+        COMP,
+        RANGE,
+        ARRAY,
+        NAME,
+        RECORD,
+        ERROR
     };
 
     enum sysCON {
-        TRUE,
-        FALSE,
-        MAXINT
+        TRUE, FALSE, MAXINT
     };
 
-    union const_valueType{
+    union const_valueType {
         valType d_type;
         sysCON sys_type;
     };
@@ -86,9 +83,7 @@ namespace TOY_COMPILER {
     };
 
     enum sysPROC {
-        WRITE,
-        WRITELN,
-        READ
+        WRITE, WRITELN, READ
     };
 
     enum opType {
@@ -99,6 +94,8 @@ namespace TOY_COMPILER {
         DIV,
         UNEQUAL,
         NOT,
+        AND,
+        OR,
         PLUS,
         MINUS,
         GE,
@@ -112,18 +109,17 @@ namespace TOY_COMPILER {
         SEMI
     };
 
-
     enum symbolType {
         VAR_S,
         CONST_S,
         RECORD_S,
-		RANGE_S,
+        RANGE_S,
         FUNCTION_S,
-		NAME_S,
-		ARRAY_S,
-		ELEMENT_S,
-		SIMPLE_S
+        NAME_S,
+        ARRAY_S,
+        ELEMENT_S,
+        SIMPLE_S
     };
 
-};
-#endif //TOY_COMPILER_TYPES_CUH
+};     // namespace TOY_COMPILER
+#endif // TOY_COMPILER_TYPES_CUH
