@@ -469,7 +469,7 @@ namespace TOY_COMPILER {
         GETTER(rhs, getRhs) { return rhs; }
     };
 
-    class functionCall : public abstractStmt {
+    class functionCall : public abstractExpr{
     protected:
         std::string func_name;
         std::vector<abstractExpr *> *args;

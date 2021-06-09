@@ -754,52 +754,112 @@ term:
         {
 
         }
-
-        |  factor {$$ = $1;}
+        |  factor
+        {
+            $$
+        }
         ;
 
 factor:
         ID 
         {
-
+            $$ = new variableNode($1);
         }
         |  ID  LP  RP
         {
-
+            $$ = new functionCall($1, nullptr);
         }
         |  ID  LP  args_list  RP 
         {
-        
+            $$ = new functionCall($1, $3);
         }
         |  SYS_FUNCT  LP  RP
         {
-                
+            std::string func_name;
+            switch($1) {
+                case 0:
+                    func_name = "abs";
+                    break;
+                case 1:
+                    func_name = "chr";
+                    break;
+                case 2:
+                    func_name = "odd";
+                    break;
+                case 3:
+                    func_name = "ord";
+                    break;
+                case 4:
+                    func_name = "pred";
+                    break;
+                case 5:
+                    func_name = "sqr";
+                    break;
+                case 6:
+                    func_name = "sqrt";
+                    break;
+                case 7
+                    func_name = "succ";
+                    break;
+            }
+
+            $$ = new functionCall(func_name, nullptr);
         }
         |  SYS_FUNCT  LP  args_list  RP 
         {
-        	
+        	std::string func_name;
+            switch($1) {
+                case 0:
+                    func_name = "abs";
+                    break;
+                case 1:
+                    func_name = "chr";
+                    break;
+                case 2:
+                    func_name = "odd";
+                    break;
+                case 3:
+                    func_name = "ord";
+                    break;
+                case 4:
+                    func_name = "pred";
+                    break;
+                case 5:
+                    func_name = "sqr";
+                    break;
+                case 6:
+                    func_name = "sqrt";
+                    break;
+                case 7
+                    func_name = "succ";
+                    break;
+            }
+
+            $$ = new functionCall(func_name, $3);
         }
         |  const_value 
         {
-        
+            $$ = $1;
         }
         |  LP  expression  RP 
-        {}
+        {
+            $$ = $2;
+        }
         |  NOT  factor 
         {
-
+            $$ = new mathExpr(TOY_COMPILER::NOT, $2, nullptr);
         }
         |  MINUS  factor 
         {
-
+            $$ = new mathExpr(TOY_COMPILER::NOT, $2, nullptr);
         }
         |  ID  LB  expression  RB 
         {
-
+            $$ = new mathExpr(TOY_COMPILER::LBRB, $1, $3);
         }
         |  ID  DOT  ID 
         {
-
+            $$ = new mathExpr(TOY_COMPILER::DOT, $1, $3);
 	    }
         ;
 
@@ -811,7 +871,7 @@ args_list:
         }
         | expression 
         {
-            $$ = new std::vector<abstractStmt *>();
+            $$ = new std::vector<abstractExpr *>();
             $$->push_back($1);
         }
         ;
