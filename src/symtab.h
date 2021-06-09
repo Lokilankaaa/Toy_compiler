@@ -3,9 +3,9 @@
 #include <string>
 #include "types.cuh"
 #include "ast.h"
-#include<map>
+#include <map>
 #include <list>
-#include<vector>
+#include <vector>
 #define SPL_LIST std::list<class Symbol>
 #define SPL_TABLE std::map<std::string, class SymbolTable*>
 

@@ -64,6 +64,7 @@
 %left   EQUAL UNEQUAL GE GT LE LT 
 %left   PLUS MINUS
 %left   MUL DIV MOD
+%nonassoc ELSE
 
 %token  END     0       "end of file"
 
@@ -120,9 +121,16 @@
 
 %type   <bool> direction
 %type	<std::string*> program_head
-%type   <rootProgram*> routine_body
+%type   <std::pair<std::vector<abstractDeclNode *> *, std::vector<functionNode *> *> > routine_head
+%type   <rootProgram*> routine sub_routine
+%type   <stmtList *> routine_body
+%type   <std::vector<functionNode *> *> routine_part
+%type   <functionNode *> function_decl procedure_decl
+%type   <std::tuple<std::string, std::vector<parameters *> *, abstractSimpleDecl *>> function_head
+%type   <std::tuple<std::string, std::vector<parameters *> *>> procedure_head
 %type   <abstractExpr *> factor term expr expression
 %type   <literal*> const_value
+%type   <constDecl *> const_part const_expr_list
 %type   <assignStmt*> assign_stmt
 %type 	<abstractStmt*> else_clause stmt non_label_stmt
 %type 	<ifStmt*> if_stmt
@@ -137,8 +145,10 @@
 %type   <caseStmt*> case_expr_list
 %type   <stmtList*> stmt_list
 %type   <std::vector<abstractStmt*>*> args_list
-
-%type   <typeDefDecl*> type_decl 
+%type   <varNode *> type_definition var_decl
+%type   <varDecl *> var_part var_decl_list
+%type   <abstractTypeDeclNode *> type_decl
+%type   <typeDefDecl *> type_part type_decl_list  
 %type   <simpleDecl*> simple_type_decl
 %type   <arrayDecl*> array_type_decl
 %type   <recordDecl *> record_type_decl field_decl_list
@@ -146,7 +156,6 @@
 %type   <parameter *> parameters 
 %type   <std::vector<parameters *>*> para_decl_list para_type_list  var_para_list val_para_list
 %type   <std::vector<std::string>*> name_list
-%type   <std::tuple<std::string, <std::vector<parameters *>*>, abstractSimpleDecl *>> function_head
 
 
 %%
@@ -155,7 +164,7 @@ program:
         program_head  routine  DOT
         {
             auto t = globalsymtab->newSymTable($1);
-            globalsymtab->SymTable.insert()
+            // globalsymtab->SymTable.insert()
         }
         ;
 
@@ -347,11 +356,11 @@ simple_type_decl:
         }
         |  MINUS  const_value  DOTDOT  const_value
         {
-            $$ = new rangeDecl(true, $1, false, $3);
+            $$ = new rangeDecl(true, $2, false, $4);
         }
         |  MINUS  const_value  DOTDOT  MINUS  const_value
         {
-            $$ = new rangeDecl(true, $1, true, $3);
+            $$ = new rangeDecl(true, $2, true, $5);
         }
         |  ID  DOTDOT  ID
         {
@@ -449,16 +458,15 @@ routine_part:
         }
         |  function_decl
         {
-            $$ = new std::vector<functionNode *>();
             $$->push_back($1);
         }
         |  procedure_decl
         {
-            //TODO: 
+            $$->push_back($1);
         }
         |
         {
-
+            $$ = new std::vector<functionNode *>();
         }
         ;
 
@@ -472,7 +480,6 @@ function_head:
         FUNCTION  ID  parameters  COLON  simple_type_decl
         {
             $$ = std::make_tuple($2, $3, $5);
-
         }
         ;
 

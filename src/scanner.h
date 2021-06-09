@@ -15,18 +15,27 @@
 
 #include <fstream>
 #include <string>
+#include "location.hh"
+#include "parser.tab.hh"
 
 namespace TOY_COMPILER  {
     class Scanner: public yyFlexLexer {
       public:
-        Scanner(const std::fstream &fin);
-//        Scanner(Marker::Driver &driver) : m_driver(driver) {}
+    public:
+        Scanner(std::istream *in) : yyFlexLexer(in){};
+        virtual ~Scanner(){};
 
-//        virtual int TOY_COMPILER::Scanner::yylex(
-//            TOY_COMPILER::Parser::semantic_type *const lval,
-//            TOY_COMPILER::location_type *loc);
+        // get rid of override virtual function warning
+        using FlexLexer::yylex;
 
-//        virtual TOY_COMPILER::Parser::semantic_type get_next_token();
+        virtual int yylex(TOY_COMPILER::Parser::semantic_type *const lval,
+                          TOY_COMPILER::location_type *location);
+        // YY_DECL defined in spl_lexer.l
+        // Method body created by flex in spl_lexer.yy.cc
+
+    private:
+        /* yyval ptr */
+        TOY_COMPILER::Parser::semantic_type *yylval = nullptr;
     };
 } // namespace yyFlexLexer
 

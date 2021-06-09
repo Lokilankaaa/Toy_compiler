@@ -3,7 +3,7 @@
 
 /* Implementation of yyFlexScanner */
 #include "scanner.hpp"
-#include "parser.tab.h"
+#include "parser.tab.hh"
 #undef  YY_DECL
 #define YY_DECL int TOY_COMPILER::Scanner::yylex(TOY_COMPILER::Parser::semantic_type * const lval, TOY_COMPILER::Parser::location_type *loc)
 
