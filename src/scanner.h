@@ -20,6 +20,8 @@ namespace TOY_COMPILER  {
     public:
         Scanner(std::istream *in) : yyFlexLexer(in){};
 
+        virtual ~Scanner() = default;
+
         // get rid of override virtual function warning
         using FlexLexer::yylex;
 

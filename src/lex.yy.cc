@@ -647,7 +647,7 @@ static yyconst flex_int16_t yy_rule_linenum[82] =
 
 /* Implementation of yyFlexScanner */
 #include "scanner.h"
-#include "parser.tab.hh"
+
 #undef  YY_DECL
 #define YY_DECL int TOY_COMPILER::Scanner::yylex(TOY_COMPILER::Parser::semantic_type * const lval, TOY_COMPILER::Parser::location_type *loc)
 

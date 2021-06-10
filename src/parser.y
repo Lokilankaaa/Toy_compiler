@@ -46,11 +46,11 @@
     #include <vector>
     #include <algorithm>
     /* include for all driver functions */
-    using namespace TOY_COMPILER;
+    #include "tt.h"
 
-    extern GlobalSymbol *globalsymtab;
+    extern TOY_COMPILER::GlobalSymbol *globalsymtab;
 
-    extern abstractAST * root;
+    extern TOY_COMPILER::rootProgram * root;
 
 #undef yylex
 #define yylex scanner.yylex
@@ -490,15 +490,17 @@ routine_part:
         }
         |  function_decl
         {
+            $$ = new std::vector<functionNode *>();
             $$->push_back($1);
         }
         |  procedure_decl
         {
+            $$ = new std::vector<functionNode *>();
             $$->push_back($1);
         }
         |
         {
-            $$ = new std::vector<functionNode *>();
+
         }
         ;
 
@@ -975,3 +977,8 @@ args_list:
         ;
 
 %%
+
+void TOY_COMPILER::Parser::error (const location_type& l, const std::string& m)
+{
+  std::cerr << l << ": " << m << '\n';
+}

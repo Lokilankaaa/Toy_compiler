@@ -3,7 +3,7 @@ project(toy_compiler)
 
 set(CMAKE_CXX_STANDARD 14)
 
-set(SRC_FILE "src")
+set(SRC_FILE "src" src/tt.h)
 
 if (CMAKE_HOST_SYSTEM_NAME MATCHES "Darwin")
     execute_process(
@@ -42,8 +42,7 @@ ADD_FLEX_BISON_DEPENDENCY(lexer parser)
 
 add_compile_options(-w -ferror-limit=99)
 
-add_executable(toy_compiler main.cpp ${SRC_FILE} ${BISON_parser_OUTPUTS}
-        ${FLEX_lexer_OUTPUTS})
+add_executable(toy_compiler main.cpp ${SRC_FILE} ${FLEX_lexer_OUTPUTS} ${BISON_parser_OUTPUTS})
 
 
 

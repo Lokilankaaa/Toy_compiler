@@ -24,7 +24,7 @@ namespace TOY_COMPILER {
 
     class abstractAST : public linenoInterface {
     public:
-        virtual void print(std::fstream &fout) {}
+        void print(std::fstream &fout) {}
 
         abstractAST *father = nullptr;
         TOY_COMPILER::ASTType n_type;
@@ -67,6 +67,7 @@ namespace TOY_COMPILER {
     public:
         literal(TOY_COMPILER::expValue *v, TOY_COMPILER::const_valueType *t) : _t{t} {
             n_type = TOY_COMPILER::LITERAL;
+            _value = new TOY_COMPILER::expValue;
             if (_t->sys_type == MAXINT) {
                 _value->int_value = INT_MAX;
             } else if (_t->sys_type == TRUE) {
@@ -108,7 +109,7 @@ namespace TOY_COMPILER {
             constdecls = new std::vector<constNode *>();
         }
 
-        void print(std::fstream &fout) override;
+        void print(std::fstream &fout);
 
         void addConstDecl(const std::string &id, literal *v) {
             constdecls->push_back(new constNode(id, v));
@@ -242,7 +243,10 @@ namespace TOY_COMPILER {
         std::vector<varNode *> *decls;
 
     public:
-        varDecl() { n_type = TOY_COMPILER::VARDECL; }
+        varDecl() {
+            n_type = TOY_COMPILER::VARDECL;
+            decls = new std::vector<varNode *>();
+        }
 
         void addDecl(varNode *v) { decls->push_back(v); }
 
@@ -300,7 +304,7 @@ namespace TOY_COMPILER {
 
     public:
         // +, -, *, /, , %, &, |, !, -(num), >, >=, <, <=, <>, [], .
-        void print(std::fstream &fout) override;
+        void print(std::fstream &fout);
 
         mathExpr(TOY_COMPILER::opType t, abstractExpr *l, abstractExpr *r)
                 : type{t}, left{l}, right{r} {
@@ -325,7 +329,7 @@ namespace TOY_COMPILER {
 
         GETTER(m_stmtList, getStmtList) { return m_stmtList; }
 
-        void print(std::fstream &fout) override;
+        void print(std::fstream &fout);
     };
 
     class ifStmt : public abstractStmt {
@@ -341,7 +345,7 @@ namespace TOY_COMPILER {
             n_type = TOY_COMPILER::IFSTMT;
         }
 
-        void print(std::fstream &fout) override;
+        void print(std::fstream &fout);
 
         GETTER(cond, getCond) { return cond; }
 
@@ -362,7 +366,7 @@ namespace TOY_COMPILER {
             n_type = TOY_COMPILER::REPEATSTMT;
         }
 
-        void print(std::fstream &fout) override;
+        void print(std::fstream &fout);
 
         GETTER(cond, getCond) { return cond; }
 
@@ -380,7 +384,7 @@ namespace TOY_COMPILER {
             n_type = TOY_COMPILER::WHILESTMT;
         }
 
-        void print(std::fstream &fout) override;
+        void print(std::fstream &fout);
 
         GETTER(cond, getCond) { return cond; }
 
@@ -403,7 +407,7 @@ namespace TOY_COMPILER {
             n_type = TOY_COMPILER::FORSTMT;
         }
 
-        void print(std::fstream &fout) override;
+        void print(std::fstream &fout);
 
         GETTER(id, getId) { return id; }
 
@@ -436,7 +440,7 @@ namespace TOY_COMPILER {
 
         void addCond(abstractExpr *cond) { case_cond = cond; }
 
-        void print(std::fstream &fout) override;
+        void print(std::fstream &fout);
 
         void addCase(caseNode *case_expr) { case_expr_list.push_back(case_expr); }
 
@@ -452,7 +456,7 @@ namespace TOY_COMPILER {
     public:
         explicit gotoStmt(int l) : label{l} { n_type = TOY_COMPILER::GOTOSTMT; }
 
-        void print(std::fstream &fout) override;
+        void print(std::fstream &fout);
 
         int getLabel() const { return label; }
     };
@@ -470,7 +474,7 @@ namespace TOY_COMPILER {
             n_type = TOY_COMPILER::ASSIGNSTMT;
         }
 
-        void print(std::fstream &fout) override;
+        void print(std::fstream &fout);
 
         GETTER(lhs, getLhs) { return lhs; }
 
@@ -515,7 +519,7 @@ namespace TOY_COMPILER {
             isprocedure = true;
         }
 
-        void print(std::fstream &fout) override;
+        void print(std::fstream &fout);
 
         GETTER(id, getId) { return id; }
 
@@ -541,7 +545,7 @@ namespace TOY_COMPILER {
 
         void addDecl(abstractTypeDeclNode *decl) { decls.push_back(decl); }
 
-        void print(std::fstream &fout) override;
+        void print(std::fstream &fout);
 
         GETTER(funcs, getFuncs) { return funcs; }
 
