@@ -22,7 +22,7 @@ namespace TOY_COMPILER {
         int getLineno() { return lineno; }
     };
 
-    class abstractAST {
+    class abstractAST : public linenoInterface {
     public:
         virtual void print(std::fstream &fout) {}
 
@@ -56,23 +56,23 @@ namespace TOY_COMPILER {
     };
 
 // mark class
-    class abstractSimpleDecl {
+    class abstractSimpleDecl : public abstractTypeDeclNode{
     };
 
     class literal : public abstractExpr {
     protected:
-        TOY_COMPILER::expValue _value;
-        TOY_COMPILER::const_valueType _t;
+        TOY_COMPILER::expValue *_value;
+        TOY_COMPILER::const_valueType *_t;
 
     public:
-        literal(TOY_COMPILER::expValue v, TOY_COMPILER::const_valueType t) : _t{t} {
+        literal(TOY_COMPILER::expValue *v, TOY_COMPILER::const_valueType *t) : _t{t} {
             n_type = TOY_COMPILER::LITERAL;
-            if (_t.sys_type == MAXINT) {
-                _value.int_value = INT_MAX;
-            } else if (_t.sys_type == TRUE) {
-                _value.bool_value = true;
-            } else if (_t.sys_type == FALSE) {
-                _value.bool_value = false;
+            if (_t->sys_type == MAXINT) {
+                _value->int_value = INT_MAX;
+            } else if (_t->sys_type == TRUE) {
+                _value->bool_value = true;
+            } else if (_t->sys_type == FALSE) {
+                _value->bool_value = false;
             } else {
                 _value = v;
             }
@@ -83,7 +83,7 @@ namespace TOY_COMPILER {
         GETTER(_value, getValue) { return _value; }
     };
 
-    class constNode {
+    class constNode : public linenoInterface {
         // NAME  EQUAL  const_value
     protected:
         std::string id;
@@ -97,24 +97,27 @@ namespace TOY_COMPILER {
         GETTER(val, getType) { return val; }
     };
 
-    class constDecl : public abstractExpr {
+    class constDecl : public abstractTypeDeclNode {
         // CONST const_expr_list  NAME  EQUAL  const_value  SEMI
     protected:
-        std::vector<constNode *> constdecls;
+        std::vector<constNode *> *constdecls;
 
     public:
-        constDecl() { n_type = TOY_COMPILER::CONSTDECL; }
+        constDecl() {
+            n_type = TOY_COMPILER::CONSTDECL;
+            constdecls = new std::vector<constNode *>();
+        }
 
         void print(std::fstream &fout) override;
 
         void addConstDecl(const std::string &id, literal *v) {
-            constdecls.push_back(new constNode(id, v));
+            constdecls->push_back(new constNode(id, v));
         }
 
         GETTER(constdecls, getDecls) { return constdecls; }
     };
 
-    class simpleDecl : public abstractTypeDeclNode, public abstractSimpleDecl {
+    class simpleDecl : public abstractSimpleDecl {
     protected:
         TOY_COMPILER::valType val_type;
 
@@ -125,10 +128,10 @@ namespace TOY_COMPILER {
         GETTER(val_type, getval_type) { return val_type; }
     };
 
-    class rangeDecl : public abstractTypeDeclNode, public abstractSimpleDecl {
+    class rangeDecl :public abstractSimpleDecl {
     protected:
         std::string id_l, id_r;
-        TOY_COMPILER::const_valueType *con_l, *con_r;
+        literal *con_l, *con_r;
         bool minus_l, minus_r;
 
     public:
@@ -141,7 +144,7 @@ namespace TOY_COMPILER {
         // simple_type_decl:  const_value  DOTDOT  const_value
         //                |  MINUS  const_value  DOTDOT  const_value
         //                |  MINUS  const_value  DOTDOT  MINUS  const_value
-        rangeDecl(bool m_l, const_valueType *c_l, bool m_r, const_valueType *c_r)
+        rangeDecl(bool m_l, literal *c_l, bool m_r, literal *c_r)
                 : minus_l{m_l}, con_l{c_l}, minus_r{m_r}, con_r{c_r} {}
 
         GETTER(con_l, getLeftRange) { return con_l; }
@@ -157,7 +160,7 @@ namespace TOY_COMPILER {
         GETTER(id_r, getId_r) { return id_r; }
     };
 
-    class namesDecl : public abstractTypeDeclNode, public abstractSimpleDecl {
+    class namesDecl : public abstractSimpleDecl {
     protected:
         std::vector<std::string> names;
         bool isnamelist;
@@ -194,7 +197,7 @@ namespace TOY_COMPILER {
         GETTER(type_decl, getTypeDecl) { return type_decl; }
     };
 
-    class field {
+    class field : public linenoInterface {
     protected:
         std::vector<std::string> *namelist;
         abstractTypeDeclNode *type;
@@ -220,7 +223,7 @@ namespace TOY_COMPILER {
         GETTER(fields, getFields) { return fields; }
     };
 
-    class varNode {
+    class varNode : public linenoInterface {
     protected:
         std::vector<std::string> *names;
         abstractTypeDeclNode *varType;
@@ -236,12 +239,12 @@ namespace TOY_COMPILER {
 
     class varDecl : public abstractTypeDeclNode {
     protected:
-        std::vector<varNode *> decls;
+        std::vector<varNode *> *decls;
 
     public:
         varDecl() { n_type = TOY_COMPILER::VARDECL; }
 
-        void addDecl(varNode *v) { decls.push_back(v); }
+        void addDecl(varNode *v) { decls->push_back(v); }
 
         GETTER(decls, getDecls) { return decls; }
     };
@@ -258,7 +261,7 @@ namespace TOY_COMPILER {
         GETTER(new_type, getNewType) { return new_type; }
     };
 
-    class parameter {
+    class parameter : public linenoInterface {
     protected:
         TOY_COMPILER::passBy by;
         std::vector<std::string> names; // names specifies whether it's nameslist or
@@ -311,7 +314,7 @@ namespace TOY_COMPILER {
         GETTER(type, getOp) { return type; }
     };
 
-    class stmtList : public abstractAST {
+    class stmtList : public abstractStmt {
     protected:
         std::vector<abstractStmt *> m_stmtList;
 
@@ -328,12 +331,12 @@ namespace TOY_COMPILER {
     class ifStmt : public abstractStmt {
     protected:
         // if cond then execStmt [else elseStmt]
-        mathExpr *cond;
+        abstractExpr *cond;
         abstractStmt *execStmt;
         abstractStmt *elseStmt;
 
     public:
-        ifStmt(mathExpr *cond, abstractStmt *execStmt, abstractStmt *elseStmt)
+        ifStmt(abstractExpr *cond, abstractStmt *execStmt, abstractStmt *elseStmt)
                 : cond{cond}, execStmt{execStmt}, elseStmt{elseStmt} {
             n_type = TOY_COMPILER::IFSTMT;
         }
@@ -351,10 +354,10 @@ namespace TOY_COMPILER {
     protected:
         // repeat stmtlists until cond
         stmtList *stmtlist;
-        mathExpr *cond;
+        abstractExpr *cond;
 
     public:
-        repeatStmt(mathExpr *cond, stmtList *stmtlist)
+        repeatStmt(abstractExpr *cond, stmtList *stmtlist)
                 : cond{cond}, stmtlist{stmtlist} {
             n_type = TOY_COMPILER::REPEATSTMT;
         }
@@ -369,11 +372,11 @@ namespace TOY_COMPILER {
     class whileStmt : public abstractStmt {
     protected:
         // while cond do stmt
-        stmtList *stmtlist;
-        mathExpr *cond;
+        abstractStmt *stmtlist;
+        abstractExpr *cond;
 
     public:
-        whileStmt(mathExpr *cond, stmtList *stmts) : cond{cond}, stmtlist{stmts} {
+        whileStmt(abstractExpr *cond, abstractStmt *stmts) : cond{cond}, stmtlist{stmts} {
             n_type = TOY_COMPILER::WHILESTMT;
         }
 
@@ -388,13 +391,13 @@ namespace TOY_COMPILER {
     protected:
         // FOR  ID  ASSIGN  from  direction  to  DO stmt
         std::string id;
-        mathExpr *from;
-        mathExpr *to;
+        abstractExpr *from;
+        abstractExpr *to;
         bool direction;
         abstractStmt *stmt;
 
     public:
-        forStmt(std::string i, mathExpr *from, mathExpr *to, bool direction,
+        forStmt(std::string i, abstractExpr *from, abstractExpr *to, bool direction,
                 abstractStmt *s)
                 : id{i}, from{from}, to{to}, direction{direction}, stmt{s} {
             n_type = TOY_COMPILER::FORSTMT;
@@ -413,7 +416,7 @@ namespace TOY_COMPILER {
         GETTER(stmt, getStmtlist) { return stmt; }
     };
 
-    class caseNode {
+    class caseNode : public linenoInterface {
     public:
         abstractExpr *case_;
         abstractStmt *stmt;
@@ -425,13 +428,13 @@ namespace TOY_COMPILER {
     class caseStmt : public abstractStmt {
     protected:
         // CASE expression OF case_expr_list  END
-        mathExpr *case_cond;
+        abstractExpr *case_cond;
         std::vector<caseNode *> case_expr_list;
 
     public:
         caseStmt() { n_type = TOY_COMPILER::CASESTMT; }
 
-        void addCond(mathExpr *cond) { case_cond = cond; }
+        void addCond(abstractExpr *cond) { case_cond = cond; }
 
         void print(std::fstream &fout) override;
 
@@ -523,7 +526,7 @@ namespace TOY_COMPILER {
         GETTER(retval, getRetval) { return retval; }
     };
 
-    class rootProgram : public abstractAST, abstractSubroutine {
+    class rootProgram : public abstractAST, public abstractSubroutine {
     public:
         std::vector<functionNode *> funcs;
         stmtList stmts;

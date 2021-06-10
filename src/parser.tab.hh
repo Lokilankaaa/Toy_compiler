@@ -32,7 +32,7 @@
 
 
 /**
- ** \file parser.tab.hh
+ ** \file /Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.hh
  ** Define the TOY_COMPILER::parser class.
  */
 
@@ -42,10 +42,10 @@
 // especially those whose name start with YY_ or yy_.  They are
 // private implementation details that can be changed or removed.
 
-#ifndef YY_YY_PARSER_TAB_HH_INCLUDED
-# define YY_YY_PARSER_TAB_HH_INCLUDED
+#ifndef YY_YY_USERS_XUEWEI_ONEDRIVE_ZJU_EDU_CN_CODE_CPP_TOY_COMPILER_SRC_PARSER_TAB_HH_INCLUDED
+# define YY_YY_USERS_XUEWEI_ONEDRIVE_ZJU_EDU_CN_CODE_CPP_TOY_COMPILER_SRC_PARSER_TAB_HH_INCLUDED
 // "%code requires" blocks.
-#line 23 "parser.y"
+#line 23 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
 
     namespace TOY_COMPILER  {
         class Scanner;
@@ -62,7 +62,7 @@
 #  endif
 # endif
 
-#line 66 "parser.tab.hh"
+#line 66 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.hh"
 
 # include <cassert>
 # include <cstdlib> // std::abort
@@ -195,9 +195,9 @@
 # define YYDEBUG 1
 #endif
 
-#line 20 "parser.y"
+#line 20 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
 namespace TOY_COMPILER {
-#line 201 "parser.tab.hh"
+#line 201 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.hh"
 
 
 
@@ -417,59 +417,62 @@ namespace TOY_COMPILER {
       // factor
       char dummy1[sizeof (abstractExpr *)];
 
+      // simple_type_decl
+      char dummy2[sizeof (abstractSimpleDecl *)];
+
       // stmt
       // non_label_stmt
       // else_clause
-      char dummy2[sizeof (abstractStmt*)];
+      char dummy3[sizeof (abstractStmt*)];
 
       // type_decl
-      char dummy3[sizeof (abstractTypeDeclNode *)];
+      char dummy4[sizeof (abstractTypeDeclNode *)];
 
       // array_type_decl
-      char dummy4[sizeof (arrayDecl*)];
+      char dummy5[sizeof (arrayDecl*)];
 
       // assign_stmt
-      char dummy5[sizeof (assignStmt*)];
+      char dummy6[sizeof (assignStmt*)];
 
       // BOOL
       // direction
-      char dummy6[sizeof (bool)];
+      char dummy7[sizeof (bool)];
 
       // case_expr
-      char dummy7[sizeof (caseNode*)];
+      char dummy8[sizeof (caseNode*)];
 
       // case_stmt
       // case_expr_list
-      char dummy8[sizeof (caseStmt*)];
+      char dummy9[sizeof (caseStmt*)];
 
       // CHAR
-      char dummy9[sizeof (char)];
+      char dummy10[sizeof (char)];
 
       // const_part
       // const_expr_list
-      char dummy10[sizeof (constDecl *)];
+      char dummy11[sizeof (constDecl *)];
 
       // REAL
-      char dummy11[sizeof (double)];
+      char dummy12[sizeof (double)];
 
       // field_decl
-      char dummy12[sizeof (field*)];
+      char dummy13[sizeof (field*)];
 
       // for_stmt
-      char dummy13[sizeof (forStmt*)];
+      char dummy14[sizeof (forStmt*)];
+
+      // proc_stmt
+      char dummy15[sizeof (functionCall *)];
 
       // function_decl
       // procedure_decl
-      char dummy14[sizeof (functionNode *)];
-
-      // proc_stmt
-      char dummy15[sizeof (functionNode*)];
+      char dummy16[sizeof (functionNode *)];
 
       // goto_stmt
-      char dummy16[sizeof (gotoStmt*)];
+      char dummy17[sizeof (gotoStmt*)];
 
       // if_stmt
-      char dummy17[sizeof (ifStmt*)];
+      char dummy18[sizeof (ifStmt*)];
 
       // SYS_CON
       // SYS_FUNCT
@@ -477,30 +480,27 @@ namespace TOY_COMPILER {
       // SYS_PROC
       // SYS_TYPE
       // INTEGER
-      char dummy18[sizeof (int)];
+      char dummy19[sizeof (int)];
 
       // const_value
-      char dummy19[sizeof (literal*)];
+      char dummy20[sizeof (literal*)];
 
-      // parameters
-      char dummy20[sizeof (parameter *)];
+      // para_type_list
+      char dummy21[sizeof (parameter *)];
 
       // record_type_decl
       // field_decl_list
-      char dummy21[sizeof (recordDecl *)];
+      char dummy22[sizeof (recordDecl *)];
 
       // repeat_stmt
-      char dummy22[sizeof (repeatStmt*)];
+      char dummy23[sizeof (repeatStmt*)];
 
       // routine
       // sub_routine
-      char dummy23[sizeof (rootProgram*)];
-
-      // simple_type_decl
-      char dummy24[sizeof (simpleDecl*)];
+      char dummy24[sizeof (rootProgram*)];
 
       // routine_head
-      char dummy25[sizeof (std::pair<std::vector<abstractDeclNode *> *, std::vector<functionNode *> *> )];
+      char dummy25[sizeof (std::pair<std::vector<abstractTypeDeclNode *> *, std::vector<functionNode *> *> )];
 
       // ID
       char dummy26[sizeof (std::string)];
@@ -509,47 +509,45 @@ namespace TOY_COMPILER {
       char dummy27[sizeof (std::string*)];
 
       // function_head
-      char dummy28[sizeof (std::tuple<std::string, std::vector<parameters *> *, abstractSimpleDecl *>)];
+      char dummy28[sizeof (std::tuple<std::string, std::vector<parameter *> *, abstractSimpleDecl *>)];
 
       // procedure_head
-      char dummy29[sizeof (std::tuple<std::string, std::vector<parameters *> *>)];
+      char dummy29[sizeof (std::tuple<std::string, std::vector<parameter *> *>)];
 
       // args_list
-      char dummy30[sizeof (std::vector<abstractStmt*>*)];
+      char dummy30[sizeof (std::vector<abstractExpr *> *)];
 
       // routine_part
       char dummy31[sizeof (std::vector<functionNode *> *)];
 
+      // parameters
       // para_decl_list
-      // para_type_list
-      // var_para_list
-      // val_para_list
-      char dummy32[sizeof (std::vector<parameters *>*)];
+      char dummy32[sizeof (std::vector<parameter *>*)];
 
       // name_list
+      // var_para_list
+      // val_para_list
       char dummy33[sizeof (std::vector<std::string>*)];
 
       // routine_body
       // compound_stmt
-      char dummy34[sizeof (stmtList *)];
-
       // stmt_list
-      char dummy35[sizeof (stmtList*)];
+      char dummy34[sizeof (stmtList *)];
 
       // type_part
       // type_decl_list
-      char dummy36[sizeof (typeDefDecl *)];
+      char dummy35[sizeof (typeDefDecl *)];
 
       // var_part
       // var_decl_list
-      char dummy37[sizeof (varDecl *)];
+      char dummy36[sizeof (varDecl *)];
 
       // type_definition
       // var_decl
-      char dummy38[sizeof (varNode *)];
+      char dummy37[sizeof (varNode *)];
 
       // while_stmt
-      char dummy39[sizeof (whileStmt*)];
+      char dummy38[sizeof (whileStmt*)];
     };
 
     /// The size of the largest semantic type.
@@ -840,6 +838,10 @@ namespace TOY_COMPILER {
         value.move< abstractExpr * > (std::move (that.value));
         break;
 
+      case symbol_kind::S_simple_type_decl: // simple_type_decl
+        value.move< abstractSimpleDecl * > (std::move (that.value));
+        break;
+
       case symbol_kind::S_stmt: // stmt
       case symbol_kind::S_non_label_stmt: // non_label_stmt
       case symbol_kind::S_else_clause: // else_clause
@@ -893,13 +895,13 @@ namespace TOY_COMPILER {
         value.move< forStmt* > (std::move (that.value));
         break;
 
+      case symbol_kind::S_proc_stmt: // proc_stmt
+        value.move< functionCall * > (std::move (that.value));
+        break;
+
       case symbol_kind::S_function_decl: // function_decl
       case symbol_kind::S_procedure_decl: // procedure_decl
         value.move< functionNode * > (std::move (that.value));
-        break;
-
-      case symbol_kind::S_proc_stmt: // proc_stmt
-        value.move< functionNode* > (std::move (that.value));
         break;
 
       case symbol_kind::S_goto_stmt: // goto_stmt
@@ -923,7 +925,7 @@ namespace TOY_COMPILER {
         value.move< literal* > (std::move (that.value));
         break;
 
-      case symbol_kind::S_parameters: // parameters
+      case symbol_kind::S_para_type_list: // para_type_list
         value.move< parameter * > (std::move (that.value));
         break;
 
@@ -941,12 +943,8 @@ namespace TOY_COMPILER {
         value.move< rootProgram* > (std::move (that.value));
         break;
 
-      case symbol_kind::S_simple_type_decl: // simple_type_decl
-        value.move< simpleDecl* > (std::move (that.value));
-        break;
-
       case symbol_kind::S_routine_head: // routine_head
-        value.move< std::pair<std::vector<abstractDeclNode *> *, std::vector<functionNode *> *>  > (std::move (that.value));
+        value.move< std::pair<std::vector<abstractTypeDeclNode *> *, std::vector<functionNode *> *>  > (std::move (that.value));
         break;
 
       case symbol_kind::S_ID: // ID
@@ -958,39 +956,36 @@ namespace TOY_COMPILER {
         break;
 
       case symbol_kind::S_function_head: // function_head
-        value.move< std::tuple<std::string, std::vector<parameters *> *, abstractSimpleDecl *> > (std::move (that.value));
+        value.move< std::tuple<std::string, std::vector<parameter *> *, abstractSimpleDecl *> > (std::move (that.value));
         break;
 
       case symbol_kind::S_procedure_head: // procedure_head
-        value.move< std::tuple<std::string, std::vector<parameters *> *> > (std::move (that.value));
+        value.move< std::tuple<std::string, std::vector<parameter *> *> > (std::move (that.value));
         break;
 
       case symbol_kind::S_args_list: // args_list
-        value.move< std::vector<abstractStmt*>* > (std::move (that.value));
+        value.move< std::vector<abstractExpr *> * > (std::move (that.value));
         break;
 
       case symbol_kind::S_routine_part: // routine_part
         value.move< std::vector<functionNode *> * > (std::move (that.value));
         break;
 
+      case symbol_kind::S_parameters: // parameters
       case symbol_kind::S_para_decl_list: // para_decl_list
-      case symbol_kind::S_para_type_list: // para_type_list
-      case symbol_kind::S_var_para_list: // var_para_list
-      case symbol_kind::S_val_para_list: // val_para_list
-        value.move< std::vector<parameters *>* > (std::move (that.value));
+        value.move< std::vector<parameter *>* > (std::move (that.value));
         break;
 
       case symbol_kind::S_name_list: // name_list
+      case symbol_kind::S_var_para_list: // var_para_list
+      case symbol_kind::S_val_para_list: // val_para_list
         value.move< std::vector<std::string>* > (std::move (that.value));
         break;
 
       case symbol_kind::S_routine_body: // routine_body
       case symbol_kind::S_compound_stmt: // compound_stmt
-        value.move< stmtList * > (std::move (that.value));
-        break;
-
       case symbol_kind::S_stmt_list: // stmt_list
-        value.move< stmtList* > (std::move (that.value));
+        value.move< stmtList * > (std::move (that.value));
         break;
 
       case symbol_kind::S_type_part: // type_part
@@ -1043,6 +1038,20 @@ namespace TOY_COMPILER {
       {}
 #else
       basic_symbol (typename Base::kind_type t, const abstractExpr *& v, const location_type& l)
+        : Base (t)
+        , value (v)
+        , location (l)
+      {}
+#endif
+
+#if 201103L <= YY_CPLUSPLUS
+      basic_symbol (typename Base::kind_type t, abstractSimpleDecl *&& v, location_type&& l)
+        : Base (t)
+        , value (std::move (v))
+        , location (std::move (l))
+      {}
+#else
+      basic_symbol (typename Base::kind_type t, const abstractSimpleDecl *& v, const location_type& l)
         : Base (t)
         , value (v)
         , location (l)
@@ -1218,13 +1227,13 @@ namespace TOY_COMPILER {
 #endif
 
 #if 201103L <= YY_CPLUSPLUS
-      basic_symbol (typename Base::kind_type t, functionNode *&& v, location_type&& l)
+      basic_symbol (typename Base::kind_type t, functionCall *&& v, location_type&& l)
         : Base (t)
         , value (std::move (v))
         , location (std::move (l))
       {}
 #else
-      basic_symbol (typename Base::kind_type t, const functionNode *& v, const location_type& l)
+      basic_symbol (typename Base::kind_type t, const functionCall *& v, const location_type& l)
         : Base (t)
         , value (v)
         , location (l)
@@ -1232,13 +1241,13 @@ namespace TOY_COMPILER {
 #endif
 
 #if 201103L <= YY_CPLUSPLUS
-      basic_symbol (typename Base::kind_type t, functionNode*&& v, location_type&& l)
+      basic_symbol (typename Base::kind_type t, functionNode *&& v, location_type&& l)
         : Base (t)
         , value (std::move (v))
         , location (std::move (l))
       {}
 #else
-      basic_symbol (typename Base::kind_type t, const functionNode*& v, const location_type& l)
+      basic_symbol (typename Base::kind_type t, const functionNode *& v, const location_type& l)
         : Base (t)
         , value (v)
         , location (l)
@@ -1358,27 +1367,13 @@ namespace TOY_COMPILER {
 #endif
 
 #if 201103L <= YY_CPLUSPLUS
-      basic_symbol (typename Base::kind_type t, simpleDecl*&& v, location_type&& l)
+      basic_symbol (typename Base::kind_type t, std::pair<std::vector<abstractTypeDeclNode *> *, std::vector<functionNode *> *> && v, location_type&& l)
         : Base (t)
         , value (std::move (v))
         , location (std::move (l))
       {}
 #else
-      basic_symbol (typename Base::kind_type t, const simpleDecl*& v, const location_type& l)
-        : Base (t)
-        , value (v)
-        , location (l)
-      {}
-#endif
-
-#if 201103L <= YY_CPLUSPLUS
-      basic_symbol (typename Base::kind_type t, std::pair<std::vector<abstractDeclNode *> *, std::vector<functionNode *> *> && v, location_type&& l)
-        : Base (t)
-        , value (std::move (v))
-        , location (std::move (l))
-      {}
-#else
-      basic_symbol (typename Base::kind_type t, const std::pair<std::vector<abstractDeclNode *> *, std::vector<functionNode *> *> & v, const location_type& l)
+      basic_symbol (typename Base::kind_type t, const std::pair<std::vector<abstractTypeDeclNode *> *, std::vector<functionNode *> *> & v, const location_type& l)
         : Base (t)
         , value (v)
         , location (l)
@@ -1414,13 +1409,13 @@ namespace TOY_COMPILER {
 #endif
 
 #if 201103L <= YY_CPLUSPLUS
-      basic_symbol (typename Base::kind_type t, std::tuple<std::string, std::vector<parameters *> *, abstractSimpleDecl *>&& v, location_type&& l)
+      basic_symbol (typename Base::kind_type t, std::tuple<std::string, std::vector<parameter *> *, abstractSimpleDecl *>&& v, location_type&& l)
         : Base (t)
         , value (std::move (v))
         , location (std::move (l))
       {}
 #else
-      basic_symbol (typename Base::kind_type t, const std::tuple<std::string, std::vector<parameters *> *, abstractSimpleDecl *>& v, const location_type& l)
+      basic_symbol (typename Base::kind_type t, const std::tuple<std::string, std::vector<parameter *> *, abstractSimpleDecl *>& v, const location_type& l)
         : Base (t)
         , value (v)
         , location (l)
@@ -1428,13 +1423,13 @@ namespace TOY_COMPILER {
 #endif
 
 #if 201103L <= YY_CPLUSPLUS
-      basic_symbol (typename Base::kind_type t, std::tuple<std::string, std::vector<parameters *> *>&& v, location_type&& l)
+      basic_symbol (typename Base::kind_type t, std::tuple<std::string, std::vector<parameter *> *>&& v, location_type&& l)
         : Base (t)
         , value (std::move (v))
         , location (std::move (l))
       {}
 #else
-      basic_symbol (typename Base::kind_type t, const std::tuple<std::string, std::vector<parameters *> *>& v, const location_type& l)
+      basic_symbol (typename Base::kind_type t, const std::tuple<std::string, std::vector<parameter *> *>& v, const location_type& l)
         : Base (t)
         , value (v)
         , location (l)
@@ -1442,13 +1437,13 @@ namespace TOY_COMPILER {
 #endif
 
 #if 201103L <= YY_CPLUSPLUS
-      basic_symbol (typename Base::kind_type t, std::vector<abstractStmt*>*&& v, location_type&& l)
+      basic_symbol (typename Base::kind_type t, std::vector<abstractExpr *> *&& v, location_type&& l)
         : Base (t)
         , value (std::move (v))
         , location (std::move (l))
       {}
 #else
-      basic_symbol (typename Base::kind_type t, const std::vector<abstractStmt*>*& v, const location_type& l)
+      basic_symbol (typename Base::kind_type t, const std::vector<abstractExpr *> *& v, const location_type& l)
         : Base (t)
         , value (v)
         , location (l)
@@ -1470,13 +1465,13 @@ namespace TOY_COMPILER {
 #endif
 
 #if 201103L <= YY_CPLUSPLUS
-      basic_symbol (typename Base::kind_type t, std::vector<parameters *>*&& v, location_type&& l)
+      basic_symbol (typename Base::kind_type t, std::vector<parameter *>*&& v, location_type&& l)
         : Base (t)
         , value (std::move (v))
         , location (std::move (l))
       {}
 #else
-      basic_symbol (typename Base::kind_type t, const std::vector<parameters *>*& v, const location_type& l)
+      basic_symbol (typename Base::kind_type t, const std::vector<parameter *>*& v, const location_type& l)
         : Base (t)
         , value (v)
         , location (l)
@@ -1505,20 +1500,6 @@ namespace TOY_COMPILER {
       {}
 #else
       basic_symbol (typename Base::kind_type t, const stmtList *& v, const location_type& l)
-        : Base (t)
-        , value (v)
-        , location (l)
-      {}
-#endif
-
-#if 201103L <= YY_CPLUSPLUS
-      basic_symbol (typename Base::kind_type t, stmtList*&& v, location_type&& l)
-        : Base (t)
-        , value (std::move (v))
-        , location (std::move (l))
-      {}
-#else
-      basic_symbol (typename Base::kind_type t, const stmtList*& v, const location_type& l)
         : Base (t)
         , value (v)
         , location (l)
@@ -1610,6 +1591,10 @@ switch (yykind)
         value.template destroy< abstractExpr * > ();
         break;
 
+      case symbol_kind::S_simple_type_decl: // simple_type_decl
+        value.template destroy< abstractSimpleDecl * > ();
+        break;
+
       case symbol_kind::S_stmt: // stmt
       case symbol_kind::S_non_label_stmt: // non_label_stmt
       case symbol_kind::S_else_clause: // else_clause
@@ -1663,13 +1648,13 @@ switch (yykind)
         value.template destroy< forStmt* > ();
         break;
 
+      case symbol_kind::S_proc_stmt: // proc_stmt
+        value.template destroy< functionCall * > ();
+        break;
+
       case symbol_kind::S_function_decl: // function_decl
       case symbol_kind::S_procedure_decl: // procedure_decl
         value.template destroy< functionNode * > ();
-        break;
-
-      case symbol_kind::S_proc_stmt: // proc_stmt
-        value.template destroy< functionNode* > ();
         break;
 
       case symbol_kind::S_goto_stmt: // goto_stmt
@@ -1693,7 +1678,7 @@ switch (yykind)
         value.template destroy< literal* > ();
         break;
 
-      case symbol_kind::S_parameters: // parameters
+      case symbol_kind::S_para_type_list: // para_type_list
         value.template destroy< parameter * > ();
         break;
 
@@ -1711,12 +1696,8 @@ switch (yykind)
         value.template destroy< rootProgram* > ();
         break;
 
-      case symbol_kind::S_simple_type_decl: // simple_type_decl
-        value.template destroy< simpleDecl* > ();
-        break;
-
       case symbol_kind::S_routine_head: // routine_head
-        value.template destroy< std::pair<std::vector<abstractDeclNode *> *, std::vector<functionNode *> *>  > ();
+        value.template destroy< std::pair<std::vector<abstractTypeDeclNode *> *, std::vector<functionNode *> *>  > ();
         break;
 
       case symbol_kind::S_ID: // ID
@@ -1728,39 +1709,36 @@ switch (yykind)
         break;
 
       case symbol_kind::S_function_head: // function_head
-        value.template destroy< std::tuple<std::string, std::vector<parameters *> *, abstractSimpleDecl *> > ();
+        value.template destroy< std::tuple<std::string, std::vector<parameter *> *, abstractSimpleDecl *> > ();
         break;
 
       case symbol_kind::S_procedure_head: // procedure_head
-        value.template destroy< std::tuple<std::string, std::vector<parameters *> *> > ();
+        value.template destroy< std::tuple<std::string, std::vector<parameter *> *> > ();
         break;
 
       case symbol_kind::S_args_list: // args_list
-        value.template destroy< std::vector<abstractStmt*>* > ();
+        value.template destroy< std::vector<abstractExpr *> * > ();
         break;
 
       case symbol_kind::S_routine_part: // routine_part
         value.template destroy< std::vector<functionNode *> * > ();
         break;
 
+      case symbol_kind::S_parameters: // parameters
       case symbol_kind::S_para_decl_list: // para_decl_list
-      case symbol_kind::S_para_type_list: // para_type_list
-      case symbol_kind::S_var_para_list: // var_para_list
-      case symbol_kind::S_val_para_list: // val_para_list
-        value.template destroy< std::vector<parameters *>* > ();
+        value.template destroy< std::vector<parameter *>* > ();
         break;
 
       case symbol_kind::S_name_list: // name_list
+      case symbol_kind::S_var_para_list: // var_para_list
+      case symbol_kind::S_val_para_list: // val_para_list
         value.template destroy< std::vector<std::string>* > ();
         break;
 
       case symbol_kind::S_routine_body: // routine_body
       case symbol_kind::S_compound_stmt: // compound_stmt
-        value.template destroy< stmtList * > ();
-        break;
-
       case symbol_kind::S_stmt_list: // stmt_list
-        value.template destroy< stmtList* > ();
+        value.template destroy< stmtList * > ();
         break;
 
       case symbol_kind::S_type_part: // type_part
@@ -3266,11 +3244,11 @@ switch (yykind)
   };
 
 
-#line 20 "parser.y"
+#line 20 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
 } // TOY_COMPILER
-#line 3272 "parser.tab.hh"
+#line 3250 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.hh"
 
 
 
 
-#endif // !YY_YY_PARSER_TAB_HH_INCLUDED
+#endif // !YY_YY_USERS_XUEWEI_ONEDRIVE_ZJU_EDU_CN_CODE_CPP_TOY_COMPILER_SRC_PARSER_TAB_HH_INCLUDED

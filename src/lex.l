@@ -2,7 +2,7 @@
 #include <string>
 
 /* Implementation of yyFlexScanner */
-#include "scanner.hpp"
+#include "scanner.h"
 #include "parser.tab.hh"
 #undef  YY_DECL
 #define YY_DECL int TOY_COMPILER::Scanner::yylex(TOY_COMPILER::Parser::semantic_type * const lval, TOY_COMPILER::Parser::location_type *loc)
@@ -95,7 +95,6 @@ boolean     { yylval->build<int>(1); return token::SYS_TYPE; }
 char        { yylval->build<int>(2); return token::SYS_TYPE; }
 integer     { yylval->build<int>(3); return token::SYS_TYPE; }
 real        { yylval->build<int>(4); return token::SYS_TYPE; }
-string      { yylval->build<int>(5); return token::SYS_TYPE; }
 
     /* integer */
 -?[0-9]+    { yylval->build<int>(atoi(yytext)); return token::INTEGER; }

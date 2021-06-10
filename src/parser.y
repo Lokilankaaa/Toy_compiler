@@ -46,8 +46,11 @@
     #include <vector>
     #include <algorithm>
     /* include for all driver functions */
+    using namespace TOY_COMPILER;
 
     extern GlobalSymbol *globalsymtab;
+
+    extern abstractAST * root;
 
 #undef yylex
 #define yylex scanner.yylex
@@ -120,13 +123,14 @@
 
 %type   <bool> direction
 %type	<std::string*> program_head
-%type   <std::pair<std::vector<abstractDeclNode *> *, std::vector<functionNode *> *> > routine_head
+%type   <std::pair<std::vector<abstractTypeDeclNode *> *, std::vector<functionNode *> *> > routine_head
 %type   <rootProgram*> routine sub_routine
 %type   <stmtList *> routine_body
 %type   <std::vector<functionNode *> *> routine_part
 %type   <functionNode *> function_decl procedure_decl
-%type   <std::tuple<std::string, std::vector<parameters *> *, abstractSimpleDecl *>> function_head
-%type   <std::tuple<std::string, std::vector<parameters *> *>> procedure_head
+%type   <functionCall *> proc_stmt
+%type   <std::tuple<std::string, std::vector<parameter *> *, abstractSimpleDecl *>> function_head
+%type   <std::tuple<std::string, std::vector<parameter *> *>> procedure_head
 %type   <abstractExpr *> factor term expr expression
 %type   <literal*> const_value
 %type   <constDecl *> const_part const_expr_list
@@ -138,23 +142,21 @@
 %type   <repeatStmt*> repeat_stmt
 %type   <forStmt*> for_stmt
 %type   <gotoStmt*> goto_stmt
-%type   <functionNode*> proc_stmt
-%type   <stmtList *> compound_stmt
+%type   <stmtList *> compound_stmt stmt_list
 %type   <caseNode*> case_expr
 %type   <caseStmt*> case_expr_list
-%type   <stmtList*> stmt_list
-%type   <std::vector<abstractStmt*>*> args_list
+%type   <std::vector<abstractExpr *> *> args_list
 %type   <varNode *> type_definition var_decl
 %type   <varDecl *> var_part var_decl_list
 %type   <abstractTypeDeclNode *> type_decl
 %type   <typeDefDecl *> type_part type_decl_list  
-%type   <simpleDecl*> simple_type_decl
+%type   <abstractSimpleDecl *> simple_type_decl
 %type   <arrayDecl*> array_type_decl
 %type   <recordDecl *> record_type_decl field_decl_list
 %type   <field*> field_decl
-%type   <parameter *> parameters 
-%type   <std::vector<parameters *>*> para_decl_list para_type_list  var_para_list val_para_list
-%type   <std::vector<std::string>*> name_list
+%type   <parameter *> para_type_list
+%type   <std::vector<parameter *>*> para_decl_list parameters
+%type   <std::vector<std::string>*> name_list var_para_list val_para_list
 
 
 %%
@@ -162,8 +164,9 @@ program:
 // TODO: add ast root to symtab
         program_head  routine  DOT
         {
-            auto t = globalsymtab->newSymTable($1);
+            //auto t = globalsymtab->newSymTable($1);
             // globalsymtab->SymTable.insert()
+            root = $2;
         }
         ;
 
@@ -177,10 +180,10 @@ routine:
         routine_head  routine_body
         {
             $$ = new rootProgram();
-            $$->getDecls = std::move(*($1.first));
-            $$->getFunc = std::move(*($1.second));
-            $$->getStmt = std::move(*($2));
-            $$->setLineno(@$.first_row);
+            $$->getDecls() = std::move(*($1.first));
+            $$->getFuncs() = std::move(*($1.second));
+            $$->getStmts() = std::move(*($2));
+            $$->setLineno(@$.begin.line);
         }
         ;
 
@@ -194,13 +197,13 @@ sub_routine:
 routine_head:
         label_part  const_part  type_part  var_part  routine_part
         {
-        	auto decls = new std::vector<abstractDeclNode *>();
-            auto f = [=](abstractDeclNode *d) {
+        	auto decls = new std::vector<abstractTypeDeclNode *>();
+            auto f = [=](abstractTypeDeclNode *d) {
                 decls->push_back(d);
-            }
-            for_each($2->begin(), $2->end(), f);
-            for_each($3->begin(), $3->end(), f);
-            for_each($4->begin(), $4->end(), f);
+            };
+            decls->push_back($2);
+            decls->push_back($3);
+            decls->push_back($4);
             $$ = std::make_pair(decls, $5);
         }
         ;
@@ -229,7 +232,7 @@ const_expr_list:
         {
             $$ = new constDecl();
             $$->addConstDecl($1, $3);
-            $$->setLineno(@$.first_row);
+            $$->setLineno(@$.begin.line);
         }
         ;
 
@@ -241,7 +244,7 @@ const_value:
             t->d_type = TOY_COMPILER::INTEGER;
             v->int_value = $1;
             $$ = new literal(v, t);
-            $$->setLineno(@1.first_row);
+            $$->setLineno(@1.begin.line);
         }
         |  REAL
         {
@@ -250,7 +253,7 @@ const_value:
             t->d_type = TOY_COMPILER::REAL;
             v->real_value = $1;
             $$ = new literal(v, t);
-            $$->setLineno(@1.first_row);
+            $$->setLineno(@1.begin.line);
         }
         |  CHAR
         {
@@ -259,7 +262,7 @@ const_value:
             t->d_type = TOY_COMPILER::CHAR;
             v->char_value = $1;
             $$ = new literal(v, t);
-            $$->setLineno(@1.first_row);
+            $$->setLineno(@1.begin.line);
         }
         |  BOOL
         {
@@ -268,7 +271,7 @@ const_value:
             t->d_type = TOY_COMPILER::BOOLEAN;
             v->bool_value = $1;
             $$ = new literal(v, t);
-            $$->setLineno(@1.first_row);
+            $$->setLineno(@1.begin.line);
         }
         |  SYS_CON
         {
@@ -283,7 +286,7 @@ const_value:
             }
             v->bool_value = $1;
             $$ = new literal(v, t);
-            $$->setLineno(@1.first_row);
+            $$->setLineno(@1.begin.line);
         }
         ;
 
@@ -307,7 +310,7 @@ type_decl_list:
         {
             $$ = new typeDefDecl();
             $$->addTypeDef($1);
-            $$->setLineno(@$.first_row);
+            $$->setLineno(@$.begin.line);
         }
         ;
 
@@ -317,7 +320,7 @@ type_definition:
             auto ns = new std::vector<std::string>();
             ns->push_back($1);
             $$ = new varNode(ns, $3);
-            $$->setLineno(@1.first_row);
+            $$->setLineno(@1.begin.line);
         }
         ;
 
@@ -339,47 +342,56 @@ type_decl:
 simple_type_decl:
         SYS_TYPE
         {
-            $$ = new simpleDecl($1);
-            $$->setLineno(@1.first_row);
+            TOY_COMPILER::valType t;
+            if ($1 == 1)
+                t = BOOLEAN;
+            else if ($1 == 2)
+                t = CHAR;
+            else if ($1 == 3)
+                t = INTEGER;
+            else
+                t = REAL;
+            $$ = new simpleDecl(t);
+            $$->setLineno(@1.begin.line);
 
         }
         |  ID
         {
             auto name = new std::vector<std::string>();
-            name.push_back($1);
+            name->push_back($1);
 
             $$ = new namesDecl(*name, false);
-            $$->setLineno(@1.first_row);
+            $$->setLineno(@1.begin.line);
         }
         |  LP  name_list  RP
         {
             auto names = new std::vector<std::string>();
             auto f = [=](std::string &name) {
-                names.push_back(name);
-            }
+                names->push_back(name);
+            };
             for_each($2->begin(), $2->end(), f);
             $$ = new namesDecl(*names, false);
-            $$->setLineno(@1.first_row);
+            $$->setLineno(@1.begin.line);
         }
         |  const_value  DOTDOT  const_value
         {
             $$ = new rangeDecl(false, $1, false, $3);
-            $$->setLineno(@1.first_row);
+            $$->setLineno(@1.begin.line);
         }
         |  MINUS  const_value  DOTDOT  const_value
         {
             $$ = new rangeDecl(true, $2, false, $4);
-            $$->setLineno(@1.first_row);
+            $$->setLineno(@1.begin.line);
         }
         |  MINUS  const_value  DOTDOT  MINUS  const_value
         {
             $$ = new rangeDecl(true, $2, true, $5);
-            $$->setLineno(@1.first_row);
+            $$->setLineno(@1.begin.line);
         }
         |  ID  DOTDOT  ID
         {
             $$ = new rangeDecl($1, $3);
-            $$->setLineno(@1.first_row);
+            $$->setLineno(@1.begin.line);
         }
         ;
 
@@ -387,7 +399,7 @@ array_type_decl:
         ARRAY  LB  simple_type_decl  RB  OF  type_decl
         {
             $$ = new arrayDecl($3, $6);
-            $$->setLineno(@1.first_row);
+            $$->setLineno(@1.begin.line);
         }
         ;
 
@@ -402,13 +414,13 @@ field_decl_list:
         field_decl_list  field_decl
         {
             $$ = $1;
-            $$->addRecord($2);
+            $$->addRecord(*$2);
         }
         |  field_decl
         {
             $$ = new recordDecl();
-            $$->addRecord($1);
-            $$->setLineno(@$.first_row);
+            $$->addRecord(*$1);
+            $$->setLineno(@$.begin.line);
         }
         ;
 
@@ -416,7 +428,7 @@ field_decl:
         name_list  COLON  type_decl  SEMI
         {
             $$ = new field($1, $3);
-            $$->setLineno(@1.first_row);
+            $$->setLineno(@1.begin.line);
         }
         ;
 
@@ -452,7 +464,7 @@ var_decl_list:
         |  var_decl
         {
             $$ = new varDecl();
-            $$->setLineno(@1.first_row);
+            $$->setLineno(@1.begin.line);
             $$->addDecl($1);
         }
         ;
@@ -461,7 +473,7 @@ var_decl:
         name_list  COLON  type_decl  SEMI
         {
             $$ = new varNode($1, $3);
-            $$->setLineno(@1.first_row);
+            $$->setLineno(@1.begin.line);
         }
         ;
 
@@ -493,7 +505,7 @@ routine_part:
 function_decl:
         function_head  SEMI  sub_routine  SEMI {
         	$$ = new functionNode(get<0>($1), get<1>($1), $3, get<2>($1));
-            $$->setLineno(@1.first_row);
+            $$->setLineno(@1.begin.line);
         }
         ;
 
@@ -508,7 +520,7 @@ procedure_decl:
         procedure_head  SEMI  sub_routine  SEMI 
         {
             $$ = new functionNode(get<0>($1), get<1>($1), $3);
-            $$->setLineno(@1.first_row);
+            $$->setLineno(@1.begin.line);
         }
         ;
 
@@ -546,26 +558,26 @@ para_type_list:
         var_para_list COLON  simple_type_decl
         {
             $$ = new parameter(TOY_COMPILER::REFER, *($1), $3);
-            $$->setLineno(@1.first_row);
+            $$->setLineno(@1.begin.line);
         }
         |  val_para_list  COLON  simple_type_decl
         {
             $$ = new parameter(TOY_COMPILER::VALUE, *($1), $3);
-            $$->setLineno(@1.first_row);
+            $$->setLineno(@1.begin.line);
         }
         ;
 
 var_para_list:
         VAR  name_list
         {
-            $$ = $2
+            $$ = $2;
         }
         ;
 
 val_para_list:
         name_list
         {
-            $$ = $1
+            $$ = $1;
         }
         ;
 
@@ -578,18 +590,18 @@ compound_stmt:
         ;
 
 stmt_list:
-        stmt_list  stmt  SEMI {$1->push_back($2); $$ = $1;}
+        stmt_list  stmt  SEMI {$1->addStmt($2); $$ = $1;}
         |  
         {
             $$ = new stmtList();
-            $$->setLineno(@$.first_row);
+            $$->setLineno(@$.begin.line);
         }
         ;
 stmt:
         INTEGER  COLON  non_label_stmt 
         {
             $$ = $3;
-            globalsymtab->Label.insert($1, $3);
+            //globalsymtab->Label.insert($1, $3);
         }
         |  non_label_stmt {$$ = $1;}
         ;
@@ -610,23 +622,23 @@ assign_stmt:
         ID  ASSIGN  expression 
         {
             auto l = new variableNode($1);
-            l->setLineno(@1.first_row);
+            l->setLineno(@1.begin.line);
             $$ = new assignStmt(l, $3);
-            $$->setLineno(@1.first_row);
+            $$->setLineno(@1.begin.line);
         }
         | ID LB expression RB ASSIGN expression 
         {
             auto l = new mathExpr(TOY_COMPILER::LBRB, new variableNode($1), $3);
-            l->setLineno(@1.first_row);
+            l->setLineno(@1.begin.line);
             $$ = new assignStmt(l, $6);
-            $$->setLineno(@1.first_row);
+            $$->setLineno(@1.begin.line);
         }
         | ID  DOT  ID  ASSIGN  expression 
         {
             auto l = new mathExpr(TOY_COMPILER::DOT, new variableNode($1), new variableNode($3));
-            l->setLineno(@1.first_row);
+            l->setLineno(@1.begin.line);
             $$ = new assignStmt(l, $5);
-            $$->setLineno(@1.first_row);
+            $$->setLineno(@1.begin.line);
         }
         ;
 
@@ -634,12 +646,12 @@ proc_stmt:
         ID  LP  RP
         {
             $$ = new functionCall($1, nullptr);
-            $$->setLineno(@1.first_row);
+            $$->setLineno(@1.begin.line);
         }
         |  ID  LP  args_list  RP 
         {
             $$ = new functionCall($1, $3);
-            $$->setLineno(@1.first_row);
+            $$->setLineno(@1.begin.line);
         }
         |  SYS_PROC  LP  RP
         {
@@ -648,7 +660,7 @@ proc_stmt:
             } else if ($1 == 9) {
                 $$ = new functionCall("writeln", nullptr);
             }
-            $$->setLineno(@1.first_row);
+            $$->setLineno(@1.begin.line);
         }
         |  SYS_PROC  LP  args_list  RP 
         {
@@ -657,13 +669,15 @@ proc_stmt:
             } else if ($1 == 9) {
                 $$ = new functionCall("writeln", $3);
             }
-            $$->setLineno(@1.first_row);
+            $$->setLineno(@1.begin.line);
         }
 // TODO: add factor class
         |  READ  LP  factor  RP
         {
-            $$ = new functionCall("read", $3);
-            $$->setLineno(@1.first_row);
+            auto args = new std::vector<abstractExpr *>();
+            args->push_back($3);
+            $$ = new functionCall("read", args);
+            $$->setLineno(@1.begin.line);
         }
         ;
 
@@ -671,7 +685,7 @@ if_stmt:
         IF  expression  THEN  stmt  else_clause 
         {
             $$ = new ifStmt($2, $4, $5);
-            $$->setLineno(@1.first_row);
+            $$->setLineno(@1.begin.line);
         }
         ;
 
@@ -684,7 +698,7 @@ repeat_stmt:
         REPEAT  stmt_list  UNTIL  expression 
         {
             $$ = new repeatStmt($4, $2);
-            $$->setLineno(@1.first_row);
+            $$->setLineno(@1.begin.line);
         }
         ;
 
@@ -692,7 +706,7 @@ while_stmt:
         WHILE  expression  DO stmt 
         {
             $$ = new whileStmt($2, $4);
-            $$->setLineno(@1.first_row);
+            $$->setLineno(@1.begin.line);
         }
         ;
 
@@ -700,7 +714,7 @@ for_stmt:
         FOR  ID  ASSIGN  expression  direction  expression  DO stmt 
         {
             $$ = new forStmt($2, $4, $6, $5, $8);
-            $$->setLineno(@1.first_row);
+            $$->setLineno(@1.begin.line);
         }
         ;
 
@@ -727,7 +741,7 @@ case_expr_list:
         {
             $$ = new caseStmt();
             $$->addCase($1);
-            $$->setLineno(@1.first_row);
+            $$->setLineno(@1.begin.line);
         }
         ;
 
@@ -735,12 +749,12 @@ case_expr:
         const_value  COLON  stmt  SEMI 
         {
             $$ = new caseNode($1, $3);
-            $$->setLineno(@1.first_row);
+            $$->setLineno(@1.begin.line);
         }
         |  ID  COLON  stmt  SEMI 
         {
             $$ = new caseNode(new variableNode($1), $3);
-            $$->setLineno(@1.first_row);
+            $$->setLineno(@1.begin.line);
         }
         ;
 
@@ -748,7 +762,7 @@ goto_stmt:
         GOTO  INTEGER 
         {
             $$ = new gotoStmt($2);
-            $$->setLineno(@1.first_row);
+            $$->setLineno(@1.begin.line);
         }
         ;
 
@@ -756,32 +770,32 @@ expression:
         expression  GE  expr 
         {
             $$ = new mathExpr(TOY_COMPILER::GE, $1, $3);
-            $$->setLineno(@1.first_row);
+            $$->setLineno(@1.begin.line);
         }
         |  expression  GT  expr 
         {
             $$ = new mathExpr(TOY_COMPILER::GT, $1, $3);
-            $$->setLineno(@1.first_row);
+            $$->setLineno(@1.begin.line);
         }
         |  expression  LE  expr 
         {
             $$ = new mathExpr(TOY_COMPILER::LE, $1, $3);
-            $$->setLineno(@1.first_row);
+            $$->setLineno(@1.begin.line);
         }
         |  expression  LT  expr 
         {
             $$ = new mathExpr(TOY_COMPILER::LT, $1, $3);
-            $$->setLineno(@1.first_row);
+            $$->setLineno(@1.begin.line);
         }
         |  expression  EQUAL  expr 
         {
             $$ = new mathExpr(TOY_COMPILER::EQUAL, $1, $3);
-            $$->setLineno(@1.first_row);
+            $$->setLineno(@1.begin.line);
         }
         |  expression  UNEQUAL  expr 
         {
             $$ = new mathExpr(TOY_COMPILER::UNEQUAL, $1, $3);
-            $$->setLineno(@1.first_row);
+            $$->setLineno(@1.begin.line);
         }
         |  expr 
         {
@@ -793,17 +807,17 @@ expr:
         expr  PLUS  term 
         {
             $$ = new mathExpr(TOY_COMPILER::PLUS, $1, $3);
-            $$->setLineno(@1.first_row);
+            $$->setLineno(@1.begin.line);
         }
         |  expr  MINUS  term 
         {
-            $$ = new math(TOY_COMPILER::MINUS, $1, $3);
-            $$->setLineno(@1.first_row);
+            $$ = new mathExpr(TOY_COMPILER::MINUS, $1, $3);
+            $$->setLineno(@1.begin.line);
         }
         |  expr  OR  term 
         {
             $$ = new mathExpr(TOY_COMPILER::OR, $1, $3);
-            $$->setLineno(@1.first_row);
+            $$->setLineno(@1.begin.line);
         }
         |  term {$$ = $1;}
         ;
@@ -812,22 +826,22 @@ term:
         term  MUL  factor 
         {
             $$ = new mathExpr(TOY_COMPILER::MUL, $1, $3);
-            $$->setLineno(@1.first_row);
+            $$->setLineno(@1.begin.line);
         }
         |  term  DIV  factor 
         {
             $$ = new mathExpr(TOY_COMPILER::DIV, $1, $3);
-            $$->setLineno(@1.first_row);
+            $$->setLineno(@1.begin.line);
 	    }
         |  term  MOD  factor 
         {
             $$ = new mathExpr(TOY_COMPILER::MOD, $1, $3);
-            $$->setLineno(@1.first_row);
+            $$->setLineno(@1.begin.line);
         }
         |  term  AND  factor 
         {
             $$ = new mathExpr(TOY_COMPILER::AND, $1, $3);
-            $$->setLineno(@1.first_row);
+            $$->setLineno(@1.begin.line);
         }
         |  factor
         {
@@ -839,17 +853,17 @@ factor:
         ID 
         {
             $$ = new variableNode($1);
-            $$->setLineno(@1.first_row);
+            $$->setLineno(@1.begin.line);
         }
         |  ID  LP  RP
         {
             $$ = new functionCall($1, nullptr);
-            $$->setLineno(@1.first_row);
+            $$->setLineno(@1.begin.line);
         }
         |  ID  LP  args_list  RP 
         {
             $$ = new functionCall($1, $3);
-            $$->setLineno(@1.first_row);
+            $$->setLineno(@1.begin.line);
         }
         |  SYS_FUNCT  LP  RP
         {
@@ -876,13 +890,13 @@ factor:
                 case 6:
                     func_name = "sqrt";
                     break;
-                case 7
+                case 7:
                     func_name = "succ";
                     break;
             }
 
             $$ = new functionCall(func_name, nullptr);
-            $$->setLineno(@1.first_row);
+            $$->setLineno(@1.begin.line);
         }
         |  SYS_FUNCT  LP  args_list  RP 
         {
@@ -909,13 +923,13 @@ factor:
                 case 6:
                     func_name = "sqrt";
                     break;
-                case 7
+                case 7:
                     func_name = "succ";
                     break;
             }
 
             $$ = new functionCall(func_name, $3);
-            $$->setLineno(@1.first_row);
+            $$->setLineno(@1.begin.line);
         }
         |  const_value 
         {
@@ -928,22 +942,22 @@ factor:
         |  NOT  factor 
         {
             $$ = new mathExpr(TOY_COMPILER::NOT, $2, nullptr);
-            $$->setLineno(@1.first_row);
+            $$->setLineno(@1.begin.line);
         }
         |  MINUS  factor 
         {
             $$ = new mathExpr(TOY_COMPILER::NOT, $2, nullptr);
-            $$->setLineno(@1.first_row);
+            $$->setLineno(@1.begin.line);
         }
         |  ID  LB  expression  RB 
         {
-            $$ = new mathExpr(TOY_COMPILER::LBRB, $1, $3);
-            $$->setLineno(@1.first_row);
+            $$ = new mathExpr(TOY_COMPILER::LBRB, new variableNode($1), $3);
+            $$->setLineno(@1.begin.line);
         }
         |  ID  DOT  ID 
         {
-            $$ = new mathExpr(TOY_COMPILER::DOT, $1, $3);
-            $$->setLineno(@1.first_row);
+            $$ = new mathExpr(TOY_COMPILER::DOT, new variableNode($1), new variableNode($3));
+            $$->setLineno(@1.begin.line);
 	    }
         ;
 

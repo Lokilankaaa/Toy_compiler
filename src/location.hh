@@ -31,12 +31,12 @@
 // version 2.2 of Bison.
 
 /**
- ** \file location.hh
+ ** \file /Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/location.hh
  ** Define the TOY_COMPILER::location class.
  */
 
-#ifndef YY_YY_LOCATION_HH_INCLUDED
-# define YY_YY_LOCATION_HH_INCLUDED
+#ifndef YY_YY_USERS_XUEWEI_ONEDRIVE_ZJU_EDU_CN_CODE_CPP_TOY_COMPILER_SRC_LOCATION_HH_INCLUDED
+# define YY_YY_USERS_XUEWEI_ONEDRIVE_ZJU_EDU_CN_CODE_CPP_TOY_COMPILER_SRC_LOCATION_HH_INCLUDED
 
 # include <iostream>
 # include <string>
@@ -53,9 +53,9 @@
 #  endif
 # endif
 
-#line 20 "parser.y"
+#line 20 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
 namespace TOY_COMPILER {
-#line 59 "location.hh"
+#line 59 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/location.hh"
 
   /// A point in a source file.
   class position
@@ -299,8 +299,8 @@ namespace TOY_COMPILER {
     return ostr;
   }
 
-#line 20 "parser.y"
+#line 20 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
 } // TOY_COMPILER
-#line 305 "location.hh"
+#line 305 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/location.hh"
 
-#endif // !YY_YY_LOCATION_HH_INCLUDED
+#endif // !YY_YY_USERS_XUEWEI_ONEDRIVE_ZJU_EDU_CN_CODE_CPP_TOY_COMPILER_SRC_LOCATION_HH_INCLUDED
