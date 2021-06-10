@@ -13,6 +13,15 @@
 #define GETTER(var, method_name) decltype(var) &method_name()
 
 namespace TOY_COMPILER {
+    class linenoInterface {
+        int lineno;
+
+    public:
+        void setLineno(int l) { lineno = l; }
+
+        int getLineno() { return lineno; }
+    };
+
     class abstractAST {
     public:
         virtual void print(std::fstream &fout) {}
@@ -420,13 +429,9 @@ namespace TOY_COMPILER {
         std::vector<caseNode *> case_expr_list;
 
     public:
-        caseStmt() {
-            n_type = TOY_COMPILER::CASESTMT;
-        }
+        caseStmt() { n_type = TOY_COMPILER::CASESTMT; }
 
-        void addCond(mathExpr *cond) {
-            case_cond = cond;
-        }
+        void addCond(mathExpr *cond) { case_cond = cond; }
 
         void print(std::fstream &fout) override;
 
@@ -469,7 +474,7 @@ namespace TOY_COMPILER {
         GETTER(rhs, getRhs) { return rhs; }
     };
 
-    class functionCall : public abstractExpr{
+    class functionCall : public abstractExpr {
     protected:
         std::string func_name;
         std::vector<abstractExpr *> *args;

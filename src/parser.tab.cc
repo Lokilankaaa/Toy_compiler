@@ -1884,7 +1884,7 @@ namespace TOY_COMPILER {
           switch (yyn)
             {
   case 2: // program: program_head routine DOT
-#line 165 "parser.y"
+#line 164 "parser.y"
         {
             auto t = globalsymtab->newSymTable(yystack_[2].value.as < std::string* > ());
             // globalsymtab->SymTable.insert()
@@ -1893,7 +1893,7 @@ namespace TOY_COMPILER {
     break;
 
   case 3: // program_head: PROGRAM ID SEMI
-#line 173 "parser.y"
+#line 172 "parser.y"
         {
             yylhs.value.as < std::string* > () = new std::string(yystack_[1].value.as < std::string > ()); // program head can be just a string
         }
@@ -1901,14 +1901,15 @@ namespace TOY_COMPILER {
     break;
 
   case 4: // routine: routine_head routine_body
-#line 179 "parser.y"
+#line 178 "parser.y"
         {
             yylhs.value.as < rootProgram* > () = new rootProgram();
             yylhs.value.as < rootProgram* > ()->getDecls = std::move(*(yystack_[1].value.as < std::pair<std::vector<abstractDeclNode *> *, std::vector<functionNode *> *>  > ().first));
             yylhs.value.as < rootProgram* > ()->getFunc = std::move(*(yystack_[1].value.as < std::pair<std::vector<abstractDeclNode *> *, std::vector<functionNode *> *>  > ().second));
             yylhs.value.as < rootProgram* > ()->getStmt = std::move(*(yystack_[0].value.as < stmtList * > ()));
+            yylhs.value.as < rootProgram* > ()->setLineno(yylhs.location.first_row);
         }
-#line 1912 "parser.tab.cc"
+#line 1913 "parser.tab.cc"
     break;
 
   case 5: // sub_routine: routine_head routine_body
@@ -1916,7 +1917,7 @@ namespace TOY_COMPILER {
         {
 
         }
-#line 1920 "parser.tab.cc"
+#line 1921 "parser.tab.cc"
     break;
 
   case 6: // routine_head: label_part const_part type_part var_part routine_part
@@ -1931,14 +1932,14 @@ namespace TOY_COMPILER {
             for_each(yystack_[1].value.as < varDecl * > ()->begin(), yystack_[1].value.as < varDecl * > ()->end(), f);
             yylhs.value.as < std::pair<std::vector<abstractDeclNode *> *, std::vector<functionNode *> *>  > () = std::make_pair(decls, yystack_[0].value.as < std::vector<functionNode *> * > ());
         }
-#line 1935 "parser.tab.cc"
+#line 1936 "parser.tab.cc"
     break;
 
   case 7: // label_part: %empty
 #line 209 "parser.y"
         {
         }
-#line 1942 "parser.tab.cc"
+#line 1943 "parser.tab.cc"
     break;
 
   case 8: // const_part: CONST const_expr_list
@@ -1946,14 +1947,14 @@ namespace TOY_COMPILER {
         {
             yylhs.value.as < constDecl * > () = yystack_[0].value.as < constDecl * > ();
         }
-#line 1950 "parser.tab.cc"
+#line 1951 "parser.tab.cc"
     break;
 
   case 9: // const_part: %empty
 #line 219 "parser.y"
         {
         }
-#line 1957 "parser.tab.cc"
+#line 1958 "parser.tab.cc"
     break;
 
   case 10: // const_expr_list: const_expr_list ID EQUAL const_value SEMI
@@ -1961,7 +1962,7 @@ namespace TOY_COMPILER {
         {
             yylhs.value.as < constDecl * > ()->addConstDecl(yystack_[3].value.as < std::string > (), yystack_[1].value.as < literal* > ());
         }
-#line 1965 "parser.tab.cc"
+#line 1966 "parser.tab.cc"
     break;
 
   case 11: // const_expr_list: ID EQUAL const_value SEMI
@@ -1969,60 +1970,65 @@ namespace TOY_COMPILER {
         {
             yylhs.value.as < constDecl * > () = new constDecl();
             yylhs.value.as < constDecl * > ()->addConstDecl(yystack_[3].value.as < std::string > (), yystack_[1].value.as < literal* > ());
+            yylhs.value.as < constDecl * > ()->setLineno(yylhs.location.first_row);
         }
-#line 1974 "parser.tab.cc"
+#line 1976 "parser.tab.cc"
     break;
 
   case 12: // const_value: INTEGER
-#line 237 "parser.y"
+#line 238 "parser.y"
         {
             auto t = new const_valueType();
             auto v = new expValue();
             t->d_type = TOY_COMPILER::INTEGER;
             v->int_value = yystack_[0].value.as < int > ();
             yylhs.value.as < literal* > () = new literal(v, t);
+            yylhs.value.as < literal* > ()->setLineno(yystack_[0].location.first_row);
         }
-#line 1986 "parser.tab.cc"
+#line 1989 "parser.tab.cc"
     break;
 
   case 13: // const_value: REAL
-#line 245 "parser.y"
+#line 247 "parser.y"
         {
             auto t = new const_valueType();
             auto v = new expValue();
             t->d_type = TOY_COMPILER::REAL;
             v->real_value = yystack_[0].value.as < double > ();
             yylhs.value.as < literal* > () = new literal(v, t);
+            yylhs.value.as < literal* > ()->setLineno(yystack_[0].location.first_row);
         }
-#line 1998 "parser.tab.cc"
+#line 2002 "parser.tab.cc"
     break;
 
   case 14: // const_value: CHAR
-#line 253 "parser.y"
+#line 256 "parser.y"
         {
             auto t = new const_valueType();
             auto v = new expValue();
             t->d_type = TOY_COMPILER::CHAR;
             v->char_value = yystack_[0].value.as < char > ();
             yylhs.value.as < literal* > () = new literal(v, t);
+            yylhs.value.as < literal* > ()->setLineno(yystack_[0].location.first_row);
         }
-#line 2010 "parser.tab.cc"
+#line 2015 "parser.tab.cc"
     break;
 
   case 15: // const_value: BOOL
-#line 261 "parser.y"
+#line 265 "parser.y"
         {
             auto t = new const_valueType();
             auto v = new expValue();
             t->d_type = TOY_COMPILER::BOOLEAN;
             v->bool_value = yystack_[0].value.as < bool > ();
             yylhs.value.as < literal* > () = new literal(v, t);
+            yylhs.value.as < literal* > ()->setLineno(yystack_[0].location.first_row);
         }
-#line 2022 "parser.tab.cc"
+#line 2028 "parser.tab.cc"
     break;
 
   case 16: // const_value: SYS_CON
-#line 269 "parser.y"
+#line 274 "parser.y"
         {
             auto t = new const_valueType();
             auto v = new expValue();
@@ -2035,99 +2041,104 @@ namespace TOY_COMPILER {
             }
             v->bool_value = yystack_[0].value.as < int > ();
             yylhs.value.as < literal* > () = new literal(v, t);
+            yylhs.value.as < literal* > ()->setLineno(yystack_[0].location.first_row);
         }
-#line 2040 "parser.tab.cc"
+#line 2047 "parser.tab.cc"
     break;
 
   case 17: // type_part: TYPE type_decl_list
-#line 286 "parser.y"
+#line 292 "parser.y"
         {
             yylhs.value.as < typeDefDecl * > () = yystack_[0].value.as < typeDefDecl * > ();
         }
-#line 2048 "parser.tab.cc"
+#line 2055 "parser.tab.cc"
     break;
 
   case 18: // type_part: %empty
-#line 290 "parser.y"
+#line 296 "parser.y"
         {
 
         }
-#line 2056 "parser.tab.cc"
+#line 2063 "parser.tab.cc"
     break;
 
   case 19: // type_decl_list: type_decl_list type_definition
-#line 297 "parser.y"
+#line 303 "parser.y"
         {
             yylhs.value.as < typeDefDecl * > ()->addTypeDef(yystack_[0].value.as < varNode * > ());
         }
-#line 2064 "parser.tab.cc"
+#line 2071 "parser.tab.cc"
     break;
 
   case 20: // type_decl_list: type_definition
-#line 301 "parser.y"
+#line 307 "parser.y"
         {
             yylhs.value.as < typeDefDecl * > () = new typeDefDecl();
             yylhs.value.as < typeDefDecl * > ()->addTypeDef(yystack_[0].value.as < varNode * > ());
+            yylhs.value.as < typeDefDecl * > ()->setLineno(yylhs.location.first_row);
         }
-#line 2073 "parser.tab.cc"
+#line 2081 "parser.tab.cc"
     break;
 
   case 21: // type_definition: ID EQUAL type_decl SEMI
-#line 309 "parser.y"
+#line 316 "parser.y"
         {
             auto ns = new std::vector<std::string>();
             ns->push_back(yystack_[3].value.as < std::string > ());
             yylhs.value.as < varNode * > () = new varNode(ns, yystack_[1].value.as < abstractTypeDeclNode * > ());
+            yylhs.value.as < varNode * > ()->setLineno(yystack_[3].location.first_row);
         }
-#line 2083 "parser.tab.cc"
+#line 2092 "parser.tab.cc"
     break;
 
   case 22: // type_decl: simple_type_decl
-#line 318 "parser.y"
+#line 326 "parser.y"
         {
             yylhs.value.as < abstractTypeDeclNode * > () = yystack_[0].value.as < simpleDecl* > ();
         }
-#line 2091 "parser.tab.cc"
+#line 2100 "parser.tab.cc"
     break;
 
   case 23: // type_decl: array_type_decl
-#line 322 "parser.y"
+#line 330 "parser.y"
         {
             yylhs.value.as < abstractTypeDeclNode * > () = yystack_[0].value.as < arrayDecl* > ();
         }
-#line 2099 "parser.tab.cc"
+#line 2108 "parser.tab.cc"
     break;
 
   case 24: // type_decl: record_type_decl
-#line 326 "parser.y"
+#line 334 "parser.y"
         {
             yylhs.value.as < abstractTypeDeclNode * > () = yystack_[0].value.as < recordDecl * > ();
-        }
-#line 2107 "parser.tab.cc"
-    break;
-
-  case 25: // simple_type_decl: SYS_TYPE
-#line 333 "parser.y"
-        {
-            yylhs.value.as < simpleDecl* > () = new simpleDecl(yystack_[0].value.as < int > ());
-
         }
 #line 2116 "parser.tab.cc"
     break;
 
+  case 25: // simple_type_decl: SYS_TYPE
+#line 341 "parser.y"
+        {
+            yylhs.value.as < simpleDecl* > () = new simpleDecl(yystack_[0].value.as < int > ());
+            yylhs.value.as < simpleDecl* > ()->setLineno(yystack_[0].location.first_row);
+
+        }
+#line 2126 "parser.tab.cc"
+    break;
+
   case 26: // simple_type_decl: ID
-#line 338 "parser.y"
+#line 347 "parser.y"
         {
             auto name = new std::vector<std::string>();
             name.push_back(yystack_[0].value.as < std::string > ());
 
             yylhs.value.as < simpleDecl* > () = new namesDecl(*name, false);
+            yylhs.value.as < simpleDecl* > ()->setLineno(yystack_[0].location.first_row);
         }
-#line 2127 "parser.tab.cc"
+#line 2138 "parser.tab.cc"
     break;
 
   case 27: // simple_type_decl: LP name_list RP
-#line 345 "parser.y"
+#line 355 "parser.y"
         {
             auto names = new std::vector<std::string>();
             auto f = [=](std::string &name) {
@@ -2135,703 +2146,761 @@ namespace TOY_COMPILER {
             }
             for_each(yystack_[1].value.as < std::vector<std::string>* > ()->begin(), yystack_[1].value.as < std::vector<std::string>* > ()->end(), f);
             yylhs.value.as < simpleDecl* > () = new namesDecl(*names, false);
+            yylhs.value.as < simpleDecl* > ()->setLineno(yystack_[2].location.first_row);
         }
-#line 2140 "parser.tab.cc"
+#line 2152 "parser.tab.cc"
     break;
 
   case 28: // simple_type_decl: const_value DOTDOT const_value
-#line 354 "parser.y"
+#line 365 "parser.y"
         {
             yylhs.value.as < simpleDecl* > () = new rangeDecl(false, yystack_[2].value.as < literal* > (), false, yystack_[0].value.as < literal* > ());
+            yylhs.value.as < simpleDecl* > ()->setLineno(yystack_[2].location.first_row);
         }
-#line 2148 "parser.tab.cc"
+#line 2161 "parser.tab.cc"
     break;
 
   case 29: // simple_type_decl: MINUS const_value DOTDOT const_value
-#line 358 "parser.y"
+#line 370 "parser.y"
         {
             yylhs.value.as < simpleDecl* > () = new rangeDecl(true, yystack_[2].value.as < literal* > (), false, yystack_[0].value.as < literal* > ());
+            yylhs.value.as < simpleDecl* > ()->setLineno(yystack_[3].location.first_row);
         }
-#line 2156 "parser.tab.cc"
+#line 2170 "parser.tab.cc"
     break;
 
   case 30: // simple_type_decl: MINUS const_value DOTDOT MINUS const_value
-#line 362 "parser.y"
+#line 375 "parser.y"
         {
             yylhs.value.as < simpleDecl* > () = new rangeDecl(true, yystack_[3].value.as < literal* > (), true, yystack_[0].value.as < literal* > ());
+            yylhs.value.as < simpleDecl* > ()->setLineno(yystack_[4].location.first_row);
         }
-#line 2164 "parser.tab.cc"
+#line 2179 "parser.tab.cc"
     break;
 
   case 31: // simple_type_decl: ID DOTDOT ID
-#line 366 "parser.y"
-        {
-            yylhs.value.as < simpleDecl* > () = new rangeDecl(yystack_[2].value.as < std::string > (), yystack_[0].value.as < std::string > ());
-        }
-#line 2172 "parser.tab.cc"
-    break;
-
-  case 32: // array_type_decl: ARRAY LB simple_type_decl RB OF type_decl
-#line 373 "parser.y"
-        {
-            yylhs.value.as < arrayDecl* > () = new arrayDecl(yystack_[3].value.as < simpleDecl* > (), yystack_[0].value.as < abstractTypeDeclNode * > ());
-        }
-#line 2180 "parser.tab.cc"
-    break;
-
-  case 33: // record_type_decl: RECORD field_decl_list _END
 #line 380 "parser.y"
         {
-            yylhs.value.as < recordDecl * > () = yystack_[1].value.as < recordDecl * > ();
+            yylhs.value.as < simpleDecl* > () = new rangeDecl(yystack_[2].value.as < std::string > (), yystack_[0].value.as < std::string > ());
+            yylhs.value.as < simpleDecl* > ()->setLineno(yystack_[2].location.first_row);
         }
 #line 2188 "parser.tab.cc"
     break;
 
-  case 34: // field_decl_list: field_decl_list field_decl
-#line 387 "parser.y"
+  case 32: // array_type_decl: ARRAY LB simple_type_decl RB OF type_decl
+#line 388 "parser.y"
         {
-            yylhs.value.as < recordDecl * > () = yystack_[1].value.as < recordDecl * > ();
-            yylhs.value.as < recordDecl * > ()->addRecord(yystack_[0].value.as < field* > ());
+            yylhs.value.as < arrayDecl* > () = new arrayDecl(yystack_[3].value.as < simpleDecl* > (), yystack_[0].value.as < abstractTypeDeclNode * > ());
+            yylhs.value.as < arrayDecl* > ()->setLineno(yystack_[5].location.first_row);
         }
 #line 2197 "parser.tab.cc"
     break;
 
-  case 35: // field_decl_list: field_decl
-#line 392 "parser.y"
+  case 33: // record_type_decl: RECORD field_decl_list _END
+#line 396 "parser.y"
         {
-            yylhs.value.as < recordDecl * > () = new recordDecl();
-            yylhs.value.as < recordDecl * > ()->addRecord(yystack_[0].value.as < field* > ());
+            yylhs.value.as < recordDecl * > () = yystack_[1].value.as < recordDecl * > ();
         }
-#line 2206 "parser.tab.cc"
+#line 2205 "parser.tab.cc"
     break;
 
-  case 36: // field_decl: name_list COLON type_decl SEMI
-#line 400 "parser.y"
+  case 34: // field_decl_list: field_decl_list field_decl
+#line 403 "parser.y"
         {
-            yylhs.value.as < field* > () = new field(yystack_[3].value.as < std::vector<std::string>* > (), yystack_[1].value.as < abstractTypeDeclNode * > ());
+            yylhs.value.as < recordDecl * > () = yystack_[1].value.as < recordDecl * > ();
+            yylhs.value.as < recordDecl * > ()->addRecord(yystack_[0].value.as < field* > ());
         }
 #line 2214 "parser.tab.cc"
     break;
 
+  case 35: // field_decl_list: field_decl
+#line 408 "parser.y"
+        {
+            yylhs.value.as < recordDecl * > () = new recordDecl();
+            yylhs.value.as < recordDecl * > ()->addRecord(yystack_[0].value.as < field* > ());
+            yylhs.value.as < recordDecl * > ()->setLineno(yylhs.location.first_row);
+        }
+#line 2224 "parser.tab.cc"
+    break;
+
+  case 36: // field_decl: name_list COLON type_decl SEMI
+#line 417 "parser.y"
+        {
+            yylhs.value.as < field* > () = new field(yystack_[3].value.as < std::vector<std::string>* > (), yystack_[1].value.as < abstractTypeDeclNode * > ());
+            yylhs.value.as < field* > ()->setLineno(yystack_[3].location.first_row);
+        }
+#line 2233 "parser.tab.cc"
+    break;
+
   case 37: // name_list: name_list COMMA ID
-#line 407 "parser.y"
+#line 425 "parser.y"
         {
             yylhs.value.as < std::vector<std::string>* > () = yystack_[2].value.as < std::vector<std::string>* > ();
             yylhs.value.as < std::vector<std::string>* > ()->push_back(yystack_[0].value.as < std::string > ());
         }
-#line 2223 "parser.tab.cc"
+#line 2242 "parser.tab.cc"
     break;
 
   case 38: // name_list: ID
-#line 412 "parser.y"
+#line 430 "parser.y"
         {
             yylhs.value.as < std::vector<std::string>* > () = new std::vector<std::string>();
             yylhs.value.as < std::vector<std::string>* > ()->push_back(yystack_[0].value.as < std::string > ());
         }
-#line 2232 "parser.tab.cc"
+#line 2251 "parser.tab.cc"
     break;
 
   case 39: // var_part: VAR var_decl_list
-#line 420 "parser.y"
+#line 438 "parser.y"
         {
             yylhs.value.as < varDecl * > () = yystack_[0].value.as < varDecl * > ();
         }
-#line 2240 "parser.tab.cc"
+#line 2259 "parser.tab.cc"
     break;
 
   case 40: // var_part: %empty
-#line 424 "parser.y"
+#line 442 "parser.y"
         {
         }
-#line 2247 "parser.tab.cc"
+#line 2266 "parser.tab.cc"
     break;
 
   case 41: // var_decl_list: var_decl_list var_decl
-#line 430 "parser.y"
+#line 448 "parser.y"
         {
             yylhs.value.as < varDecl * > () = yystack_[1].value.as < varDecl * > ();
             yylhs.value.as < varDecl * > ()->addDecl(yystack_[0].value.as < varNode * > ());
         }
-#line 2256 "parser.tab.cc"
+#line 2275 "parser.tab.cc"
     break;
 
   case 42: // var_decl_list: var_decl
-#line 435 "parser.y"
+#line 453 "parser.y"
         {
             yylhs.value.as < varDecl * > () = new varDecl();
+            yylhs.value.as < varDecl * > ()->setLineno(yystack_[0].location.first_row);
             yylhs.value.as < varDecl * > ()->addDecl(yystack_[0].value.as < varNode * > ());
         }
-#line 2265 "parser.tab.cc"
+#line 2285 "parser.tab.cc"
     break;
 
   case 43: // var_decl: name_list COLON type_decl SEMI
-#line 443 "parser.y"
+#line 462 "parser.y"
         {
             yylhs.value.as < varNode * > () = new varNode(yystack_[3].value.as < std::vector<std::string>* > (), yystack_[1].value.as < abstractTypeDeclNode * > ());
+            yylhs.value.as < varNode * > ()->setLineno(yystack_[3].location.first_row);
         }
-#line 2273 "parser.tab.cc"
+#line 2294 "parser.tab.cc"
     break;
 
   case 44: // routine_part: routine_part function_decl
-#line 450 "parser.y"
+#line 470 "parser.y"
         {
             yylhs.value.as < std::vector<functionNode *> * > () = yystack_[1].value.as < std::vector<functionNode *> * > ();
             yylhs.value.as < std::vector<functionNode *> * > ()->push_back(yystack_[0].value.as < functionNode * > ());
         }
-#line 2282 "parser.tab.cc"
+#line 2303 "parser.tab.cc"
     break;
 
   case 45: // routine_part: routine_part procedure_decl
-#line 455 "parser.y"
+#line 475 "parser.y"
         {
             yylhs.value.as < std::vector<functionNode *> * > () = yystack_[1].value.as < std::vector<functionNode *> * > ();
             yylhs.value.as < std::vector<functionNode *> * > ()->push_back(yystack_[0].value.as < functionNode * > ());
         }
-#line 2291 "parser.tab.cc"
+#line 2312 "parser.tab.cc"
     break;
 
   case 46: // routine_part: function_decl
-#line 460 "parser.y"
+#line 480 "parser.y"
         {
             yylhs.value.as < std::vector<functionNode *> * > ()->push_back(yystack_[0].value.as < functionNode * > ());
         }
-#line 2299 "parser.tab.cc"
+#line 2320 "parser.tab.cc"
     break;
 
   case 47: // routine_part: procedure_decl
-#line 464 "parser.y"
+#line 484 "parser.y"
         {
             yylhs.value.as < std::vector<functionNode *> * > ()->push_back(yystack_[0].value.as < functionNode * > ());
         }
-#line 2307 "parser.tab.cc"
+#line 2328 "parser.tab.cc"
     break;
 
   case 48: // routine_part: %empty
-#line 468 "parser.y"
+#line 488 "parser.y"
         {
             yylhs.value.as < std::vector<functionNode *> * > () = new std::vector<functionNode *>();
         }
-#line 2315 "parser.tab.cc"
+#line 2336 "parser.tab.cc"
     break;
 
   case 49: // function_decl: function_head SEMI sub_routine SEMI
-#line 474 "parser.y"
+#line 494 "parser.y"
                                                {
         	yylhs.value.as < functionNode * > () = new functionNode(get<0>(yystack_[3].value.as < std::tuple<std::string, std::vector<parameters *> *, abstractSimpleDecl *> > ()), get<1>(yystack_[3].value.as < std::tuple<std::string, std::vector<parameters *> *, abstractSimpleDecl *> > ()), yystack_[1].value.as < rootProgram* > (), get<2>(yystack_[3].value.as < std::tuple<std::string, std::vector<parameters *> *, abstractSimpleDecl *> > ()));
+            yylhs.value.as < functionNode * > ()->setLineno(yystack_[3].location.first_row);
         }
-#line 2323 "parser.tab.cc"
+#line 2345 "parser.tab.cc"
     break;
 
   case 50: // function_head: FUNCTION ID parameters COLON simple_type_decl
-#line 481 "parser.y"
+#line 502 "parser.y"
         {
             yylhs.value.as < std::tuple<std::string, std::vector<parameters *> *, abstractSimpleDecl *> > () = std::make_tuple(yystack_[3].value.as < std::string > (), yystack_[2].value.as < parameter * > (), yystack_[0].value.as < simpleDecl* > ());
         }
-#line 2331 "parser.tab.cc"
+#line 2353 "parser.tab.cc"
     break;
 
   case 51: // procedure_decl: procedure_head SEMI sub_routine SEMI
-#line 488 "parser.y"
+#line 509 "parser.y"
         {
             yylhs.value.as < functionNode * > () = new functionNode(get<0>(yystack_[3].value.as < std::tuple<std::string, std::vector<parameters *> *> > ()), get<1>(yystack_[3].value.as < std::tuple<std::string, std::vector<parameters *> *> > ()), yystack_[1].value.as < rootProgram* > ());
-        }
-#line 2339 "parser.tab.cc"
-    break;
-
-  case 52: // procedure_head: PROCEDURE ID parameters
-#line 495 "parser.y"
-        {
-            yylhs.value.as < std::tuple<std::string, std::vector<parameters *> *> > () = std::make_tuple(yystack_[1].value.as < std::string > (), yystack_[0].value.as < parameter * > ());
-        }
-#line 2347 "parser.tab.cc"
-    break;
-
-  case 53: // parameters: LP para_decl_list RP
-#line 502 "parser.y"
-        {
-            yylhs.value.as < parameter * > () = yystack_[1].value.as < std::vector<parameters *>* > ();
-        }
-#line 2355 "parser.tab.cc"
-    break;
-
-  case 54: // parameters: %empty
-#line 506 "parser.y"
-        {
+            yylhs.value.as < functionNode * > ()->setLineno(yystack_[3].location.first_row);
         }
 #line 2362 "parser.tab.cc"
     break;
 
+  case 52: // procedure_head: PROCEDURE ID parameters
+#line 517 "parser.y"
+        {
+            yylhs.value.as < std::tuple<std::string, std::vector<parameters *> *> > () = std::make_tuple(yystack_[1].value.as < std::string > (), yystack_[0].value.as < parameter * > ());
+        }
+#line 2370 "parser.tab.cc"
+    break;
+
+  case 53: // parameters: LP para_decl_list RP
+#line 524 "parser.y"
+        {
+            yylhs.value.as < parameter * > () = yystack_[1].value.as < std::vector<parameters *>* > ();
+        }
+#line 2378 "parser.tab.cc"
+    break;
+
+  case 54: // parameters: %empty
+#line 528 "parser.y"
+        {
+        }
+#line 2385 "parser.tab.cc"
+    break;
+
   case 55: // para_decl_list: para_decl_list SEMI para_type_list
-#line 512 "parser.y"
+#line 534 "parser.y"
         {
             yylhs.value.as < std::vector<parameters *>* > () = yystack_[2].value.as < std::vector<parameters *>* > ();
             yylhs.value.as < std::vector<parameters *>* > ()->push_back(yystack_[0].value.as < std::vector<parameters *>* > ());
         }
-#line 2371 "parser.tab.cc"
+#line 2394 "parser.tab.cc"
     break;
 
   case 56: // para_decl_list: para_type_list
-#line 517 "parser.y"
+#line 539 "parser.y"
         {
             yylhs.value.as < std::vector<parameters *>* > () = new std::vector<parameter *>();
             yylhs.value.as < std::vector<parameters *>* > ()->push_back(yystack_[0].value.as < std::vector<parameters *>* > ());
         }
-#line 2380 "parser.tab.cc"
+#line 2403 "parser.tab.cc"
     break;
 
   case 57: // para_type_list: var_para_list COLON simple_type_decl
-#line 525 "parser.y"
+#line 547 "parser.y"
         {
             yylhs.value.as < std::vector<parameters *>* > () = new parameter(TOY_COMPILER::REFER, *(yystack_[2].value.as < std::vector<parameters *>* > ()), yystack_[0].value.as < simpleDecl* > ());
-        }
-#line 2388 "parser.tab.cc"
-    break;
-
-  case 58: // para_type_list: val_para_list COLON simple_type_decl
-#line 529 "parser.y"
-        {
-            yylhs.value.as < std::vector<parameters *>* > () = new parameter(TOY_COMPILER::VALUE, *(yystack_[2].value.as < std::vector<parameters *>* > ()), yystack_[0].value.as < simpleDecl* > ());
-        }
-#line 2396 "parser.tab.cc"
-    break;
-
-  case 59: // var_para_list: VAR name_list
-#line 536 "parser.y"
-        {
-            yylhs.value.as < std::vector<parameters *>* > () = yystack_[0].value.as < std::vector<std::string>* > ()
-        }
-#line 2404 "parser.tab.cc"
-    break;
-
-  case 60: // val_para_list: name_list
-#line 543 "parser.y"
-        {
-            yylhs.value.as < std::vector<parameters *>* > () = yystack_[0].value.as < std::vector<std::string>* > ()
+            yylhs.value.as < std::vector<parameters *>* > ()->setLineno(yystack_[2].location.first_row);
         }
 #line 2412 "parser.tab.cc"
     break;
 
+  case 58: // para_type_list: val_para_list COLON simple_type_decl
+#line 552 "parser.y"
+        {
+            yylhs.value.as < std::vector<parameters *>* > () = new parameter(TOY_COMPILER::VALUE, *(yystack_[2].value.as < std::vector<parameters *>* > ()), yystack_[0].value.as < simpleDecl* > ());
+            yylhs.value.as < std::vector<parameters *>* > ()->setLineno(yystack_[2].location.first_row);
+        }
+#line 2421 "parser.tab.cc"
+    break;
+
+  case 59: // var_para_list: VAR name_list
+#line 560 "parser.y"
+        {
+            yylhs.value.as < std::vector<parameters *>* > () = yystack_[0].value.as < std::vector<std::string>* > ()
+        }
+#line 2429 "parser.tab.cc"
+    break;
+
+  case 60: // val_para_list: name_list
+#line 567 "parser.y"
+        {
+            yylhs.value.as < std::vector<parameters *>* > () = yystack_[0].value.as < std::vector<std::string>* > ()
+        }
+#line 2437 "parser.tab.cc"
+    break;
+
   case 61: // routine_body: compound_stmt
-#line 549 "parser.y"
+#line 573 "parser.y"
                       { yylhs.value.as < stmtList * > () = yystack_[0].value.as < stmtList * > (); }
-#line 2418 "parser.tab.cc"
+#line 2443 "parser.tab.cc"
     break;
 
   case 62: // compound_stmt: _BEGIN stmt_list _END
-#line 553 "parser.y"
+#line 577 "parser.y"
                                 {yylhs.value.as < stmtList * > () = yystack_[1].value.as < stmtList* > ();}
-#line 2424 "parser.tab.cc"
+#line 2449 "parser.tab.cc"
     break;
 
   case 63: // stmt_list: stmt_list stmt SEMI
-#line 557 "parser.y"
+#line 581 "parser.y"
                               {yystack_[2].value.as < stmtList* > ()->push_back(yystack_[1].value.as < abstractStmt* > ()); yylhs.value.as < stmtList* > () = yystack_[2].value.as < stmtList* > ();}
-#line 2430 "parser.tab.cc"
+#line 2455 "parser.tab.cc"
     break;
 
   case 64: // stmt_list: %empty
-#line 558 "parser.y"
-           {yylhs.value.as < stmtList* > () = new stmtList();}
-#line 2436 "parser.tab.cc"
+#line 583 "parser.y"
+        {
+            yylhs.value.as < stmtList* > () = new stmtList();
+            yylhs.value.as < stmtList* > ()->setLineno(yylhs.location.first_row);
+        }
+#line 2464 "parser.tab.cc"
     break;
 
   case 65: // stmt: INTEGER COLON non_label_stmt
-#line 562 "parser.y"
+#line 590 "parser.y"
         {
             yylhs.value.as < abstractStmt* > () = yystack_[0].value.as < abstractStmt* > ();
             globalsymtab->Label.insert(yystack_[2].value.as < int > (), yystack_[0].value.as < abstractStmt* > ());
         }
-#line 2445 "parser.tab.cc"
+#line 2473 "parser.tab.cc"
     break;
 
   case 66: // stmt: non_label_stmt
-#line 566 "parser.y"
+#line 594 "parser.y"
                           {yylhs.value.as < abstractStmt* > () = yystack_[0].value.as < abstractStmt* > ();}
-#line 2451 "parser.tab.cc"
+#line 2479 "parser.tab.cc"
     break;
 
   case 67: // non_label_stmt: assign_stmt
-#line 570 "parser.y"
+#line 598 "parser.y"
                     {yylhs.value.as < abstractStmt* > () = yystack_[0].value.as < assignStmt* > ();}
-#line 2457 "parser.tab.cc"
+#line 2485 "parser.tab.cc"
     break;
 
   case 68: // non_label_stmt: proc_stmt
-#line 571 "parser.y"
+#line 599 "parser.y"
                     {yylhs.value.as < abstractStmt* > () = yystack_[0].value.as < functionNode* > ();}
-#line 2463 "parser.tab.cc"
+#line 2491 "parser.tab.cc"
     break;
 
   case 69: // non_label_stmt: compound_stmt
-#line 572 "parser.y"
+#line 600 "parser.y"
                         {yylhs.value.as < abstractStmt* > () = yystack_[0].value.as < stmtList * > ();}
-#line 2469 "parser.tab.cc"
+#line 2497 "parser.tab.cc"
     break;
 
   case 70: // non_label_stmt: if_stmt
-#line 573 "parser.y"
+#line 601 "parser.y"
                   {yylhs.value.as < abstractStmt* > () = yystack_[0].value.as < ifStmt* > ();}
-#line 2475 "parser.tab.cc"
+#line 2503 "parser.tab.cc"
     break;
 
   case 71: // non_label_stmt: repeat_stmt
-#line 574 "parser.y"
+#line 602 "parser.y"
                       {yylhs.value.as < abstractStmt* > () = yystack_[0].value.as < repeatStmt* > ();}
-#line 2481 "parser.tab.cc"
+#line 2509 "parser.tab.cc"
     break;
 
   case 72: // non_label_stmt: while_stmt
-#line 575 "parser.y"
+#line 603 "parser.y"
                      {yylhs.value.as < abstractStmt* > () = yystack_[0].value.as < whileStmt* > ();}
-#line 2487 "parser.tab.cc"
+#line 2515 "parser.tab.cc"
     break;
 
   case 73: // non_label_stmt: for_stmt
-#line 576 "parser.y"
+#line 604 "parser.y"
                    {yylhs.value.as < abstractStmt* > () = yystack_[0].value.as < forStmt* > ();}
-#line 2493 "parser.tab.cc"
+#line 2521 "parser.tab.cc"
     break;
 
   case 74: // non_label_stmt: case_stmt
-#line 577 "parser.y"
+#line 605 "parser.y"
                     {yylhs.value.as < abstractStmt* > () = yystack_[0].value.as < caseStmt* > ();}
-#line 2499 "parser.tab.cc"
+#line 2527 "parser.tab.cc"
     break;
 
   case 75: // non_label_stmt: goto_stmt
-#line 578 "parser.y"
+#line 606 "parser.y"
                     {yylhs.value.as < abstractStmt* > () = yystack_[0].value.as < gotoStmt* > ();}
-#line 2505 "parser.tab.cc"
+#line 2533 "parser.tab.cc"
     break;
 
   case 76: // assign_stmt: ID ASSIGN expression
-#line 583 "parser.y"
+#line 611 "parser.y"
         {
             auto l = new variableNode(yystack_[2].value.as < std::string > ());
+            l->setLineno(yystack_[2].location.first_row);
             yylhs.value.as < assignStmt* > () = new assignStmt(l, yystack_[0].value.as < abstractExpr * > ());
+            yylhs.value.as < assignStmt* > ()->setLineno(yystack_[2].location.first_row);
         }
-#line 2514 "parser.tab.cc"
+#line 2544 "parser.tab.cc"
     break;
 
   case 77: // assign_stmt: ID LB expression RB ASSIGN expression
-#line 588 "parser.y"
+#line 618 "parser.y"
         {
             auto l = new mathExpr(TOY_COMPILER::LBRB, new variableNode(yystack_[5].value.as < std::string > ()), yystack_[3].value.as < abstractExpr * > ());
+            l->setLineno(yystack_[5].location.first_row);
             yylhs.value.as < assignStmt* > () = new assignStmt(l, yystack_[0].value.as < abstractExpr * > ());
+            yylhs.value.as < assignStmt* > ()->setLineno(yystack_[5].location.first_row);
         }
-#line 2523 "parser.tab.cc"
+#line 2555 "parser.tab.cc"
     break;
 
   case 78: // assign_stmt: ID DOT ID ASSIGN expression
-#line 593 "parser.y"
+#line 625 "parser.y"
         {
             auto l = new mathExpr(TOY_COMPILER::DOT, new variableNode(yystack_[4].value.as < std::string > ()), new variableNode(yystack_[2].value.as < std::string > ()));
+            l->setLineno(yystack_[4].location.first_row);
             yylhs.value.as < assignStmt* > () = new assignStmt(l, yystack_[0].value.as < abstractExpr * > ());
+            yylhs.value.as < assignStmt* > ()->setLineno(yystack_[4].location.first_row);
         }
-#line 2532 "parser.tab.cc"
+#line 2566 "parser.tab.cc"
     break;
 
   case 79: // proc_stmt: ID LP RP
-#line 601 "parser.y"
+#line 635 "parser.y"
         {
             yylhs.value.as < functionNode* > () = new functionCall(yystack_[2].value.as < std::string > (), nullptr);
+            yylhs.value.as < functionNode* > ()->setLineno(yystack_[2].location.first_row);
         }
-#line 2540 "parser.tab.cc"
+#line 2575 "parser.tab.cc"
     break;
 
   case 80: // proc_stmt: ID LP args_list RP
-#line 605 "parser.y"
+#line 640 "parser.y"
         {
             yylhs.value.as < functionNode* > () = new functionCall(yystack_[3].value.as < std::string > (), yystack_[1].value.as < std::vector<abstractStmt*>* > ());
+            yylhs.value.as < functionNode* > ()->setLineno(yystack_[3].location.first_row);
         }
-#line 2548 "parser.tab.cc"
+#line 2584 "parser.tab.cc"
     break;
 
   case 81: // proc_stmt: SYS_PROC LP RP
-#line 609 "parser.y"
+#line 645 "parser.y"
         {
             if (yystack_[2].value.as < int > () == 8) {
                 yylhs.value.as < functionNode* > () = new functionCall("write", nullptr);
             } else if (yystack_[2].value.as < int > () == 9) {
                 yylhs.value.as < functionNode* > () = new functionCall("writeln", nullptr);
             }
+            yylhs.value.as < functionNode* > ()->setLineno(yystack_[2].location.first_row);
         }
-#line 2560 "parser.tab.cc"
+#line 2597 "parser.tab.cc"
     break;
 
   case 82: // proc_stmt: SYS_PROC LP args_list RP
-#line 617 "parser.y"
+#line 654 "parser.y"
         {
             if (yystack_[3].value.as < int > () == 8) {
                 yylhs.value.as < functionNode* > () = new functionCall("write", yystack_[1].value.as < std::vector<abstractStmt*>* > ());
             } else if (yystack_[3].value.as < int > () == 9) {
                 yylhs.value.as < functionNode* > () = new functionCall("writeln", yystack_[1].value.as < std::vector<abstractStmt*>* > ());
             }
+            yylhs.value.as < functionNode* > ()->setLineno(yystack_[3].location.first_row);
         }
-#line 2572 "parser.tab.cc"
+#line 2610 "parser.tab.cc"
     break;
 
   case 83: // proc_stmt: READ LP factor RP
-#line 626 "parser.y"
+#line 664 "parser.y"
         {
             yylhs.value.as < functionNode* > () = new functionCall("read", yystack_[1].value.as < abstractExpr * > ());
+            yylhs.value.as < functionNode* > ()->setLineno(yystack_[3].location.first_row);
         }
-#line 2580 "parser.tab.cc"
+#line 2619 "parser.tab.cc"
     break;
 
   case 84: // if_stmt: IF expression THEN stmt else_clause
-#line 633 "parser.y"
-        {yylhs.value.as < ifStmt* > () = new ifStmt(yystack_[3].value.as < abstractExpr * > (), yystack_[1].value.as < abstractStmt* > (), yystack_[0].value.as < abstractStmt* > ());}
-#line 2586 "parser.tab.cc"
+#line 672 "parser.y"
+        {
+            yylhs.value.as < ifStmt* > () = new ifStmt(yystack_[3].value.as < abstractExpr * > (), yystack_[1].value.as < abstractStmt* > (), yystack_[0].value.as < abstractStmt* > ());
+            yylhs.value.as < ifStmt* > ()->setLineno(yystack_[4].location.first_row);
+        }
+#line 2628 "parser.tab.cc"
     break;
 
   case 85: // else_clause: ELSE stmt
-#line 637 "parser.y"
+#line 679 "parser.y"
                   {yylhs.value.as < abstractStmt* > () = yystack_[0].value.as < abstractStmt* > ();}
-#line 2592 "parser.tab.cc"
+#line 2634 "parser.tab.cc"
     break;
 
   case 86: // else_clause: %empty
-#line 638 "parser.y"
+#line 680 "parser.y"
            {yylhs.value.as < abstractStmt* > () = nullptr;}
-#line 2598 "parser.tab.cc"
+#line 2640 "parser.tab.cc"
     break;
 
   case 87: // repeat_stmt: REPEAT stmt_list UNTIL expression
-#line 643 "parser.y"
-        {yylhs.value.as < repeatStmt* > () = new repeatStmt(yystack_[0].value.as < abstractExpr * > (), yystack_[2].value.as < stmtList* > ());}
-#line 2604 "parser.tab.cc"
+#line 685 "parser.y"
+        {
+            yylhs.value.as < repeatStmt* > () = new repeatStmt(yystack_[0].value.as < abstractExpr * > (), yystack_[2].value.as < stmtList* > ());
+            yylhs.value.as < repeatStmt* > ()->setLineno(yystack_[3].location.first_row);
+        }
+#line 2649 "parser.tab.cc"
     break;
 
   case 88: // while_stmt: WHILE expression DO stmt
-#line 647 "parser.y"
-                                   {
-        yylhs.value.as < whileStmt* > () = new whileStmt(yystack_[2].value.as < abstractExpr * > (), yystack_[0].value.as < abstractStmt* > ());
+#line 693 "parser.y"
+        {
+            yylhs.value.as < whileStmt* > () = new whileStmt(yystack_[2].value.as < abstractExpr * > (), yystack_[0].value.as < abstractStmt* > ());
+            yylhs.value.as < whileStmt* > ()->setLineno(yystack_[3].location.first_row);
         }
-#line 2612 "parser.tab.cc"
+#line 2658 "parser.tab.cc"
     break;
 
   case 89: // for_stmt: FOR ID ASSIGN expression direction expression DO stmt
-#line 654 "parser.y"
+#line 701 "parser.y"
         {
             yylhs.value.as < forStmt* > () = new forStmt(yystack_[6].value.as < std::string > (), yystack_[4].value.as < abstractExpr * > (), yystack_[2].value.as < abstractExpr * > (), yystack_[3].value.as < bool > (), yystack_[0].value.as < abstractStmt* > ());
-        }
-#line 2620 "parser.tab.cc"
-    break;
-
-  case 90: // direction: TO
-#line 660 "parser.y"
-           {yylhs.value.as < bool > () = true;}
-#line 2626 "parser.tab.cc"
-    break;
-
-  case 91: // direction: DOWNTO
-#line 661 "parser.y"
-                 {yylhs.value.as < bool > () = false;}
-#line 2632 "parser.tab.cc"
-    break;
-
-  case 92: // case_stmt: CASE expression OF case_expr_list _END
-#line 666 "parser.y"
-        {
-            yylhs.value.as < caseStmt* > () = yystack_[1].value.as < caseStmt* > ();
-            yylhs.value.as < caseStmt* > ()->addCond(yystack_[3].value.as < abstractExpr * > ());
-        }
-#line 2641 "parser.tab.cc"
-    break;
-
-  case 93: // case_expr_list: case_expr_list case_expr
-#line 674 "parser.y"
-        {
-            yylhs.value.as < caseStmt* > () = yystack_[1].value.as < caseStmt* > ();
-            yylhs.value.as < caseStmt* > ()->addCase(yystack_[0].value.as < caseNode* > ());
-        }
-#line 2650 "parser.tab.cc"
-    break;
-
-  case 94: // case_expr_list: case_expr
-#line 679 "parser.y"
-        {
-            yylhs.value.as < caseStmt* > () = new caseStmt();
-            yylhs.value.as < caseStmt* > ()->addCase(yystack_[0].value.as < caseNode* > ());
-        }
-#line 2659 "parser.tab.cc"
-    break;
-
-  case 95: // case_expr: const_value COLON stmt SEMI
-#line 687 "parser.y"
-        {
-            yylhs.value.as < caseNode* > () = new caseNode(yystack_[3].value.as < literal* > (), yystack_[1].value.as < abstractStmt* > ());
+            yylhs.value.as < forStmt* > ()->setLineno(yystack_[7].location.first_row);
         }
 #line 2667 "parser.tab.cc"
     break;
 
-  case 96: // case_expr: ID COLON stmt SEMI
-#line 691 "parser.y"
+  case 90: // direction: TO
+#line 708 "parser.y"
+           {yylhs.value.as < bool > () = true;}
+#line 2673 "parser.tab.cc"
+    break;
+
+  case 91: // direction: DOWNTO
+#line 709 "parser.y"
+                 {yylhs.value.as < bool > () = false;}
+#line 2679 "parser.tab.cc"
+    break;
+
+  case 92: // case_stmt: CASE expression OF case_expr_list _END
+#line 714 "parser.y"
         {
-            yylhs.value.as < caseNode* > () = new caseNode(new variableNode(yystack_[3].value.as < std::string > ()), yystack_[1].value.as < abstractStmt* > ());
+            yylhs.value.as < caseStmt* > () = yystack_[1].value.as < caseStmt* > ();
+            yylhs.value.as < caseStmt* > ()->addCond(yystack_[3].value.as < abstractExpr * > ());
         }
-#line 2675 "parser.tab.cc"
+#line 2688 "parser.tab.cc"
     break;
 
-  case 97: // goto_stmt: GOTO INTEGER
-#line 697 "parser.y"
-                      {yylhs.value.as < gotoStmt* > () = new gotoStmt(yystack_[0].value.as < int > ());}
-#line 2681 "parser.tab.cc"
-    break;
-
-  case 98: // expression: expression GE expr
-#line 702 "parser.y"
+  case 93: // case_expr_list: case_expr_list case_expr
+#line 722 "parser.y"
         {
-            yylhs.value.as < abstractExpr * > () = new mathExpr(TOY_COMPILER::GE, yystack_[2].value.as < abstractExpr * > (), yystack_[0].value.as < abstractExpr * > ());
-        }
-#line 2689 "parser.tab.cc"
-    break;
-
-  case 99: // expression: expression GT expr
-#line 706 "parser.y"
-        {
-            yylhs.value.as < abstractExpr * > () = new mathExpr(TOY_COMPILER::GT, yystack_[2].value.as < abstractExpr * > (), yystack_[0].value.as < abstractExpr * > ());
+            yylhs.value.as < caseStmt* > () = yystack_[1].value.as < caseStmt* > ();
+            yylhs.value.as < caseStmt* > ()->addCase(yystack_[0].value.as < caseNode* > ());
         }
 #line 2697 "parser.tab.cc"
     break;
 
-  case 100: // expression: expression LE expr
-#line 710 "parser.y"
+  case 94: // case_expr_list: case_expr
+#line 727 "parser.y"
         {
-            yylhs.value.as < abstractExpr * > () = new mathExpr(TOY_COMPILER::LE, yystack_[2].value.as < abstractExpr * > (), yystack_[0].value.as < abstractExpr * > ());
+            yylhs.value.as < caseStmt* > () = new caseStmt();
+            yylhs.value.as < caseStmt* > ()->addCase(yystack_[0].value.as < caseNode* > ());
+            yylhs.value.as < caseStmt* > ()->setLineno(yystack_[0].location.first_row);
         }
-#line 2705 "parser.tab.cc"
+#line 2707 "parser.tab.cc"
     break;
 
-  case 101: // expression: expression LT expr
-#line 714 "parser.y"
+  case 95: // case_expr: const_value COLON stmt SEMI
+#line 736 "parser.y"
         {
-            yylhs.value.as < abstractExpr * > () = new mathExpr(TOY_COMPILER::LT, yystack_[2].value.as < abstractExpr * > (), yystack_[0].value.as < abstractExpr * > ());
+            yylhs.value.as < caseNode* > () = new caseNode(yystack_[3].value.as < literal* > (), yystack_[1].value.as < abstractStmt* > ());
+            yylhs.value.as < caseNode* > ()->setLineno(yystack_[3].location.first_row);
         }
-#line 2713 "parser.tab.cc"
+#line 2716 "parser.tab.cc"
     break;
 
-  case 102: // expression: expression EQUAL expr
-#line 718 "parser.y"
-        {
-            yylhs.value.as < abstractExpr * > () = new mathExpr(TOY_COMPILER::EQUAL, yystack_[2].value.as < abstractExpr * > (), yystack_[0].value.as < abstractExpr * > ());
-        }
-#line 2721 "parser.tab.cc"
-    break;
-
-  case 103: // expression: expression UNEQUAL expr
-#line 722 "parser.y"
-        {
-            yylhs.value.as < abstractExpr * > () = new mathExpr(TOY_COMPILER::UNEQUAL, yystack_[2].value.as < abstractExpr * > (), yystack_[0].value.as < abstractExpr * > ());
-        }
-#line 2729 "parser.tab.cc"
-    break;
-
-  case 104: // expression: expr
-#line 726 "parser.y"
-        {
-            yylhs.value.as < abstractExpr * > () = yystack_[0].value.as < abstractExpr * > ();
-        }
-#line 2737 "parser.tab.cc"
-    break;
-
-  case 105: // expr: expr PLUS term
-#line 733 "parser.y"
-        {
-            yylhs.value.as < abstractExpr * > () = new mathExpr(TOY_COMPILER::PLUS, yystack_[2].value.as < abstractExpr * > (), yystack_[0].value.as < abstractExpr * > ());
-        }
-#line 2745 "parser.tab.cc"
-    break;
-
-  case 106: // expr: expr MINUS term
-#line 737 "parser.y"
-        {
-            yylhs.value.as < abstractExpr * > () = new math(TOY_COMPILER::MINUS, yystack_[2].value.as < abstractExpr * > (), yystack_[0].value.as < abstractExpr * > ());
-        }
-#line 2753 "parser.tab.cc"
-    break;
-
-  case 107: // expr: expr OR term
+  case 96: // case_expr: ID COLON stmt SEMI
 #line 741 "parser.y"
         {
-            yylhs.value.as < abstractExpr * > () = new mathExpr(TOY_COMPILER::OR, yystack_[2].value.as < abstractExpr * > (), yystack_[0].value.as < abstractExpr * > ());
+            yylhs.value.as < caseNode* > () = new caseNode(new variableNode(yystack_[3].value.as < std::string > ()), yystack_[1].value.as < abstractStmt* > ());
+            yylhs.value.as < caseNode* > ()->setLineno(yystack_[3].location.first_row);
+        }
+#line 2725 "parser.tab.cc"
+    break;
+
+  case 97: // goto_stmt: GOTO INTEGER
+#line 749 "parser.y"
+        {
+            yylhs.value.as < gotoStmt* > () = new gotoStmt(yystack_[0].value.as < int > ());
+            yylhs.value.as < gotoStmt* > ()->setLineno(yystack_[1].location.first_row);
+        }
+#line 2734 "parser.tab.cc"
+    break;
+
+  case 98: // expression: expression GE expr
+#line 757 "parser.y"
+        {
+            yylhs.value.as < abstractExpr * > () = new mathExpr(TOY_COMPILER::GE, yystack_[2].value.as < abstractExpr * > (), yystack_[0].value.as < abstractExpr * > ());
+            yylhs.value.as < abstractExpr * > ()->setLineno(yystack_[2].location.first_row);
+        }
+#line 2743 "parser.tab.cc"
+    break;
+
+  case 99: // expression: expression GT expr
+#line 762 "parser.y"
+        {
+            yylhs.value.as < abstractExpr * > () = new mathExpr(TOY_COMPILER::GT, yystack_[2].value.as < abstractExpr * > (), yystack_[0].value.as < abstractExpr * > ());
+            yylhs.value.as < abstractExpr * > ()->setLineno(yystack_[2].location.first_row);
+        }
+#line 2752 "parser.tab.cc"
+    break;
+
+  case 100: // expression: expression LE expr
+#line 767 "parser.y"
+        {
+            yylhs.value.as < abstractExpr * > () = new mathExpr(TOY_COMPILER::LE, yystack_[2].value.as < abstractExpr * > (), yystack_[0].value.as < abstractExpr * > ());
+            yylhs.value.as < abstractExpr * > ()->setLineno(yystack_[2].location.first_row);
         }
 #line 2761 "parser.tab.cc"
     break;
 
-  case 108: // expr: term
-#line 744 "parser.y"
-                {yylhs.value.as < abstractExpr * > () = yystack_[0].value.as < abstractExpr * > ();}
-#line 2767 "parser.tab.cc"
-    break;
-
-  case 109: // term: term MUL factor
-#line 749 "parser.y"
+  case 101: // expression: expression LT expr
+#line 772 "parser.y"
         {
-            yylhs.value.as < abstractExpr * > () = new mathExpr(TOY_COMPILER::MUL, yystack_[2].value.as < abstractExpr * > (), yystack_[0].value.as < abstractExpr * > ());
+            yylhs.value.as < abstractExpr * > () = new mathExpr(TOY_COMPILER::LT, yystack_[2].value.as < abstractExpr * > (), yystack_[0].value.as < abstractExpr * > ());
+            yylhs.value.as < abstractExpr * > ()->setLineno(yystack_[2].location.first_row);
         }
-#line 2775 "parser.tab.cc"
+#line 2770 "parser.tab.cc"
     break;
 
-  case 110: // term: term DIV factor
-#line 753 "parser.y"
+  case 102: // expression: expression EQUAL expr
+#line 777 "parser.y"
         {
-            yylhs.value.as < abstractExpr * > () = new mathExpr(TOY_COMPILER::DIV, yystack_[2].value.as < abstractExpr * > (), yystack_[0].value.as < abstractExpr * > ());
-	    }
-#line 2783 "parser.tab.cc"
-    break;
-
-  case 111: // term: term MOD factor
-#line 757 "parser.y"
-        {
-            yylhs.value.as < abstractExpr * > () = new mathExpr(TOY_COMPILER::MOD, yystack_[2].value.as < abstractExpr * > (), yystack_[0].value.as < abstractExpr * > ());
+            yylhs.value.as < abstractExpr * > () = new mathExpr(TOY_COMPILER::EQUAL, yystack_[2].value.as < abstractExpr * > (), yystack_[0].value.as < abstractExpr * > ());
+            yylhs.value.as < abstractExpr * > ()->setLineno(yystack_[2].location.first_row);
         }
-#line 2791 "parser.tab.cc"
+#line 2779 "parser.tab.cc"
     break;
 
-  case 112: // term: term AND factor
-#line 761 "parser.y"
+  case 103: // expression: expression UNEQUAL expr
+#line 782 "parser.y"
         {
-            yylhs.value.as < abstractExpr * > () = new mathExpr(TOY_COMPILER::AND, yystack_[2].value.as < abstractExpr * > (), yystack_[0].value.as < abstractExpr * > ());
+            yylhs.value.as < abstractExpr * > () = new mathExpr(TOY_COMPILER::UNEQUAL, yystack_[2].value.as < abstractExpr * > (), yystack_[0].value.as < abstractExpr * > ());
+            yylhs.value.as < abstractExpr * > ()->setLineno(yystack_[2].location.first_row);
         }
-#line 2799 "parser.tab.cc"
+#line 2788 "parser.tab.cc"
     break;
 
-  case 113: // term: factor
-#line 765 "parser.y"
+  case 104: // expression: expr
+#line 787 "parser.y"
         {
             yylhs.value.as < abstractExpr * > () = yystack_[0].value.as < abstractExpr * > ();
         }
-#line 2807 "parser.tab.cc"
+#line 2796 "parser.tab.cc"
     break;
 
-  case 114: // factor: ID
-#line 772 "parser.y"
+  case 105: // expr: expr PLUS term
+#line 794 "parser.y"
         {
-            yylhs.value.as < abstractExpr * > () = new variableNode(yystack_[0].value.as < std::string > ());
+            yylhs.value.as < abstractExpr * > () = new mathExpr(TOY_COMPILER::PLUS, yystack_[2].value.as < abstractExpr * > (), yystack_[0].value.as < abstractExpr * > ());
+            yylhs.value.as < abstractExpr * > ()->setLineno(yystack_[2].location.first_row);
         }
-#line 2815 "parser.tab.cc"
+#line 2805 "parser.tab.cc"
     break;
 
-  case 115: // factor: ID LP RP
-#line 776 "parser.y"
+  case 106: // expr: expr MINUS term
+#line 799 "parser.y"
         {
-            yylhs.value.as < abstractExpr * > () = new functionCall(yystack_[2].value.as < std::string > (), nullptr);
+            yylhs.value.as < abstractExpr * > () = new math(TOY_COMPILER::MINUS, yystack_[2].value.as < abstractExpr * > (), yystack_[0].value.as < abstractExpr * > ());
+            yylhs.value.as < abstractExpr * > ()->setLineno(yystack_[2].location.first_row);
+        }
+#line 2814 "parser.tab.cc"
+    break;
+
+  case 107: // expr: expr OR term
+#line 804 "parser.y"
+        {
+            yylhs.value.as < abstractExpr * > () = new mathExpr(TOY_COMPILER::OR, yystack_[2].value.as < abstractExpr * > (), yystack_[0].value.as < abstractExpr * > ());
+            yylhs.value.as < abstractExpr * > ()->setLineno(yystack_[2].location.first_row);
         }
 #line 2823 "parser.tab.cc"
     break;
 
+  case 108: // expr: term
+#line 808 "parser.y"
+                {yylhs.value.as < abstractExpr * > () = yystack_[0].value.as < abstractExpr * > ();}
+#line 2829 "parser.tab.cc"
+    break;
+
+  case 109: // term: term MUL factor
+#line 813 "parser.y"
+        {
+            yylhs.value.as < abstractExpr * > () = new mathExpr(TOY_COMPILER::MUL, yystack_[2].value.as < abstractExpr * > (), yystack_[0].value.as < abstractExpr * > ());
+            yylhs.value.as < abstractExpr * > ()->setLineno(yystack_[2].location.first_row);
+        }
+#line 2838 "parser.tab.cc"
+    break;
+
+  case 110: // term: term DIV factor
+#line 818 "parser.y"
+        {
+            yylhs.value.as < abstractExpr * > () = new mathExpr(TOY_COMPILER::DIV, yystack_[2].value.as < abstractExpr * > (), yystack_[0].value.as < abstractExpr * > ());
+            yylhs.value.as < abstractExpr * > ()->setLineno(yystack_[2].location.first_row);
+	    }
+#line 2847 "parser.tab.cc"
+    break;
+
+  case 111: // term: term MOD factor
+#line 823 "parser.y"
+        {
+            yylhs.value.as < abstractExpr * > () = new mathExpr(TOY_COMPILER::MOD, yystack_[2].value.as < abstractExpr * > (), yystack_[0].value.as < abstractExpr * > ());
+            yylhs.value.as < abstractExpr * > ()->setLineno(yystack_[2].location.first_row);
+        }
+#line 2856 "parser.tab.cc"
+    break;
+
+  case 112: // term: term AND factor
+#line 828 "parser.y"
+        {
+            yylhs.value.as < abstractExpr * > () = new mathExpr(TOY_COMPILER::AND, yystack_[2].value.as < abstractExpr * > (), yystack_[0].value.as < abstractExpr * > ());
+            yylhs.value.as < abstractExpr * > ()->setLineno(yystack_[2].location.first_row);
+        }
+#line 2865 "parser.tab.cc"
+    break;
+
+  case 113: // term: factor
+#line 833 "parser.y"
+        {
+            yylhs.value.as < abstractExpr * > () = yystack_[0].value.as < abstractExpr * > ();
+        }
+#line 2873 "parser.tab.cc"
+    break;
+
+  case 114: // factor: ID
+#line 840 "parser.y"
+        {
+            yylhs.value.as < abstractExpr * > () = new variableNode(yystack_[0].value.as < std::string > ());
+            yylhs.value.as < abstractExpr * > ()->setLineno(yystack_[0].location.first_row);
+        }
+#line 2882 "parser.tab.cc"
+    break;
+
+  case 115: // factor: ID LP RP
+#line 845 "parser.y"
+        {
+            yylhs.value.as < abstractExpr * > () = new functionCall(yystack_[2].value.as < std::string > (), nullptr);
+            yylhs.value.as < abstractExpr * > ()->setLineno(yystack_[2].location.first_row);
+        }
+#line 2891 "parser.tab.cc"
+    break;
+
   case 116: // factor: ID LP args_list RP
-#line 780 "parser.y"
+#line 850 "parser.y"
         {
             yylhs.value.as < abstractExpr * > () = new functionCall(yystack_[3].value.as < std::string > (), yystack_[1].value.as < std::vector<abstractStmt*>* > ());
+            yylhs.value.as < abstractExpr * > ()->setLineno(yystack_[3].location.first_row);
         }
-#line 2831 "parser.tab.cc"
+#line 2900 "parser.tab.cc"
     break;
 
   case 117: // factor: SYS_FUNCT LP RP
-#line 784 "parser.y"
+#line 855 "parser.y"
         {
             std::string func_name;
             switch(yystack_[2].value.as < int > ()) {
@@ -2862,12 +2931,13 @@ namespace TOY_COMPILER {
             }
 
             yylhs.value.as < abstractExpr * > () = new functionCall(func_name, nullptr);
+            yylhs.value.as < abstractExpr * > ()->setLineno(yystack_[2].location.first_row);
         }
-#line 2867 "parser.tab.cc"
+#line 2937 "parser.tab.cc"
     break;
 
   case 118: // factor: SYS_FUNCT LP args_list RP
-#line 816 "parser.y"
+#line 888 "parser.y"
         {
         	std::string func_name;
             switch(yystack_[3].value.as < int > ()) {
@@ -2898,78 +2968,83 @@ namespace TOY_COMPILER {
             }
 
             yylhs.value.as < abstractExpr * > () = new functionCall(func_name, yystack_[1].value.as < std::vector<abstractStmt*>* > ());
+            yylhs.value.as < abstractExpr * > ()->setLineno(yystack_[3].location.first_row);
         }
-#line 2903 "parser.tab.cc"
+#line 2974 "parser.tab.cc"
     break;
 
   case 119: // factor: const_value
-#line 848 "parser.y"
+#line 921 "parser.y"
         {
             yylhs.value.as < abstractExpr * > () = yystack_[0].value.as < literal* > ();
         }
-#line 2911 "parser.tab.cc"
+#line 2982 "parser.tab.cc"
     break;
 
   case 120: // factor: LP expression RP
-#line 852 "parser.y"
+#line 925 "parser.y"
         {
             yylhs.value.as < abstractExpr * > () = yystack_[1].value.as < abstractExpr * > ();
         }
-#line 2919 "parser.tab.cc"
+#line 2990 "parser.tab.cc"
     break;
 
   case 121: // factor: NOT factor
-#line 856 "parser.y"
+#line 929 "parser.y"
         {
             yylhs.value.as < abstractExpr * > () = new mathExpr(TOY_COMPILER::NOT, yystack_[0].value.as < abstractExpr * > (), nullptr);
+            yylhs.value.as < abstractExpr * > ()->setLineno(yystack_[1].location.first_row);
         }
-#line 2927 "parser.tab.cc"
+#line 2999 "parser.tab.cc"
     break;
 
   case 122: // factor: MINUS factor
-#line 860 "parser.y"
+#line 934 "parser.y"
         {
             yylhs.value.as < abstractExpr * > () = new mathExpr(TOY_COMPILER::NOT, yystack_[0].value.as < abstractExpr * > (), nullptr);
+            yylhs.value.as < abstractExpr * > ()->setLineno(yystack_[1].location.first_row);
         }
-#line 2935 "parser.tab.cc"
+#line 3008 "parser.tab.cc"
     break;
 
   case 123: // factor: ID LB expression RB
-#line 864 "parser.y"
+#line 939 "parser.y"
         {
             yylhs.value.as < abstractExpr * > () = new mathExpr(TOY_COMPILER::LBRB, yystack_[3].value.as < std::string > (), yystack_[1].value.as < abstractExpr * > ());
+            yylhs.value.as < abstractExpr * > ()->setLineno(yystack_[3].location.first_row);
         }
-#line 2943 "parser.tab.cc"
+#line 3017 "parser.tab.cc"
     break;
 
   case 124: // factor: ID DOT ID
-#line 868 "parser.y"
+#line 944 "parser.y"
         {
             yylhs.value.as < abstractExpr * > () = new mathExpr(TOY_COMPILER::DOT, yystack_[2].value.as < std::string > (), yystack_[0].value.as < std::string > ());
+            yylhs.value.as < abstractExpr * > ()->setLineno(yystack_[2].location.first_row);
 	    }
-#line 2951 "parser.tab.cc"
+#line 3026 "parser.tab.cc"
     break;
 
   case 125: // args_list: args_list COMMA expression
-#line 875 "parser.y"
+#line 952 "parser.y"
         {
             yylhs.value.as < std::vector<abstractStmt*>* > () = yystack_[2].value.as < std::vector<abstractStmt*>* > ();
             yylhs.value.as < std::vector<abstractStmt*>* > ()->push_back(yystack_[0].value.as < abstractExpr * > ());
         }
-#line 2960 "parser.tab.cc"
+#line 3035 "parser.tab.cc"
     break;
 
   case 126: // args_list: expression
-#line 880 "parser.y"
+#line 957 "parser.y"
         {
             yylhs.value.as < std::vector<abstractStmt*>* > () = new std::vector<abstractExpr *>();
             yylhs.value.as < std::vector<abstractStmt*>* > ()->push_back(yystack_[0].value.as < abstractExpr * > ());
         }
-#line 2969 "parser.tab.cc"
+#line 3044 "parser.tab.cc"
     break;
 
 
-#line 2973 "parser.tab.cc"
+#line 3048 "parser.tab.cc"
 
             default:
               break;
@@ -3599,19 +3674,19 @@ namespace TOY_COMPILER {
   const short
   Parser::yyrline_[] =
   {
-       0,   164,   164,   172,   178,   188,   195,   209,   214,   219,
-     224,   228,   236,   244,   252,   260,   268,   285,   290,   296,
-     300,   308,   317,   321,   325,   332,   337,   344,   353,   357,
-     361,   365,   372,   379,   386,   391,   399,   406,   411,   419,
-     424,   429,   434,   442,   449,   454,   459,   463,   468,   474,
-     480,   487,   494,   501,   506,   511,   516,   524,   528,   535,
-     542,   549,   553,   557,   558,   561,   566,   570,   571,   572,
-     573,   574,   575,   576,   577,   578,   582,   587,   592,   600,
-     604,   608,   616,   625,   632,   637,   638,   642,   647,   653,
-     660,   661,   665,   673,   678,   686,   690,   697,   701,   705,
-     709,   713,   717,   721,   725,   732,   736,   740,   744,   748,
-     752,   756,   760,   764,   771,   775,   779,   783,   815,   847,
-     851,   855,   859,   863,   867,   874,   879
+       0,   163,   163,   171,   177,   188,   195,   209,   214,   219,
+     224,   228,   237,   246,   255,   264,   273,   291,   296,   302,
+     306,   315,   325,   329,   333,   340,   346,   354,   364,   369,
+     374,   379,   387,   395,   402,   407,   416,   424,   429,   437,
+     442,   447,   452,   461,   469,   474,   479,   483,   488,   494,
+     501,   508,   516,   523,   528,   533,   538,   546,   551,   559,
+     566,   573,   577,   581,   583,   589,   594,   598,   599,   600,
+     601,   602,   603,   604,   605,   606,   610,   617,   624,   634,
+     639,   644,   653,   663,   671,   679,   680,   684,   692,   700,
+     708,   709,   713,   721,   726,   735,   740,   748,   756,   761,
+     766,   771,   776,   781,   786,   793,   798,   803,   808,   812,
+     817,   822,   827,   832,   839,   844,   849,   854,   887,   920,
+     924,   928,   933,   938,   943,   951,   956
   };
 
   void
@@ -3696,6 +3771,6 @@ namespace TOY_COMPILER {
 
 #line 20 "parser.y"
 } // TOY_COMPILER
-#line 3700 "parser.tab.cc"
+#line 3775 "parser.tab.cc"
 
-#line 886 "parser.y"
+#line 963 "parser.y"
