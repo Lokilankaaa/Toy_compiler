@@ -50,6 +50,7 @@
     #include <string>
     #include <vector>
     #include <algorithm>
+    #include <tuple>
     /* include for all driver functions */
     #include "tt.h"
 
@@ -60,7 +61,7 @@
 #undef yylex
 #define yylex scanner.yylex
 
-#line 64 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 65 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
 
 
 #ifndef YY_
@@ -153,7 +154,7 @@
 
 #line 20 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
 namespace TOY_COMPILER {
-#line 157 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 158 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
 
   /// Build a parser object.
   Parser::Parser (Scanner &scanner_yyarg)
@@ -1866,25 +1867,25 @@ namespace TOY_COMPILER {
           switch (yyn)
             {
   case 2: // program: program_head routine DOT
-#line 166 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 167 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
         {
             //auto t = globalsymtab->newSymTable($1);
             // globalsymtab->SymTable.insert()
             root = yystack_[1].value.as < rootProgram* > ();
         }
-#line 1876 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 1877 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 3: // program_head: PROGRAM ID SEMI
-#line 175 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 176 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
         {
             yylhs.value.as < std::string* > () = new std::string(yystack_[1].value.as < std::string > ()); // program head can be just a string
         }
-#line 1884 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 1885 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 4: // routine: routine_head routine_body
-#line 181 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 182 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
         {
             yylhs.value.as < rootProgram* > () = new rootProgram();
             yylhs.value.as < rootProgram* > ()->getDecls() = std::move(*(yystack_[1].value.as < std::pair<std::vector<abstractTypeDeclNode *> *, std::vector<functionNode *> *>  > ().first));
@@ -1892,19 +1893,19 @@ namespace TOY_COMPILER {
             yylhs.value.as < rootProgram* > ()->getStmts() = std::move(*(yystack_[0].value.as < stmtList * > ()));
             yylhs.value.as < rootProgram* > ()->setLineno(yylhs.location.begin.line);
         }
-#line 1896 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 1897 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 5: // sub_routine: routine_head routine_body
-#line 192 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 193 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
         {
 
         }
-#line 1904 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 1905 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 6: // routine_head: label_part const_part type_part var_part routine_part
-#line 199 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 200 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
         {
         	auto decls = new std::vector<abstractTypeDeclNode *>();
             auto f = [=](abstractTypeDeclNode *d) {
@@ -1915,51 +1916,51 @@ namespace TOY_COMPILER {
             decls->push_back(yystack_[1].value.as < varDecl * > ());
             yylhs.value.as < std::pair<std::vector<abstractTypeDeclNode *> *, std::vector<functionNode *> *>  > () = std::make_pair(decls, yystack_[0].value.as < std::vector<functionNode *> * > ());
         }
-#line 1919 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 1920 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 7: // label_part: %empty
-#line 212 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 213 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
         {
         }
-#line 1926 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 1927 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 8: // const_part: CONST const_expr_list
-#line 218 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 219 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
         {
             yylhs.value.as < constDecl * > () = yystack_[0].value.as < constDecl * > ();
         }
-#line 1934 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 1935 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 9: // const_part: %empty
-#line 222 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 223 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
         {
         }
-#line 1941 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 1942 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 10: // const_expr_list: const_expr_list ID EQUAL const_value SEMI
-#line 228 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 229 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
         {
             yylhs.value.as < constDecl * > ()->addConstDecl(yystack_[3].value.as < std::string > (), yystack_[1].value.as < literal* > ());
         }
-#line 1949 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 1950 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 11: // const_expr_list: ID EQUAL const_value SEMI
-#line 232 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 233 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
         {
             yylhs.value.as < constDecl * > () = new constDecl();
             yylhs.value.as < constDecl * > ()->addConstDecl(yystack_[3].value.as < std::string > (), yystack_[1].value.as < literal* > ());
             yylhs.value.as < constDecl * > ()->setLineno(yylhs.location.begin.line);
         }
-#line 1959 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 1960 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 12: // const_value: INTEGER
-#line 241 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 242 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
         {
             auto t = new const_valueType();
             auto v = new expValue();
@@ -1968,11 +1969,11 @@ namespace TOY_COMPILER {
             yylhs.value.as < literal* > () = new literal(v, t);
             yylhs.value.as < literal* > ()->setLineno(yystack_[0].location.begin.line);
         }
-#line 1972 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 1973 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 13: // const_value: REAL
-#line 250 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 251 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
         {
             auto t = new const_valueType();
             auto v = new expValue();
@@ -1981,11 +1982,11 @@ namespace TOY_COMPILER {
             yylhs.value.as < literal* > () = new literal(v, t);
             yylhs.value.as < literal* > ()->setLineno(yystack_[0].location.begin.line);
         }
-#line 1985 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 1986 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 14: // const_value: CHAR
-#line 259 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 260 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
         {
             auto t = new const_valueType();
             auto v = new expValue();
@@ -1994,11 +1995,11 @@ namespace TOY_COMPILER {
             yylhs.value.as < literal* > () = new literal(v, t);
             yylhs.value.as < literal* > ()->setLineno(yystack_[0].location.begin.line);
         }
-#line 1998 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 1999 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 15: // const_value: BOOL
-#line 268 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 269 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
         {
             auto t = new const_valueType();
             auto v = new expValue();
@@ -2007,11 +2008,11 @@ namespace TOY_COMPILER {
             yylhs.value.as < literal* > () = new literal(v, t);
             yylhs.value.as < literal* > ()->setLineno(yystack_[0].location.begin.line);
         }
-#line 2011 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 2012 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 16: // const_value: SYS_CON
-#line 277 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 278 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
         {
             auto t = new const_valueType();
             auto v = new expValue();
@@ -2026,80 +2027,80 @@ namespace TOY_COMPILER {
             yylhs.value.as < literal* > () = new literal(v, t);
             yylhs.value.as < literal* > ()->setLineno(yystack_[0].location.begin.line);
         }
-#line 2030 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 2031 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 17: // type_part: TYPE type_decl_list
-#line 295 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 296 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
         {
             yylhs.value.as < typeDefDecl * > () = yystack_[0].value.as < typeDefDecl * > ();
         }
-#line 2038 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 2039 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 18: // type_part: %empty
-#line 299 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 300 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
         {
 
         }
-#line 2046 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 2047 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 19: // type_decl_list: type_decl_list type_definition
-#line 306 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 307 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
         {
             yylhs.value.as < typeDefDecl * > ()->addTypeDef(yystack_[0].value.as < varNode * > ());
         }
-#line 2054 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 2055 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 20: // type_decl_list: type_definition
-#line 310 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 311 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
         {
             yylhs.value.as < typeDefDecl * > () = new typeDefDecl();
             yylhs.value.as < typeDefDecl * > ()->addTypeDef(yystack_[0].value.as < varNode * > ());
             yylhs.value.as < typeDefDecl * > ()->setLineno(yylhs.location.begin.line);
         }
-#line 2064 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 2065 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 21: // type_definition: ID EQUAL type_decl SEMI
-#line 319 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 320 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
         {
             auto ns = new std::vector<std::string>();
             ns->push_back(yystack_[3].value.as < std::string > ());
             yylhs.value.as < varNode * > () = new varNode(ns, yystack_[1].value.as < abstractTypeDeclNode * > ());
             yylhs.value.as < varNode * > ()->setLineno(yystack_[3].location.begin.line);
         }
-#line 2075 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 2076 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 22: // type_decl: simple_type_decl
-#line 329 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 330 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
         {
             yylhs.value.as < abstractTypeDeclNode * > () = yystack_[0].value.as < abstractSimpleDecl * > ();
         }
-#line 2083 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 2084 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 23: // type_decl: array_type_decl
-#line 333 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 334 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
         {
             yylhs.value.as < abstractTypeDeclNode * > () = yystack_[0].value.as < arrayDecl* > ();
         }
-#line 2091 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 2092 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 24: // type_decl: record_type_decl
-#line 337 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 338 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
         {
             yylhs.value.as < abstractTypeDeclNode * > () = yystack_[0].value.as < recordDecl * > ();
         }
-#line 2099 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 2100 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 25: // simple_type_decl: SYS_TYPE
-#line 344 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 345 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
         {
             TOY_COMPILER::valType t;
             if (yystack_[0].value.as < int > () == 1)
@@ -2114,11 +2115,11 @@ namespace TOY_COMPILER {
             yylhs.value.as < abstractSimpleDecl * > ()->setLineno(yystack_[0].location.begin.line);
 
         }
-#line 2118 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 2119 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 26: // simple_type_decl: ID
-#line 359 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 360 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
         {
             auto name = new std::vector<std::string>();
             name->push_back(yystack_[0].value.as < std::string > ());
@@ -2126,11 +2127,11 @@ namespace TOY_COMPILER {
             yylhs.value.as < abstractSimpleDecl * > () = new namesDecl(*name, false);
             yylhs.value.as < abstractSimpleDecl * > ()->setLineno(yystack_[0].location.begin.line);
         }
-#line 2130 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 2131 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 27: // simple_type_decl: LP name_list RP
-#line 367 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 368 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
         {
             auto names = new std::vector<std::string>();
             auto f = [=](std::string &name) {
@@ -2140,445 +2141,445 @@ namespace TOY_COMPILER {
             yylhs.value.as < abstractSimpleDecl * > () = new namesDecl(*names, false);
             yylhs.value.as < abstractSimpleDecl * > ()->setLineno(yystack_[2].location.begin.line);
         }
-#line 2144 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 2145 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 28: // simple_type_decl: const_value DOTDOT const_value
-#line 377 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 378 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
         {
             yylhs.value.as < abstractSimpleDecl * > () = new rangeDecl(false, yystack_[2].value.as < literal* > (), false, yystack_[0].value.as < literal* > ());
             yylhs.value.as < abstractSimpleDecl * > ()->setLineno(yystack_[2].location.begin.line);
         }
-#line 2153 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 2154 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 29: // simple_type_decl: MINUS const_value DOTDOT const_value
-#line 382 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 383 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
         {
             yylhs.value.as < abstractSimpleDecl * > () = new rangeDecl(true, yystack_[2].value.as < literal* > (), false, yystack_[0].value.as < literal* > ());
             yylhs.value.as < abstractSimpleDecl * > ()->setLineno(yystack_[3].location.begin.line);
         }
-#line 2162 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 2163 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 30: // simple_type_decl: MINUS const_value DOTDOT MINUS const_value
-#line 387 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 388 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
         {
             yylhs.value.as < abstractSimpleDecl * > () = new rangeDecl(true, yystack_[3].value.as < literal* > (), true, yystack_[0].value.as < literal* > ());
             yylhs.value.as < abstractSimpleDecl * > ()->setLineno(yystack_[4].location.begin.line);
         }
-#line 2171 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 2172 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 31: // simple_type_decl: ID DOTDOT ID
-#line 392 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 393 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
         {
             yylhs.value.as < abstractSimpleDecl * > () = new rangeDecl(yystack_[2].value.as < std::string > (), yystack_[0].value.as < std::string > ());
             yylhs.value.as < abstractSimpleDecl * > ()->setLineno(yystack_[2].location.begin.line);
         }
-#line 2180 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 2181 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 32: // array_type_decl: ARRAY LB simple_type_decl RB OF type_decl
-#line 400 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 401 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
         {
             yylhs.value.as < arrayDecl* > () = new arrayDecl(yystack_[3].value.as < abstractSimpleDecl * > (), yystack_[0].value.as < abstractTypeDeclNode * > ());
             yylhs.value.as < arrayDecl* > ()->setLineno(yystack_[5].location.begin.line);
         }
-#line 2189 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 2190 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 33: // record_type_decl: RECORD field_decl_list _END
-#line 408 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 409 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
         {
             yylhs.value.as < recordDecl * > () = yystack_[1].value.as < recordDecl * > ();
         }
-#line 2197 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 2198 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 34: // field_decl_list: field_decl_list field_decl
-#line 415 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 416 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
         {
             yylhs.value.as < recordDecl * > () = yystack_[1].value.as < recordDecl * > ();
             yylhs.value.as < recordDecl * > ()->addRecord(*yystack_[0].value.as < field* > ());
         }
-#line 2206 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 2207 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 35: // field_decl_list: field_decl
-#line 420 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 421 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
         {
             yylhs.value.as < recordDecl * > () = new recordDecl();
             yylhs.value.as < recordDecl * > ()->addRecord(*yystack_[0].value.as < field* > ());
             yylhs.value.as < recordDecl * > ()->setLineno(yylhs.location.begin.line);
         }
-#line 2216 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 2217 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 36: // field_decl: name_list COLON type_decl SEMI
-#line 429 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 430 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
         {
             yylhs.value.as < field* > () = new field(yystack_[3].value.as < std::vector<std::string>* > (), yystack_[1].value.as < abstractTypeDeclNode * > ());
             yylhs.value.as < field* > ()->setLineno(yystack_[3].location.begin.line);
         }
-#line 2225 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 2226 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 37: // name_list: name_list COMMA ID
-#line 437 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 438 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
         {
             yylhs.value.as < std::vector<std::string>* > () = yystack_[2].value.as < std::vector<std::string>* > ();
             yylhs.value.as < std::vector<std::string>* > ()->push_back(yystack_[0].value.as < std::string > ());
         }
-#line 2234 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 2235 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 38: // name_list: ID
-#line 442 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 443 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
         {
             yylhs.value.as < std::vector<std::string>* > () = new std::vector<std::string>();
             yylhs.value.as < std::vector<std::string>* > ()->push_back(yystack_[0].value.as < std::string > ());
         }
-#line 2243 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 2244 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 39: // var_part: VAR var_decl_list
-#line 450 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 451 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
         {
             yylhs.value.as < varDecl * > () = yystack_[0].value.as < varDecl * > ();
         }
-#line 2251 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 2252 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 40: // var_part: %empty
-#line 454 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 455 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
         {
         }
-#line 2258 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 2259 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 41: // var_decl_list: var_decl_list var_decl
-#line 460 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 461 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
         {
             yylhs.value.as < varDecl * > () = yystack_[1].value.as < varDecl * > ();
             yylhs.value.as < varDecl * > ()->addDecl(yystack_[0].value.as < varNode * > ());
         }
-#line 2267 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 2268 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 42: // var_decl_list: var_decl
-#line 465 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 466 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
         {
             yylhs.value.as < varDecl * > () = new varDecl();
             yylhs.value.as < varDecl * > ()->setLineno(yystack_[0].location.begin.line);
             yylhs.value.as < varDecl * > ()->addDecl(yystack_[0].value.as < varNode * > ());
         }
-#line 2277 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 2278 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 43: // var_decl: name_list COLON type_decl SEMI
-#line 474 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 475 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
         {
             yylhs.value.as < varNode * > () = new varNode(yystack_[3].value.as < std::vector<std::string>* > (), yystack_[1].value.as < abstractTypeDeclNode * > ());
             yylhs.value.as < varNode * > ()->setLineno(yystack_[3].location.begin.line);
         }
-#line 2286 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 2287 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 44: // routine_part: routine_part function_decl
-#line 482 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 483 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
         {
             yylhs.value.as < std::vector<functionNode *> * > () = yystack_[1].value.as < std::vector<functionNode *> * > ();
             yylhs.value.as < std::vector<functionNode *> * > ()->push_back(yystack_[0].value.as < functionNode * > ());
         }
-#line 2295 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 2296 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 45: // routine_part: routine_part procedure_decl
-#line 487 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 488 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
         {
             yylhs.value.as < std::vector<functionNode *> * > () = yystack_[1].value.as < std::vector<functionNode *> * > ();
             yylhs.value.as < std::vector<functionNode *> * > ()->push_back(yystack_[0].value.as < functionNode * > ());
         }
-#line 2304 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 2305 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 46: // routine_part: function_decl
-#line 492 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 493 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
         {
             yylhs.value.as < std::vector<functionNode *> * > () = new std::vector<functionNode *>();
             yylhs.value.as < std::vector<functionNode *> * > ()->push_back(yystack_[0].value.as < functionNode * > ());
         }
-#line 2313 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 2314 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 47: // routine_part: procedure_decl
-#line 497 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 498 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
         {
             yylhs.value.as < std::vector<functionNode *> * > () = new std::vector<functionNode *>();
             yylhs.value.as < std::vector<functionNode *> * > ()->push_back(yystack_[0].value.as < functionNode * > ());
         }
-#line 2322 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 2323 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 48: // routine_part: %empty
-#line 502 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 503 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
         {
 
         }
-#line 2330 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 2331 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 49: // function_decl: function_head SEMI sub_routine SEMI
-#line 508 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 509 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
                                                {
         	yylhs.value.as < functionNode * > () = new functionNode(get<0>(yystack_[3].value.as < std::tuple<std::string, std::vector<parameter *> *, abstractSimpleDecl *> > ()), get<1>(yystack_[3].value.as < std::tuple<std::string, std::vector<parameter *> *, abstractSimpleDecl *> > ()), yystack_[1].value.as < rootProgram* > (), get<2>(yystack_[3].value.as < std::tuple<std::string, std::vector<parameter *> *, abstractSimpleDecl *> > ()));
             yylhs.value.as < functionNode * > ()->setLineno(yystack_[3].location.begin.line);
         }
-#line 2339 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 2340 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 50: // function_head: FUNCTION ID parameters COLON simple_type_decl
-#line 516 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 517 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
         {
             yylhs.value.as < std::tuple<std::string, std::vector<parameter *> *, abstractSimpleDecl *> > () = std::make_tuple(yystack_[3].value.as < std::string > (), yystack_[2].value.as < std::vector<parameter *>* > (), yystack_[0].value.as < abstractSimpleDecl * > ());
         }
-#line 2347 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 2348 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 51: // procedure_decl: procedure_head SEMI sub_routine SEMI
-#line 523 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 524 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
         {
             yylhs.value.as < functionNode * > () = new functionNode(get<0>(yystack_[3].value.as < std::tuple<std::string, std::vector<parameter *> *> > ()), get<1>(yystack_[3].value.as < std::tuple<std::string, std::vector<parameter *> *> > ()), yystack_[1].value.as < rootProgram* > ());
             yylhs.value.as < functionNode * > ()->setLineno(yystack_[3].location.begin.line);
         }
-#line 2356 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 2357 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 52: // procedure_head: PROCEDURE ID parameters
-#line 531 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 532 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
         {
             yylhs.value.as < std::tuple<std::string, std::vector<parameter *> *> > () = std::make_tuple(yystack_[1].value.as < std::string > (), yystack_[0].value.as < std::vector<parameter *>* > ());
         }
-#line 2364 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 2365 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 53: // parameters: LP para_decl_list RP
-#line 538 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 539 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
         {
             yylhs.value.as < std::vector<parameter *>* > () = yystack_[1].value.as < std::vector<parameter *>* > ();
         }
-#line 2372 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 2373 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 54: // parameters: %empty
-#line 542 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 543 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
         {
         }
-#line 2379 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 2380 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 55: // para_decl_list: para_decl_list SEMI para_type_list
-#line 548 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 549 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
         {
             yylhs.value.as < std::vector<parameter *>* > () = yystack_[2].value.as < std::vector<parameter *>* > ();
             yylhs.value.as < std::vector<parameter *>* > ()->push_back(yystack_[0].value.as < parameter * > ());
         }
-#line 2388 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 2389 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 56: // para_decl_list: para_type_list
-#line 553 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 554 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
         {
             yylhs.value.as < std::vector<parameter *>* > () = new std::vector<parameter *>();
             yylhs.value.as < std::vector<parameter *>* > ()->push_back(yystack_[0].value.as < parameter * > ());
         }
-#line 2397 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 2398 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 57: // para_type_list: var_para_list COLON simple_type_decl
-#line 561 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 562 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
         {
             yylhs.value.as < parameter * > () = new parameter(TOY_COMPILER::REFER, *(yystack_[2].value.as < std::vector<std::string>* > ()), yystack_[0].value.as < abstractSimpleDecl * > ());
             yylhs.value.as < parameter * > ()->setLineno(yystack_[2].location.begin.line);
         }
-#line 2406 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 2407 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 58: // para_type_list: val_para_list COLON simple_type_decl
-#line 566 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 567 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
         {
             yylhs.value.as < parameter * > () = new parameter(TOY_COMPILER::VALUE, *(yystack_[2].value.as < std::vector<std::string>* > ()), yystack_[0].value.as < abstractSimpleDecl * > ());
             yylhs.value.as < parameter * > ()->setLineno(yystack_[2].location.begin.line);
         }
-#line 2415 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 2416 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 59: // var_para_list: VAR name_list
-#line 574 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 575 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
         {
             yylhs.value.as < std::vector<std::string>* > () = yystack_[0].value.as < std::vector<std::string>* > ();
         }
-#line 2423 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 2424 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 60: // val_para_list: name_list
-#line 581 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 582 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
         {
             yylhs.value.as < std::vector<std::string>* > () = yystack_[0].value.as < std::vector<std::string>* > ();
         }
-#line 2431 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 2432 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 61: // routine_body: compound_stmt
-#line 587 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 588 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
                       { yylhs.value.as < stmtList * > () = yystack_[0].value.as < stmtList * > (); }
-#line 2437 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 2438 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 62: // compound_stmt: _BEGIN stmt_list _END
-#line 591 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 592 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
                                 {yylhs.value.as < stmtList * > () = yystack_[1].value.as < stmtList * > ();}
-#line 2443 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 2444 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 63: // stmt_list: stmt_list stmt SEMI
-#line 595 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 596 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
                               {yystack_[2].value.as < stmtList * > ()->addStmt(yystack_[1].value.as < abstractStmt* > ()); yylhs.value.as < stmtList * > () = yystack_[2].value.as < stmtList * > ();}
-#line 2449 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 2450 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 64: // stmt_list: %empty
-#line 597 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 598 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
         {
             yylhs.value.as < stmtList * > () = new stmtList();
             yylhs.value.as < stmtList * > ()->setLineno(yylhs.location.begin.line);
         }
-#line 2458 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 2459 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 65: // stmt: INTEGER COLON non_label_stmt
-#line 604 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 605 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
         {
             yylhs.value.as < abstractStmt* > () = yystack_[0].value.as < abstractStmt* > ();
             //globalsymtab->Label.insert($1, $3);
         }
-#line 2467 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 2468 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 66: // stmt: non_label_stmt
-#line 608 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 609 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
                           {yylhs.value.as < abstractStmt* > () = yystack_[0].value.as < abstractStmt* > ();}
-#line 2473 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 2474 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 67: // non_label_stmt: assign_stmt
-#line 612 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 613 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
                     {yylhs.value.as < abstractStmt* > () = yystack_[0].value.as < assignStmt* > ();}
-#line 2479 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 2480 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 68: // non_label_stmt: proc_stmt
-#line 613 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 614 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
                     {yylhs.value.as < abstractStmt* > () = yystack_[0].value.as < functionCall * > ();}
-#line 2485 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 2486 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 69: // non_label_stmt: compound_stmt
-#line 614 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 615 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
                         {yylhs.value.as < abstractStmt* > () = yystack_[0].value.as < stmtList * > ();}
-#line 2491 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 2492 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 70: // non_label_stmt: if_stmt
-#line 615 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 616 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
                   {yylhs.value.as < abstractStmt* > () = yystack_[0].value.as < ifStmt* > ();}
-#line 2497 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 2498 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 71: // non_label_stmt: repeat_stmt
-#line 616 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 617 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
                       {yylhs.value.as < abstractStmt* > () = yystack_[0].value.as < repeatStmt* > ();}
-#line 2503 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 2504 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 72: // non_label_stmt: while_stmt
-#line 617 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 618 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
                      {yylhs.value.as < abstractStmt* > () = yystack_[0].value.as < whileStmt* > ();}
-#line 2509 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 2510 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 73: // non_label_stmt: for_stmt
-#line 618 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 619 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
                    {yylhs.value.as < abstractStmt* > () = yystack_[0].value.as < forStmt* > ();}
-#line 2515 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 2516 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 74: // non_label_stmt: case_stmt
-#line 619 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 620 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
                     {yylhs.value.as < abstractStmt* > () = yystack_[0].value.as < caseStmt* > ();}
-#line 2521 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 2522 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 75: // non_label_stmt: goto_stmt
-#line 620 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 621 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
                     {yylhs.value.as < abstractStmt* > () = yystack_[0].value.as < gotoStmt* > ();}
-#line 2527 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 2528 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 76: // assign_stmt: ID ASSIGN expression
-#line 625 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 626 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
         {
             auto l = new variableNode(yystack_[2].value.as < std::string > ());
             l->setLineno(yystack_[2].location.begin.line);
             yylhs.value.as < assignStmt* > () = new assignStmt(l, yystack_[0].value.as < abstractExpr * > ());
             yylhs.value.as < assignStmt* > ()->setLineno(yystack_[2].location.begin.line);
         }
-#line 2538 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 2539 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 77: // assign_stmt: ID LB expression RB ASSIGN expression
-#line 632 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 633 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
         {
             auto l = new mathExpr(TOY_COMPILER::LBRB, new variableNode(yystack_[5].value.as < std::string > ()), yystack_[3].value.as < abstractExpr * > ());
             l->setLineno(yystack_[5].location.begin.line);
             yylhs.value.as < assignStmt* > () = new assignStmt(l, yystack_[0].value.as < abstractExpr * > ());
             yylhs.value.as < assignStmt* > ()->setLineno(yystack_[5].location.begin.line);
         }
-#line 2549 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 2550 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 78: // assign_stmt: ID DOT ID ASSIGN expression
-#line 639 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 640 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
         {
             auto l = new mathExpr(TOY_COMPILER::DOT, new variableNode(yystack_[4].value.as < std::string > ()), new variableNode(yystack_[2].value.as < std::string > ()));
             l->setLineno(yystack_[4].location.begin.line);
             yylhs.value.as < assignStmt* > () = new assignStmt(l, yystack_[0].value.as < abstractExpr * > ());
             yylhs.value.as < assignStmt* > ()->setLineno(yystack_[4].location.begin.line);
         }
-#line 2560 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 2561 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 79: // proc_stmt: ID LP RP
-#line 649 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 650 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
         {
             yylhs.value.as < functionCall * > () = new functionCall(yystack_[2].value.as < std::string > (), nullptr);
             yylhs.value.as < functionCall * > ()->setLineno(yystack_[2].location.begin.line);
         }
-#line 2569 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 2570 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 80: // proc_stmt: ID LP args_list RP
-#line 654 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 655 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
         {
             yylhs.value.as < functionCall * > () = new functionCall(yystack_[3].value.as < std::string > (), yystack_[1].value.as < std::vector<abstractExpr *> * > ());
             yylhs.value.as < functionCall * > ()->setLineno(yystack_[3].location.begin.line);
         }
-#line 2578 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 2579 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 81: // proc_stmt: SYS_PROC LP RP
-#line 659 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 660 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
         {
             if (yystack_[2].value.as < int > () == 8) {
                 yylhs.value.as < functionCall * > () = new functionCall("write", nullptr);
@@ -2587,11 +2588,11 @@ namespace TOY_COMPILER {
             }
             yylhs.value.as < functionCall * > ()->setLineno(yystack_[2].location.begin.line);
         }
-#line 2591 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 2592 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 82: // proc_stmt: SYS_PROC LP args_list RP
-#line 668 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 669 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
         {
             if (yystack_[3].value.as < int > () == 8) {
                 yylhs.value.as < functionCall * > () = new functionCall("write", yystack_[1].value.as < std::vector<abstractExpr *> * > ());
@@ -2600,303 +2601,303 @@ namespace TOY_COMPILER {
             }
             yylhs.value.as < functionCall * > ()->setLineno(yystack_[3].location.begin.line);
         }
-#line 2604 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 2605 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 83: // proc_stmt: READ LP factor RP
-#line 678 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 679 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
         {
             auto args = new std::vector<abstractExpr *>();
             args->push_back(yystack_[1].value.as < abstractExpr * > ());
             yylhs.value.as < functionCall * > () = new functionCall("read", args);
             yylhs.value.as < functionCall * > ()->setLineno(yystack_[3].location.begin.line);
         }
-#line 2615 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 2616 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 84: // if_stmt: IF expression THEN stmt else_clause
-#line 688 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 689 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
         {
             yylhs.value.as < ifStmt* > () = new ifStmt(yystack_[3].value.as < abstractExpr * > (), yystack_[1].value.as < abstractStmt* > (), yystack_[0].value.as < abstractStmt* > ());
             yylhs.value.as < ifStmt* > ()->setLineno(yystack_[4].location.begin.line);
         }
-#line 2624 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 2625 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 85: // else_clause: ELSE stmt
-#line 695 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 696 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
                   {yylhs.value.as < abstractStmt* > () = yystack_[0].value.as < abstractStmt* > ();}
-#line 2630 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 2631 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 86: // else_clause: %empty
-#line 696 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 697 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
            {yylhs.value.as < abstractStmt* > () = nullptr;}
-#line 2636 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 2637 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 87: // repeat_stmt: REPEAT stmt_list UNTIL expression
-#line 701 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 702 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
         {
             yylhs.value.as < repeatStmt* > () = new repeatStmt(yystack_[0].value.as < abstractExpr * > (), yystack_[2].value.as < stmtList * > ());
             yylhs.value.as < repeatStmt* > ()->setLineno(yystack_[3].location.begin.line);
         }
-#line 2645 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 2646 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 88: // while_stmt: WHILE expression DO stmt
-#line 709 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 710 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
         {
             yylhs.value.as < whileStmt* > () = new whileStmt(yystack_[2].value.as < abstractExpr * > (), yystack_[0].value.as < abstractStmt* > ());
             yylhs.value.as < whileStmt* > ()->setLineno(yystack_[3].location.begin.line);
         }
-#line 2654 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 2655 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 89: // for_stmt: FOR ID ASSIGN expression direction expression DO stmt
-#line 717 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 718 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
         {
             yylhs.value.as < forStmt* > () = new forStmt(yystack_[6].value.as < std::string > (), yystack_[4].value.as < abstractExpr * > (), yystack_[2].value.as < abstractExpr * > (), yystack_[3].value.as < bool > (), yystack_[0].value.as < abstractStmt* > ());
             yylhs.value.as < forStmt* > ()->setLineno(yystack_[7].location.begin.line);
         }
-#line 2663 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 2664 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 90: // direction: TO
-#line 724 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 725 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
            {yylhs.value.as < bool > () = true;}
-#line 2669 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 2670 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 91: // direction: DOWNTO
-#line 725 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 726 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
                  {yylhs.value.as < bool > () = false;}
-#line 2675 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 2676 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 92: // case_stmt: CASE expression OF case_expr_list _END
-#line 730 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 731 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
         {
             yylhs.value.as < caseStmt* > () = yystack_[1].value.as < caseStmt* > ();
             yylhs.value.as < caseStmt* > ()->addCond(yystack_[3].value.as < abstractExpr * > ());
         }
-#line 2684 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 2685 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 93: // case_expr_list: case_expr_list case_expr
-#line 738 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 739 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
         {
             yylhs.value.as < caseStmt* > () = yystack_[1].value.as < caseStmt* > ();
             yylhs.value.as < caseStmt* > ()->addCase(yystack_[0].value.as < caseNode* > ());
         }
-#line 2693 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 2694 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 94: // case_expr_list: case_expr
-#line 743 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 744 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
         {
             yylhs.value.as < caseStmt* > () = new caseStmt();
             yylhs.value.as < caseStmt* > ()->addCase(yystack_[0].value.as < caseNode* > ());
             yylhs.value.as < caseStmt* > ()->setLineno(yystack_[0].location.begin.line);
         }
-#line 2703 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 2704 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 95: // case_expr: const_value COLON stmt SEMI
-#line 752 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 753 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
         {
             yylhs.value.as < caseNode* > () = new caseNode(yystack_[3].value.as < literal* > (), yystack_[1].value.as < abstractStmt* > ());
             yylhs.value.as < caseNode* > ()->setLineno(yystack_[3].location.begin.line);
         }
-#line 2712 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 2713 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 96: // case_expr: ID COLON stmt SEMI
-#line 757 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 758 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
         {
             yylhs.value.as < caseNode* > () = new caseNode(new variableNode(yystack_[3].value.as < std::string > ()), yystack_[1].value.as < abstractStmt* > ());
             yylhs.value.as < caseNode* > ()->setLineno(yystack_[3].location.begin.line);
         }
-#line 2721 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 2722 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 97: // goto_stmt: GOTO INTEGER
-#line 765 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 766 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
         {
             yylhs.value.as < gotoStmt* > () = new gotoStmt(yystack_[0].value.as < int > ());
             yylhs.value.as < gotoStmt* > ()->setLineno(yystack_[1].location.begin.line);
         }
-#line 2730 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 2731 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 98: // expression: expression GE expr
-#line 773 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 774 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
         {
             yylhs.value.as < abstractExpr * > () = new mathExpr(TOY_COMPILER::GE, yystack_[2].value.as < abstractExpr * > (), yystack_[0].value.as < abstractExpr * > ());
             yylhs.value.as < abstractExpr * > ()->setLineno(yystack_[2].location.begin.line);
         }
-#line 2739 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 2740 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 99: // expression: expression GT expr
-#line 778 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 779 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
         {
             yylhs.value.as < abstractExpr * > () = new mathExpr(TOY_COMPILER::GT, yystack_[2].value.as < abstractExpr * > (), yystack_[0].value.as < abstractExpr * > ());
             yylhs.value.as < abstractExpr * > ()->setLineno(yystack_[2].location.begin.line);
         }
-#line 2748 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 2749 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 100: // expression: expression LE expr
-#line 783 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 784 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
         {
             yylhs.value.as < abstractExpr * > () = new mathExpr(TOY_COMPILER::LE, yystack_[2].value.as < abstractExpr * > (), yystack_[0].value.as < abstractExpr * > ());
             yylhs.value.as < abstractExpr * > ()->setLineno(yystack_[2].location.begin.line);
         }
-#line 2757 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 2758 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 101: // expression: expression LT expr
-#line 788 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 789 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
         {
             yylhs.value.as < abstractExpr * > () = new mathExpr(TOY_COMPILER::LT, yystack_[2].value.as < abstractExpr * > (), yystack_[0].value.as < abstractExpr * > ());
             yylhs.value.as < abstractExpr * > ()->setLineno(yystack_[2].location.begin.line);
         }
-#line 2766 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 2767 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 102: // expression: expression EQUAL expr
-#line 793 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 794 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
         {
             yylhs.value.as < abstractExpr * > () = new mathExpr(TOY_COMPILER::EQUAL, yystack_[2].value.as < abstractExpr * > (), yystack_[0].value.as < abstractExpr * > ());
             yylhs.value.as < abstractExpr * > ()->setLineno(yystack_[2].location.begin.line);
         }
-#line 2775 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 2776 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 103: // expression: expression UNEQUAL expr
-#line 798 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 799 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
         {
             yylhs.value.as < abstractExpr * > () = new mathExpr(TOY_COMPILER::UNEQUAL, yystack_[2].value.as < abstractExpr * > (), yystack_[0].value.as < abstractExpr * > ());
             yylhs.value.as < abstractExpr * > ()->setLineno(yystack_[2].location.begin.line);
         }
-#line 2784 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 2785 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 104: // expression: expr
-#line 803 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 804 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
         {
             yylhs.value.as < abstractExpr * > () = yystack_[0].value.as < abstractExpr * > ();
         }
-#line 2792 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 2793 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 105: // expr: expr PLUS term
-#line 810 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 811 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
         {
             yylhs.value.as < abstractExpr * > () = new mathExpr(TOY_COMPILER::PLUS, yystack_[2].value.as < abstractExpr * > (), yystack_[0].value.as < abstractExpr * > ());
             yylhs.value.as < abstractExpr * > ()->setLineno(yystack_[2].location.begin.line);
         }
-#line 2801 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 2802 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 106: // expr: expr MINUS term
-#line 815 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 816 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
         {
             yylhs.value.as < abstractExpr * > () = new mathExpr(TOY_COMPILER::MINUS, yystack_[2].value.as < abstractExpr * > (), yystack_[0].value.as < abstractExpr * > ());
             yylhs.value.as < abstractExpr * > ()->setLineno(yystack_[2].location.begin.line);
         }
-#line 2810 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 2811 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 107: // expr: expr OR term
-#line 820 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 821 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
         {
             yylhs.value.as < abstractExpr * > () = new mathExpr(TOY_COMPILER::OR, yystack_[2].value.as < abstractExpr * > (), yystack_[0].value.as < abstractExpr * > ());
             yylhs.value.as < abstractExpr * > ()->setLineno(yystack_[2].location.begin.line);
         }
-#line 2819 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 2820 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 108: // expr: term
-#line 824 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 825 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
                 {yylhs.value.as < abstractExpr * > () = yystack_[0].value.as < abstractExpr * > ();}
-#line 2825 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 2826 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 109: // term: term MUL factor
-#line 829 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 830 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
         {
             yylhs.value.as < abstractExpr * > () = new mathExpr(TOY_COMPILER::MUL, yystack_[2].value.as < abstractExpr * > (), yystack_[0].value.as < abstractExpr * > ());
             yylhs.value.as < abstractExpr * > ()->setLineno(yystack_[2].location.begin.line);
         }
-#line 2834 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 2835 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 110: // term: term DIV factor
-#line 834 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 835 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
         {
             yylhs.value.as < abstractExpr * > () = new mathExpr(TOY_COMPILER::DIV, yystack_[2].value.as < abstractExpr * > (), yystack_[0].value.as < abstractExpr * > ());
             yylhs.value.as < abstractExpr * > ()->setLineno(yystack_[2].location.begin.line);
 	    }
-#line 2843 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 2844 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 111: // term: term MOD factor
-#line 839 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 840 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
         {
             yylhs.value.as < abstractExpr * > () = new mathExpr(TOY_COMPILER::MOD, yystack_[2].value.as < abstractExpr * > (), yystack_[0].value.as < abstractExpr * > ());
             yylhs.value.as < abstractExpr * > ()->setLineno(yystack_[2].location.begin.line);
         }
-#line 2852 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 2853 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 112: // term: term AND factor
-#line 844 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 845 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
         {
             yylhs.value.as < abstractExpr * > () = new mathExpr(TOY_COMPILER::AND, yystack_[2].value.as < abstractExpr * > (), yystack_[0].value.as < abstractExpr * > ());
             yylhs.value.as < abstractExpr * > ()->setLineno(yystack_[2].location.begin.line);
         }
-#line 2861 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 2862 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 113: // term: factor
-#line 849 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 850 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
         {
             yylhs.value.as < abstractExpr * > () = yystack_[0].value.as < abstractExpr * > ();
         }
-#line 2869 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 2870 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 114: // factor: ID
-#line 856 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 857 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
         {
             yylhs.value.as < abstractExpr * > () = new variableNode(yystack_[0].value.as < std::string > ());
             yylhs.value.as < abstractExpr * > ()->setLineno(yystack_[0].location.begin.line);
         }
-#line 2878 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 2879 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 115: // factor: ID LP RP
-#line 861 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 862 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
         {
             yylhs.value.as < abstractExpr * > () = new functionCall(yystack_[2].value.as < std::string > (), nullptr);
             yylhs.value.as < abstractExpr * > ()->setLineno(yystack_[2].location.begin.line);
         }
-#line 2887 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 2888 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 116: // factor: ID LP args_list RP
-#line 866 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 867 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
         {
             yylhs.value.as < abstractExpr * > () = new functionCall(yystack_[3].value.as < std::string > (), yystack_[1].value.as < std::vector<abstractExpr *> * > ());
             yylhs.value.as < abstractExpr * > ()->setLineno(yystack_[3].location.begin.line);
         }
-#line 2896 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 2897 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 117: // factor: SYS_FUNCT LP RP
-#line 871 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 872 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
         {
             std::string func_name;
             switch(yystack_[2].value.as < int > ()) {
@@ -2929,11 +2930,11 @@ namespace TOY_COMPILER {
             yylhs.value.as < abstractExpr * > () = new functionCall(func_name, nullptr);
             yylhs.value.as < abstractExpr * > ()->setLineno(yystack_[2].location.begin.line);
         }
-#line 2933 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 2934 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 118: // factor: SYS_FUNCT LP args_list RP
-#line 904 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 905 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
         {
         	std::string func_name;
             switch(yystack_[3].value.as < int > ()) {
@@ -2966,81 +2967,81 @@ namespace TOY_COMPILER {
             yylhs.value.as < abstractExpr * > () = new functionCall(func_name, yystack_[1].value.as < std::vector<abstractExpr *> * > ());
             yylhs.value.as < abstractExpr * > ()->setLineno(yystack_[3].location.begin.line);
         }
-#line 2970 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 2971 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 119: // factor: const_value
-#line 937 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 938 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
         {
             yylhs.value.as < abstractExpr * > () = yystack_[0].value.as < literal* > ();
         }
-#line 2978 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 2979 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 120: // factor: LP expression RP
-#line 941 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 942 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
         {
             yylhs.value.as < abstractExpr * > () = yystack_[1].value.as < abstractExpr * > ();
         }
-#line 2986 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 2987 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 121: // factor: NOT factor
-#line 945 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 946 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
         {
             yylhs.value.as < abstractExpr * > () = new mathExpr(TOY_COMPILER::NOT, yystack_[0].value.as < abstractExpr * > (), nullptr);
             yylhs.value.as < abstractExpr * > ()->setLineno(yystack_[1].location.begin.line);
         }
-#line 2995 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 2996 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 122: // factor: MINUS factor
-#line 950 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 951 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
         {
             yylhs.value.as < abstractExpr * > () = new mathExpr(TOY_COMPILER::NOT, yystack_[0].value.as < abstractExpr * > (), nullptr);
             yylhs.value.as < abstractExpr * > ()->setLineno(yystack_[1].location.begin.line);
         }
-#line 3004 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 3005 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 123: // factor: ID LB expression RB
-#line 955 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 956 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
         {
             yylhs.value.as < abstractExpr * > () = new mathExpr(TOY_COMPILER::LBRB, new variableNode(yystack_[3].value.as < std::string > ()), yystack_[1].value.as < abstractExpr * > ());
             yylhs.value.as < abstractExpr * > ()->setLineno(yystack_[3].location.begin.line);
         }
-#line 3013 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 3014 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 124: // factor: ID DOT ID
-#line 960 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 961 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
         {
             yylhs.value.as < abstractExpr * > () = new mathExpr(TOY_COMPILER::DOT, new variableNode(yystack_[2].value.as < std::string > ()), new variableNode(yystack_[0].value.as < std::string > ()));
             yylhs.value.as < abstractExpr * > ()->setLineno(yystack_[2].location.begin.line);
 	    }
-#line 3022 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 3023 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 125: // args_list: args_list COMMA expression
-#line 968 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 969 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
         {
             yylhs.value.as < std::vector<abstractExpr *> * > () = yystack_[2].value.as < std::vector<abstractExpr *> * > ();
             yylhs.value.as < std::vector<abstractExpr *> * > ()->push_back(yystack_[0].value.as < abstractExpr * > ());
         }
-#line 3031 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 3032 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
   case 126: // args_list: expression
-#line 973 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 974 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
         {
             yylhs.value.as < std::vector<abstractExpr *> * > () = new std::vector<abstractExpr *>();
             yylhs.value.as < std::vector<abstractExpr *> * > ()->push_back(yystack_[0].value.as < abstractExpr * > ());
         }
-#line 3040 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 3041 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
     break;
 
 
-#line 3044 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 3045 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
 
             default:
               break;
@@ -3670,19 +3671,19 @@ namespace TOY_COMPILER {
   const short
   Parser::yyrline_[] =
   {
-       0,   165,   165,   174,   180,   191,   198,   212,   217,   222,
-     227,   231,   240,   249,   258,   267,   276,   294,   299,   305,
-     309,   318,   328,   332,   336,   343,   358,   366,   376,   381,
-     386,   391,   399,   407,   414,   419,   428,   436,   441,   449,
-     454,   459,   464,   473,   481,   486,   491,   496,   502,   508,
-     515,   522,   530,   537,   542,   547,   552,   560,   565,   573,
-     580,   587,   591,   595,   597,   603,   608,   612,   613,   614,
-     615,   616,   617,   618,   619,   620,   624,   631,   638,   648,
-     653,   658,   667,   677,   687,   695,   696,   700,   708,   716,
-     724,   725,   729,   737,   742,   751,   756,   764,   772,   777,
-     782,   787,   792,   797,   802,   809,   814,   819,   824,   828,
-     833,   838,   843,   848,   855,   860,   865,   870,   903,   936,
-     940,   944,   949,   954,   959,   967,   972
+       0,   166,   166,   175,   181,   192,   199,   213,   218,   223,
+     228,   232,   241,   250,   259,   268,   277,   295,   300,   306,
+     310,   319,   329,   333,   337,   344,   359,   367,   377,   382,
+     387,   392,   400,   408,   415,   420,   429,   437,   442,   450,
+     455,   460,   465,   474,   482,   487,   492,   497,   503,   509,
+     516,   523,   531,   538,   543,   548,   553,   561,   566,   574,
+     581,   588,   592,   596,   598,   604,   609,   613,   614,   615,
+     616,   617,   618,   619,   620,   621,   625,   632,   639,   649,
+     654,   659,   668,   678,   688,   696,   697,   701,   709,   717,
+     725,   726,   730,   738,   743,   752,   757,   765,   773,   778,
+     783,   788,   793,   798,   803,   810,   815,   820,   825,   829,
+     834,   839,   844,   849,   856,   861,   866,   871,   904,   937,
+     941,   945,   950,   955,   960,   968,   973
   };
 
   void
@@ -3767,9 +3768,9 @@ namespace TOY_COMPILER {
 
 #line 20 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
 } // TOY_COMPILER
-#line 3771 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
+#line 3772 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.tab.cc"
 
-#line 979 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
+#line 980 "/Users/xuewei/OneDrive - zju.edu.cn/code/cpp/toy_compiler/src/parser.y"
 
 
 void TOY_COMPILER::Parser::error (const location_type& l, const std::string& m)
