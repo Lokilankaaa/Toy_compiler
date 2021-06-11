@@ -2,3 +2,9 @@
 cmake-build-debug/
 .DS_Stroe
 .vscode/
+src/lex.yy.cc
+src/parser.tab.cc
+src/parser.tab.hh
+src/location.hh
+src/position.hh
+src/stack.hh
