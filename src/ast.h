@@ -10,6 +10,8 @@
 #include <utility>
 #include <vector>
 #include <climits>
+#include <llvm/IR/Module.h>
+
 
 #define GETTER(var, method_name) decltype(var) &method_name()
 

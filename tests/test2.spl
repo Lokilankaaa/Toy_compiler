@@ -3,16 +3,11 @@ program hello;
 var
 	i : integer;
 	b : string;
-	arr : array [10] of integer;
+	arr : array [1 .. 6] of integer;
     m : record
         age : integer;
         height : integer;
         end;
-//function bo(a : integer): integer;
-//begin
-//    write("bo: %d", a);
-//end
-//;
 
 
 function go(var a : integer): integer;

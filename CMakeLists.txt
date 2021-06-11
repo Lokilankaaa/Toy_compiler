@@ -1,11 +1,8 @@
 cmake_minimum_required(VERSION 3.14)
-project(toy_compiler)
+project(toy_compiler CXX)
 
 set(CMAKE_CXX_STANDARD 14)
-
-#set(CMAKE_CXX_COMPILER "/usr/local/Cellar/gcc/9.2.0_1/bin/g++-9")
-#include_directories("include")
-set(SRC_FILE "src")
+set(SRC_FILE "src/" "src/ast.cpp")
 
 if (CMAKE_HOST_SYSTEM_NAME MATCHES "Darwin")
     execute_process(
@@ -31,8 +28,15 @@ if (CMAKE_HOST_SYSTEM_NAME MATCHES "Darwin")
     endif ()
 endif ()
 
+include_directories("/usr/local/Cellar/llvm/11.0.0/include/")
+
+set(LLVM_DIR "/usr/local/Cellar/llvm/11.0.0/lib/cmake/llvm")
+
 find_package(BISON REQUIRED)
 find_package(FLEX REQUIRED)
+find_package(LLVM REQUIRED)
+
+link_directories(${LLVM_LIBRARY_DIRS})
 
 BISON_TARGET(parser
         ${CMAKE_CURRENT_SOURCE_DIR}/src/parser.y
@@ -46,5 +50,6 @@ add_compile_options(-w)
 
 add_executable(toy_compiler main.cpp ${SRC_FILE} ${FLEX_lexer_OUTPUTS} ${BISON_parser_OUTPUTS})
 
+target_link_libraries(toy_compiler LLVM)
 
 
