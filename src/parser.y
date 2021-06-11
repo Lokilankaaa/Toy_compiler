@@ -153,7 +153,8 @@
 %type   <typeDefDecl *> type_part type_decl_list  
 %type   <abstractSimpleDecl *> simple_type_decl
 %type   <arrayDecl*> array_type_decl
-%type   <recordDecl *> record_type_decl field_decl_list
+%type   <recordDecl *> record_type_decl
+%type   <std::vector<field*> *> field_decl_list
 %type   <field*> field_decl
 %type   <parameter *> para_type_list
 %type   <std::vector<parameter *>*> para_decl_list parameters
@@ -421,7 +422,8 @@ array_type_decl:
 record_type_decl:
         RECORD  field_decl_list  _END
         {
-            $$ = $2;
+            $$ = new recordDecl();
+            $$->getFields() = *($2);
         }
         ;
 
@@ -429,13 +431,12 @@ field_decl_list:
         field_decl_list  field_decl
         {
             $$ = $1;
-            $$->addRecord(*$2);
+            $$->push_back($2);
         }
         |  field_decl
         {
-            $$ = new recordDecl();
-            $$->addRecord(*$1);
-            $$->setLineno(@$.begin.line);
+            $$ = new std::vector<field *>;
+            $$->push_back($1);
         }
         ;
 

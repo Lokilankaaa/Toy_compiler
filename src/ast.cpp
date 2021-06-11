@@ -5,15 +5,15 @@
 #include "ast.h"
 #include <algorithm>
 
-std::string getJsonString(const std::string& name) {
+std::string getJsonString(const std::string &name) {
     return R"({ "name" : ")" + name + "\" }";
 }
 
-std::string getJsonString(const std::string& name, const std::vector<std::string>& children) {
+std::string getJsonString(const std::string &name, const std::vector<std::string> &children) {
     std::string result = R"({ "name" : ")" + name + R"(", "children" : [ )";
     int i = 0;
-    for(auto &child : children) {
-        if(i != children.size() - 1)
+    for (auto &child : children) {
+        if (i != children.size() - 1)
             result += child + ", ";
         else
             result += child + " ";
@@ -22,15 +22,15 @@ std::string getJsonString(const std::string& name, const std::vector<std::string
     return result + " ] }";
 }
 
-std::string getJsonString(const std::string& name, const std::string& value) {
+std::string getJsonString(const std::string &name, const std::string &value) {
     return getJsonString(name, std::vector<std::string>{value});
 }
 
-std::string getJsonString(const std::string& name, const std::string& value, const std::vector<std::string>& children) {
+std::string getJsonString(const std::string &name, const std::string &value, const std::vector<std::string> &children) {
     std::string result = R"({ "name" : ")" + name + R"(", "value" : ")" + value + R"(", "children" : [ )";
     int i = 0;
-    for(auto &child : children) {
-        if(i != children.size() - 1)
+    for (auto &child : children) {
+        if (i != children.size() - 1)
             result += child + ", ";
         else
             result += child + " ";
@@ -49,7 +49,7 @@ std::string TOY_COMPILER::constNode::getNodeJson() {
 
 std::string TOY_COMPILER::constDecl::getNodeJson() {
     std::vector<std::string> children;
-    auto f = [&](utilsInterface * n) {
+    auto f = [&](utilsInterface *n) {
         children.push_back(n->getNodeJson());
     };
 
@@ -80,7 +80,7 @@ std::string TOY_COMPILER::field::getNodeJson() {
 
 std::string TOY_COMPILER::recordDecl::getNodeJson() {
     std::vector<std::string> children;
-    auto f = [&](utilsInterface * n) {
+    auto f = [&](utilsInterface *n) {
         children.push_back(n->getNodeJson());
     };
 
@@ -90,12 +90,12 @@ std::string TOY_COMPILER::recordDecl::getNodeJson() {
 }
 
 std::string TOY_COMPILER::varNode::getNodeJson() {
-    return getJsonString("varNode");
+    return getJsonString("varNode", varType->getNodeJson());
 }
 
 std::string TOY_COMPILER::varDecl::getNodeJson() {
     std::vector<std::string> children;
-    auto f = [&](utilsInterface * n) {
+    auto f = [&](utilsInterface *n) {
         children.push_back(n->getNodeJson());
     };
 
@@ -106,7 +106,7 @@ std::string TOY_COMPILER::varDecl::getNodeJson() {
 
 std::string TOY_COMPILER::typeDefDecl::getNodeJson() {
     std::vector<std::string> children;
-    auto f = [&](utilsInterface * n) {
+    auto f = [&](utilsInterface *n) {
         children.push_back(n->getNodeJson());
     };
 
@@ -134,7 +134,7 @@ std::string TOY_COMPILER::mathExpr::getNodeJson() {
 
 std::string TOY_COMPILER::stmtList::getNodeJson() {
     std::vector<std::string> children;
-    auto f = [&](utilsInterface * n) {
+    auto f = [&](utilsInterface *n) {
         children.push_back(n->getNodeJson());
     };
 
@@ -147,7 +147,7 @@ std::string TOY_COMPILER::ifStmt::getNodeJson() {
     std::vector<std::string> children;
     children.push_back(getJsonString("cond", cond->getNodeJson()));
     children.push_back(getJsonString("execStmt", execStmt->getNodeJson()));
-    if(elseStmt != nullptr)
+    if (elseStmt != nullptr)
         children.push_back(getJsonString("elseStmt", elseStmt->getNodeJson()));
     return getJsonString("ifStmt", children);
 }
@@ -179,7 +179,7 @@ std::string TOY_COMPILER::caseNode::getNodeJson() {
 std::string TOY_COMPILER::caseStmt::getNodeJson() {
     std::vector<std::string> children;
     children.push_back(getJsonString("case_cond", case_cond->getNodeJson()));
-    auto f = [&](utilsInterface * n) {
+    auto f = [&](utilsInterface *n) {
         children.push_back(n->getNodeJson());
     };
 
@@ -212,7 +212,7 @@ std::string TOY_COMPILER::functionNode::getNodeJson() {
 
 std::string TOY_COMPILER::rootProgram::getNodeJson() {
     std::vector<std::string> children;
-    auto f = [&](utilsInterface * n) {
+    auto f = [&](utilsInterface *n) {
         if (n)
             children.push_back(n->getNodeJson());
     };
