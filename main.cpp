@@ -15,6 +15,7 @@ int main() {
     auto parser = new TOY_COMPILER::Parser(*scanner);
     parser->parse();
 
-    std::cout << "1";
+    auto str = root->getNodeJson();
+    std::cout << str;
     return 0;
 }

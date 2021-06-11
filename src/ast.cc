@@ -9,7 +9,7 @@ std::string getJsonString(const std::string& name) {
     return R"({ "name" : ")" + name + "\" }";
 }
 
-std::string getJsonString(const std::string& name, const vector<std::string>& children) {
+std::string getJsonString(const std::string& name, const std::vector<std::string>& children) {
     std::string result = R"({ "name" : ")" + name + R"(", "children" : [ )";
     int i = 0;
     for(auto &child : children) {
@@ -26,7 +26,7 @@ std::string getJsonString(const std::string& name, const std::string& value) {
     return getJsonString(name, std::vector<std::string>{value});
 }
 
-std::string getJsonString(const std::string& name, const std::string& value, const vector<string>& children) {
+std::string getJsonString(const std::string& name, const std::string& value, const std::vector<std::string>& children) {
     std::string result = R"({ "name" : ")" + name + R"(", "value" : ")" + value + R"(", "children" : [ )";
     int i = 0;
     for(auto &child : children) {
@@ -148,7 +148,7 @@ std::string TOY_COMPILER::ifStmt::getNodeJson() {
     children.push_back(getJsonString("cond", cond->getNodeJson()));
     children.push_back(getJsonString("execStmt", execStmt->getNodeJson()));
     if(elseStmt != nullptr)
-        children.push_back("elseStmt", elseStmt->getNodeJson());
+        children.push_back(getJsonString("elseStmt", elseStmt->getNodeJson()));
     return getJsonString("ifStmt", children);
 }
 
@@ -169,33 +169,56 @@ std::string TOY_COMPILER::whileStmt::getNodeJson() {
 }
 
 std::string TOY_COMPILER::forStmt::getNodeJson() {
-    return utilsInterface::getNodeJson();
+    return getJsonString("forStmt", stmt->getNodeJson());
 }
 
 std::string TOY_COMPILER::caseNode::getNodeJson() {
-    return utilsInterface::getNodeJson();
+    return getJsonString("caseNode");
 }
 
 std::string TOY_COMPILER::caseStmt::getNodeJson() {
-    return utilsInterface::getNodeJson();
+    std::vector<std::string> children;
+    children.push_back(getJsonString("case_cond", case_cond->getNodeJson()));
+    auto f = [&](utilsInterface * n) {
+        children.push_back(n->getNodeJson());
+    };
+
+    for_each(case_expr_list.begin(), case_expr_list.end(), f);
+
+    return getJsonString("caseStmt", children);
 }
 
 std::string TOY_COMPILER::gotoStmt::getNodeJson() {
-    return utilsInterface::getNodeJson();
+    return getJsonString("gotoStmt");
 }
 
 std::string TOY_COMPILER::assignStmt::getNodeJson() {
-    return utilsInterface::getNodeJson();
+    return getJsonString("assignStmt");
 }
 
 std::string TOY_COMPILER::functionCall::getNodeJson() {
-    return utilsInterface::getNodeJson();
+    return getJsonString("functionCall");
 }
 
 std::string TOY_COMPILER::functionNode::getNodeJson() {
-    return utilsInterface::getNodeJson();
+    std::vector<std::string> children;
+    children.emplace_back("id");
+    children.emplace_back("paralist");
+    children.push_back(body->getNodeJson());
+    children.emplace_back("returnValue");
+
+    return getJsonString("functionDecl", children);
 }
 
 std::string TOY_COMPILER::rootProgram::getNodeJson() {
-    return utilsInterface::getNodeJson();
+    std::vector<std::string> children;
+    auto f = [&](utilsInterface * n) {
+        children.push_back(n->getNodeJson());
+    };
+
+    for_each(decls.begin(), decls.end(), f);
+    for_each(funcs.begin(), funcs.end(), f);
+    children.push_back(stmts.getNodeJson());
+
+    return getJsonString("rootProgram", children);
 }

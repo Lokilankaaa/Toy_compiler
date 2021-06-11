@@ -22,7 +22,7 @@ namespace TOY_COMPILER {
 
         int getLineno() { return lineno; }
 
-        std::string getNodeJson() {return "";}
+        virtual std::string getNodeJson();
     };
 
     class abstractAST : public utilsInterface {
@@ -34,6 +34,8 @@ namespace TOY_COMPILER {
 
 // mark class
     class abstractSubroutine {
+    public:
+        std::string getNodeJson() { return ""; }
     };
 
     class abstractStmt : public abstractAST {
@@ -58,7 +60,7 @@ namespace TOY_COMPILER {
     };
 
 // mark class
-    class abstractSimpleDecl : public abstractTypeDeclNode{
+    class abstractSimpleDecl : public abstractTypeDeclNode {
     };
 
     class literal : public abstractExpr {
@@ -137,7 +139,7 @@ namespace TOY_COMPILER {
         GETTER(val_type, getval_type) { return val_type; }
     };
 
-    class rangeDecl :public abstractSimpleDecl {
+    class rangeDecl : public abstractSimpleDecl {
     protected:
         std::string id_l, id_r;
         literal *con_l, *con_r;

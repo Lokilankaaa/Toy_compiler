@@ -3,7 +3,9 @@ project(toy_compiler)
 
 set(CMAKE_CXX_STANDARD 14)
 
-set(SRC_FILE "src" src/tt.h)
+#set(CMAKE_CXX_COMPILER "/usr/local/Cellar/gcc/9.2.0_1/bin/g++-9")
+#include_directories("include")
+set(SRC_FILE "src")
 
 if (CMAKE_HOST_SYSTEM_NAME MATCHES "Darwin")
     execute_process(
@@ -40,7 +42,7 @@ FLEX_TARGET(lexer
         ${CMAKE_CURRENT_SOURCE_DIR}/src/lex.yy.cc)
 ADD_FLEX_BISON_DEPENDENCY(lexer parser)
 
-add_compile_options(-w -ferror-limit=99)
+add_compile_options(-w)
 
 add_executable(toy_compiler main.cpp ${SRC_FILE} ${FLEX_lexer_OUTPUTS} ${BISON_parser_OUTPUTS})
 

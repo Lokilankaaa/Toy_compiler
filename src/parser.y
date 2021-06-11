@@ -184,7 +184,7 @@ routine:
             $$->getDecls() = std::move(*($1.first));
             $$->getFuncs() = std::move(*($1.second));
             $$->getStmts() = std::move(*($2));
-            $$->setLineno(@$.begin.line);
+            $$->setLineno(@1.begin.line);
         }
         ;
 
@@ -507,7 +507,7 @@ routine_part:
 
 function_decl:
         function_head  SEMI  sub_routine  SEMI {
-        	$$ = new functionNode(get<0>($1), get<1>($1), $3, get<2>($1));
+        	$$ = new functionNode(std::get<0>($1), std::get<1>($1), $3, std::get<2>($1));
             $$->setLineno(@1.begin.line);
         }
         ;
@@ -522,7 +522,7 @@ function_head:
 procedure_decl:
         procedure_head  SEMI  sub_routine  SEMI 
         {
-            $$ = new functionNode(get<0>($1), get<1>($1), $3);
+            $$ = new functionNode(std::get<0>($1), std::get<1>($1), $3);
             $$->setLineno(@1.begin.line);
         }
         ;
