@@ -9,22 +9,24 @@
 #include <iostream>
 #include <utility>
 #include <vector>
+#include <climits>
 
 #define GETTER(var, method_name) decltype(var) &method_name()
 
 namespace TOY_COMPILER {
-    class linenoInterface {
+    class utilsInterface {
         int lineno;
 
     public:
         void setLineno(int l) { lineno = l; }
 
         int getLineno() { return lineno; }
+
+        std::string getNodeJson() {return "";}
     };
 
-    class abstractAST : public linenoInterface {
+    class abstractAST : public utilsInterface {
     public:
-        void print(std::fstream &fout) {}
 
         abstractAST *father = nullptr;
         TOY_COMPILER::ASTType n_type;
@@ -79,12 +81,14 @@ namespace TOY_COMPILER {
             }
         }
 
+        std::string getNodeJson();
+
         GETTER(_t, getType) { return _t; }
 
         GETTER(_value, getValue) { return _value; }
     };
 
-    class constNode : public linenoInterface {
+    class constNode : public utilsInterface {
         // NAME  EQUAL  const_value
     protected:
         std::string id;
@@ -92,6 +96,8 @@ namespace TOY_COMPILER {
 
     public:
         constNode(std::string id, literal *v) : id{std::move(id)}, val{v} {}
+
+        std::string getNodeJson();
 
         GETTER(id, getId) { return id; }
 
@@ -109,7 +115,7 @@ namespace TOY_COMPILER {
             constdecls = new std::vector<constNode *>();
         }
 
-        void print(std::fstream &fout);
+        std::string getNodeJson();
 
         void addConstDecl(const std::string &id, literal *v) {
             constdecls->push_back(new constNode(id, v));
@@ -125,6 +131,8 @@ namespace TOY_COMPILER {
     public:
         // simple_type_decl:   sys_type
         simpleDecl(TOY_COMPILER::valType t) : val_type{t} {}
+
+        std::string getNodeJson();
 
         GETTER(val_type, getval_type) { return val_type; }
     };
@@ -159,6 +167,8 @@ namespace TOY_COMPILER {
         GETTER(id_l, getId_l) { return id_l; }
 
         GETTER(id_r, getId_r) { return id_r; }
+
+        std::string getNodeJson();
     };
 
     class namesDecl : public abstractSimpleDecl {
@@ -175,6 +185,8 @@ namespace TOY_COMPILER {
         }
 
         void addName(const std::string &name) { names.push_back(name); }
+
+        std::string getNodeJson();
 
         GETTER(names, getNames) { return names; }
 
@@ -193,12 +205,14 @@ namespace TOY_COMPILER {
             n_type = TOY_COMPILER::ARRAYDECL;
         }
 
+        std::string getNodeJson();
+
         GETTER(sim_type, getSimpleType) { return sim_type; }
 
         GETTER(type_decl, getTypeDecl) { return type_decl; }
     };
 
-    class field : public linenoInterface {
+    class field : public utilsInterface {
     protected:
         std::vector<std::string> *namelist;
         abstractTypeDeclNode *type;
@@ -210,6 +224,8 @@ namespace TOY_COMPILER {
         GETTER(namelist, getNamelist) { return namelist; }
 
         GETTER(type, getType) { return type; }
+
+        std::string getNodeJson();
     };
 
     class recordDecl : public abstractTypeDeclNode {
@@ -222,9 +238,11 @@ namespace TOY_COMPILER {
         void addRecord(field r) { fields.push_back(&r); }
 
         GETTER(fields, getFields) { return fields; }
+
+        std::string getNodeJson();
     };
 
-    class varNode : public linenoInterface {
+    class varNode : public utilsInterface {
     protected:
         std::vector<std::string> *names;
         abstractTypeDeclNode *varType;
@@ -236,6 +254,8 @@ namespace TOY_COMPILER {
         GETTER(names, getNames) { return names; }
 
         GETTER(varType, getVarType) { return varType; }
+
+        std::string getNodeJson();
     };
 
     class varDecl : public abstractTypeDeclNode {
@@ -251,6 +271,8 @@ namespace TOY_COMPILER {
         void addDecl(varNode *v) { decls->push_back(v); }
 
         GETTER(decls, getDecls) { return decls; }
+
+        std::string getNodeJson();
     };
 
     class typeDefDecl : public abstractTypeDeclNode {
@@ -263,9 +285,11 @@ namespace TOY_COMPILER {
         void addTypeDef(varNode *d) { new_type->push_back(d); }
 
         GETTER(new_type, getNewType) { return new_type; }
+
+        std::string getNodeJson();
     };
 
-    class parameter : public linenoInterface {
+    class parameter : public utilsInterface {
     protected:
         TOY_COMPILER::passBy by;
         std::vector<std::string> names; // names specifies whether it's nameslist or
@@ -282,6 +306,8 @@ namespace TOY_COMPILER {
         GETTER(names, getNames) { return names; }
 
         GETTER(simple_type, getSimpleType) { return simple_type; }
+
+        std::string getNodeJson();
     };
 
     class variableNode : public abstractExpr {
@@ -294,6 +320,8 @@ namespace TOY_COMPILER {
         }
 
         GETTER(id, getId) { return id; }
+
+        std::string getNodeJson();
     };
 
     class mathExpr : public abstractExpr {
@@ -304,7 +332,6 @@ namespace TOY_COMPILER {
 
     public:
         // +, -, *, /, , %, &, |, !, -(num), >, >=, <, <=, <>, [], .
-        void print(std::fstream &fout);
 
         mathExpr(TOY_COMPILER::opType t, abstractExpr *l, abstractExpr *r)
                 : type{t}, left{l}, right{r} {
@@ -316,6 +343,8 @@ namespace TOY_COMPILER {
         GETTER(right, getRightChild) { return right; }
 
         GETTER(type, getOp) { return type; }
+
+        std::string getNodeJson();
     };
 
     class stmtList : public abstractStmt {
@@ -329,7 +358,7 @@ namespace TOY_COMPILER {
 
         GETTER(m_stmtList, getStmtList) { return m_stmtList; }
 
-        void print(std::fstream &fout);
+        std::string getNodeJson();
     };
 
     class ifStmt : public abstractStmt {
@@ -345,13 +374,13 @@ namespace TOY_COMPILER {
             n_type = TOY_COMPILER::IFSTMT;
         }
 
-        void print(std::fstream &fout);
-
         GETTER(cond, getCond) { return cond; }
 
         GETTER(execStmt, getExecStmt) { return execStmt; }
 
         GETTER(elseStmt, getElseStmt) { return elseStmt; }
+
+        std::string getNodeJson();
     };
 
     class repeatStmt : public abstractStmt {
@@ -366,11 +395,11 @@ namespace TOY_COMPILER {
             n_type = TOY_COMPILER::REPEATSTMT;
         }
 
-        void print(std::fstream &fout);
-
         GETTER(cond, getCond) { return cond; }
 
         GETTER(stmtlist, getStmtList) { return stmtlist; }
+
+        std::string getNodeJson();
     };
 
     class whileStmt : public abstractStmt {
@@ -384,11 +413,11 @@ namespace TOY_COMPILER {
             n_type = TOY_COMPILER::WHILESTMT;
         }
 
-        void print(std::fstream &fout);
-
         GETTER(cond, getCond) { return cond; }
 
         GETTER(stmtlist, getStmtlist) { return stmtlist; }
+
+        std::string getNodeJson();
     };
 
     class forStmt : public abstractStmt {
@@ -407,8 +436,6 @@ namespace TOY_COMPILER {
             n_type = TOY_COMPILER::FORSTMT;
         }
 
-        void print(std::fstream &fout);
-
         GETTER(id, getId) { return id; }
 
         GETTER(from, getFrom) { return from; }
@@ -418,15 +445,19 @@ namespace TOY_COMPILER {
         GETTER(direction, getDirection) { return direction; }
 
         GETTER(stmt, getStmtlist) { return stmt; }
+
+        std::string getNodeJson();
     };
 
-    class caseNode : public linenoInterface {
+    class caseNode : public utilsInterface {
     public:
         abstractExpr *case_;
         abstractStmt *stmt;
 
         // if case_
         caseNode(abstractExpr *c, abstractStmt *s) : case_{c}, stmt{s} {}
+
+        std::string getNodeJson();
     };
 
     class caseStmt : public abstractStmt {
@@ -447,6 +478,8 @@ namespace TOY_COMPILER {
         GETTER(case_cond, getCond) { return case_cond; }
 
         GETTER(case_expr_list, getCases) { return case_expr_list; }
+
+        std::string getNodeJson();
     };
 
     class gotoStmt : public abstractStmt {
@@ -459,6 +492,8 @@ namespace TOY_COMPILER {
         void print(std::fstream &fout);
 
         int getLabel() const { return label; }
+
+        std::string getNodeJson();
     };
 
     class assignStmt : public abstractStmt {
@@ -474,11 +509,11 @@ namespace TOY_COMPILER {
             n_type = TOY_COMPILER::ASSIGNSTMT;
         }
 
-        void print(std::fstream &fout);
-
         GETTER(lhs, getLhs) { return lhs; }
 
         GETTER(rhs, getRhs) { return rhs; }
+
+        std::string getNodeJson();
     };
 
     class functionCall : public abstractExpr {
@@ -495,6 +530,8 @@ namespace TOY_COMPILER {
         GETTER(func_name, getFunc_name) { return func_name; }
 
         GETTER(args, getArgs) { return args; }
+
+        std::string getNodeJson();
     };
 
     class functionNode : public abstractAST {
@@ -519,8 +556,6 @@ namespace TOY_COMPILER {
             isprocedure = true;
         }
 
-        void print(std::fstream &fout);
-
         GETTER(id, getId) { return id; }
 
         GETTER(paralist, getParams) { return paralist; }
@@ -528,6 +563,8 @@ namespace TOY_COMPILER {
         GETTER(body, getBody) { return body; }
 
         GETTER(retval, getRetval) { return retval; }
+
+        std::string getNodeJson();
     };
 
     class rootProgram : public abstractAST, public abstractSubroutine {
@@ -545,13 +582,13 @@ namespace TOY_COMPILER {
 
         void addDecl(abstractTypeDeclNode *decl) { decls.push_back(decl); }
 
-        void print(std::fstream &fout);
-
         GETTER(funcs, getFuncs) { return funcs; }
 
         GETTER(stmts, getStmts) { return stmts; }
 
         GETTER(decls, getDecls) { return decls; }
+
+        std::string getNodeJson();
     };
 } // namespace TOY_COMPILER
 
