@@ -10,7 +10,7 @@
 #include <utility>
 #include <vector>
 #include <climits>
-#include <llvm/IR/Module.h>
+#include <llvm/IR/Value.h>
 
 
 #define GETTER(var, method_name) decltype(var) &method_name()
@@ -21,6 +21,8 @@ namespace TOY_COMPILER {
 
     public:
         virtual std::string getNodeJson();
+
+        virtual llvm::Value *codeGen();
 
         void setLineno(int l) { lineno = l; }
 
@@ -85,6 +87,8 @@ namespace TOY_COMPILER {
 
         std::string getNodeJson() override;
 
+        llvm::Value *codeGen() override;
+
         GETTER(_t, getType) { return _t; }
 
         GETTER(_value, getValue) { return _value; }
@@ -100,6 +104,8 @@ namespace TOY_COMPILER {
         constNode(std::string id, literal *v) : id{std::move(id)}, val{v} {}
 
         std::string getNodeJson() override;
+
+        llvm::Value *codeGen() override;
 
         GETTER(id, getId) { return id; }
 
@@ -119,6 +125,8 @@ namespace TOY_COMPILER {
 
         std::string getNodeJson() override;
 
+        llvm::Value *codeGen() override;
+
         void addConstDecl(const std::string &id, literal *v) {
             constdecls->push_back(new constNode(id, v));
         }
@@ -135,6 +143,8 @@ namespace TOY_COMPILER {
         simpleDecl(TOY_COMPILER::valType t) : val_type{t} {}
 
         std::string getNodeJson() override;
+
+        llvm::Value *codeGen() override;
 
         GETTER(val_type, getval_type) { return val_type; }
     };
@@ -171,8 +181,11 @@ namespace TOY_COMPILER {
         GETTER(id_r, getId_r) { return id_r; }
 
         std::string getNodeJson() override;
+
+        llvm::Value *codeGen() override;
     };
 
+    //alias enumDecl
     class namesDecl : public abstractSimpleDecl {
     protected:
         std::vector<std::string> names;
@@ -181,6 +194,7 @@ namespace TOY_COMPILER {
     public:
         // simple_type_decl ：  NAME  |  LP  name_list  RP  (can judge whether NAME
         // or name_list by the length of vector)
+        // actually enum type [apple, banana,....] == [1,2,...]
         namesDecl(std::vector<std::string> names, bool islist)
                 : names{std::move(names)}, isnamelist{islist} {
             n_type = TOY_COMPILER::NAMEDECL;
@@ -193,6 +207,8 @@ namespace TOY_COMPILER {
         GETTER(names, getNames) { return names; }
 
         GETTER(isnamelist, getIsNamelist) { return isnamelist; }
+
+        llvm::Value *codeGen() override;
     };
 
     class arrayDecl : public abstractTypeDeclNode {
@@ -208,6 +224,8 @@ namespace TOY_COMPILER {
         }
 
         std::string getNodeJson() override;
+
+        llvm::Value *codeGen() override;
 
         GETTER(sim_type, getSimpleType) { return sim_type; }
 
@@ -228,6 +246,8 @@ namespace TOY_COMPILER {
         GETTER(type, getType) { return type; }
 
         std::string getNodeJson() override;
+
+        llvm::Value *codeGen() override;
     };
 
     class recordDecl : public abstractTypeDeclNode {
@@ -242,6 +262,8 @@ namespace TOY_COMPILER {
         GETTER(fields, getFields) { return fields; }
 
         std::string getNodeJson() override;
+
+        llvm::Value *codeGen() override;
     };
 
     class varNode : public utilsInterface {
@@ -258,6 +280,8 @@ namespace TOY_COMPILER {
         GETTER(varType, getVarType) { return varType; }
 
         std::string getNodeJson() override;
+
+        llvm::Value *codeGen() override;
     };
 
     class varDecl : public abstractTypeDeclNode {
@@ -275,6 +299,8 @@ namespace TOY_COMPILER {
         GETTER(decls, getDecls) { return decls; }
 
         std::string getNodeJson() override;
+
+        llvm::Value *codeGen() override;
     };
 
     class typeDefDecl : public abstractTypeDeclNode {
@@ -289,6 +315,8 @@ namespace TOY_COMPILER {
         GETTER(new_type, getNewType) { return new_type; }
 
         std::string getNodeJson() override;
+
+        llvm::Value *codeGen() override;
     };
 
     class parameter : public utilsInterface {
@@ -310,6 +338,8 @@ namespace TOY_COMPILER {
         GETTER(simple_type, getSimpleType) { return simple_type; }
 
         std::string getNodeJson() override;
+
+        llvm::Value *codeGen() override;
     };
 
     class variableNode : public abstractExpr {
@@ -324,6 +354,8 @@ namespace TOY_COMPILER {
         GETTER(id, getId) { return id; }
 
         std::string getNodeJson() override;
+
+        llvm::Value *codeGen() override;
     };
 
     class mathExpr : public abstractExpr {
@@ -347,6 +379,8 @@ namespace TOY_COMPILER {
         GETTER(type, getOp) { return type; }
 
         std::string getNodeJson() override;
+
+        llvm::Value *codeGen() override;
     };
 
     class stmtList : public abstractStmt {
@@ -361,6 +395,8 @@ namespace TOY_COMPILER {
         GETTER(m_stmtList, getStmtList) { return m_stmtList; }
 
         std::string getNodeJson() override;
+
+        llvm::Value *codeGen() override;
     };
 
     class ifStmt : public abstractStmt {
@@ -383,6 +419,8 @@ namespace TOY_COMPILER {
         GETTER(elseStmt, getElseStmt) { return elseStmt; }
 
         std::string getNodeJson() override;
+
+        llvm::Value *codeGen() override;
     };
 
     class repeatStmt : public abstractStmt {
@@ -402,6 +440,8 @@ namespace TOY_COMPILER {
         GETTER(stmtlist, getStmtList) { return stmtlist; }
 
         std::string getNodeJson() override;
+
+        llvm::Value *codeGen() override;
     };
 
     class whileStmt : public abstractStmt {
@@ -420,6 +460,8 @@ namespace TOY_COMPILER {
         GETTER(stmtlist, getStmtlist) { return stmtlist; }
 
         std::string getNodeJson() override;
+
+        llvm::Value *codeGen() override;
     };
 
     class forStmt : public abstractStmt {
@@ -449,6 +491,8 @@ namespace TOY_COMPILER {
         GETTER(stmt, getStmtlist) { return stmt; }
 
         std::string getNodeJson() override;
+
+        llvm::Value *codeGen() override;
     };
 
     class caseNode : public utilsInterface {
@@ -460,6 +504,8 @@ namespace TOY_COMPILER {
         caseNode(abstractExpr *c, abstractStmt *s) : case_{c}, stmt{s} {}
 
         std::string getNodeJson() override;
+
+        llvm::Value *codeGen() override;
     };
 
     class caseStmt : public abstractStmt {
@@ -482,6 +528,8 @@ namespace TOY_COMPILER {
         GETTER(case_expr_list, getCases) { return case_expr_list; }
 
         std::string getNodeJson() override;
+
+        llvm::Value *codeGen() override;
     };
 
     class gotoStmt : public abstractStmt {
@@ -496,6 +544,8 @@ namespace TOY_COMPILER {
         int getLabel() const { return label; }
 
         std::string getNodeJson() override;
+
+        llvm::Value *codeGen() override;
     };
 
     class assignStmt : public abstractStmt {
@@ -516,6 +566,8 @@ namespace TOY_COMPILER {
         GETTER(rhs, getRhs) { return rhs; }
 
         std::string getNodeJson() override;
+
+        llvm::Value *codeGen() override;
     };
 
     class functionCall : public abstractExpr {
@@ -534,6 +586,8 @@ namespace TOY_COMPILER {
         GETTER(args, getArgs) { return args; }
 
         std::string getNodeJson() override;
+
+        llvm::Value *codeGen() override;
     };
 
     class functionNode : public abstractAST {
@@ -567,6 +621,8 @@ namespace TOY_COMPILER {
         GETTER(retval, getRetval) { return retval; }
 
         std::string getNodeJson() override;
+
+        llvm::Value *codeGen() override;
     };
 
     class rootProgram :public abstractSubroutine {
@@ -591,6 +647,8 @@ namespace TOY_COMPILER {
         GETTER(decls, getDecls) { return decls; }
 
         std::string getNodeJson() override;
+
+        llvm::Value *codeGen() override;
     };
 } // namespace TOY_COMPILER
 
