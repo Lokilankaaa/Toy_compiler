@@ -202,10 +202,10 @@ std::string TOY_COMPILER::functionCall::getNodeJson() {
 
 std::string TOY_COMPILER::functionNode::getNodeJson() {
     std::vector<std::string> children;
-    children.emplace_back("id");
-    children.emplace_back("paralist");
+    children.push_back(getJsonString("id"));
+    children.push_back(getJsonString("paralist"));
     children.push_back(body->getNodeJson());
-    children.emplace_back("returnValue");
+    children.push_back(getJsonString("returnValue"));
 
     return getJsonString("functionDecl", children);
 }

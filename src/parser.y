@@ -197,8 +197,9 @@ sub_routine:
                 $$->getFuncs() = std::move(*($1.second));
                 $$->getStmts() = std::move(*($2));
                 $$->setLineno(@1.begin.line);
-            } else {
+            } else if($2) {
                 $$ = new rootProgram();
+                $$->getStmts() = std::move(*($2));
                 $$->setLineno(@2.begin.line);
             }
         }
