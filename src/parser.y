@@ -191,7 +191,16 @@ routine:
 sub_routine:
         routine_head  routine_body
         {
-
+            if($1.first && $1.second) {
+                $$ = new rootProgram();
+                $$->getDecls() = std::move(*($1.first));
+                $$->getFuncs() = std::move(*($1.second));
+                $$->getStmts() = std::move(*($2));
+                $$->setLineno(@1.begin.line);
+            } else {
+                $$ = new rootProgram();
+                $$->setLineno(@2.begin.line);
+            }
         }
         ;
 
@@ -206,6 +215,10 @@ routine_head:
             decls->push_back($3);
             decls->push_back($4);
             $$ = std::make_pair(decls, $5);
+        }
+        |
+        {
+            $$ = std::make_pair(nullptr, nullptr);
         }
         ;
 

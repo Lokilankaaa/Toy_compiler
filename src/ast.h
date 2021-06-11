@@ -18,11 +18,11 @@ namespace TOY_COMPILER {
         int lineno;
 
     public:
+        virtual std::string getNodeJson();
+
         void setLineno(int l) { lineno = l; }
 
         int getLineno() { return lineno; }
-
-        virtual std::string getNodeJson();
     };
 
     class abstractAST : public utilsInterface {
@@ -33,9 +33,7 @@ namespace TOY_COMPILER {
     };
 
 // mark class
-    class abstractSubroutine {
-    public:
-        std::string getNodeJson() { return ""; }
+    class abstractSubroutine : public abstractAST {
     };
 
     class abstractStmt : public abstractAST {
@@ -83,7 +81,7 @@ namespace TOY_COMPILER {
             }
         }
 
-        std::string getNodeJson();
+        std::string getNodeJson() override;
 
         GETTER(_t, getType) { return _t; }
 
@@ -99,7 +97,7 @@ namespace TOY_COMPILER {
     public:
         constNode(std::string id, literal *v) : id{std::move(id)}, val{v} {}
 
-        std::string getNodeJson();
+        std::string getNodeJson() override;
 
         GETTER(id, getId) { return id; }
 
@@ -117,7 +115,7 @@ namespace TOY_COMPILER {
             constdecls = new std::vector<constNode *>();
         }
 
-        std::string getNodeJson();
+        std::string getNodeJson() override;
 
         void addConstDecl(const std::string &id, literal *v) {
             constdecls->push_back(new constNode(id, v));
@@ -134,7 +132,7 @@ namespace TOY_COMPILER {
         // simple_type_decl:   sys_type
         simpleDecl(TOY_COMPILER::valType t) : val_type{t} {}
 
-        std::string getNodeJson();
+        std::string getNodeJson() override;
 
         GETTER(val_type, getval_type) { return val_type; }
     };
@@ -170,7 +168,7 @@ namespace TOY_COMPILER {
 
         GETTER(id_r, getId_r) { return id_r; }
 
-        std::string getNodeJson();
+        std::string getNodeJson() override;
     };
 
     class namesDecl : public abstractSimpleDecl {
@@ -188,7 +186,7 @@ namespace TOY_COMPILER {
 
         void addName(const std::string &name) { names.push_back(name); }
 
-        std::string getNodeJson();
+        std::string getNodeJson() override;
 
         GETTER(names, getNames) { return names; }
 
@@ -207,7 +205,7 @@ namespace TOY_COMPILER {
             n_type = TOY_COMPILER::ARRAYDECL;
         }
 
-        std::string getNodeJson();
+        std::string getNodeJson() override;
 
         GETTER(sim_type, getSimpleType) { return sim_type; }
 
@@ -227,7 +225,7 @@ namespace TOY_COMPILER {
 
         GETTER(type, getType) { return type; }
 
-        std::string getNodeJson();
+        std::string getNodeJson() override;
     };
 
     class recordDecl : public abstractTypeDeclNode {
@@ -241,7 +239,7 @@ namespace TOY_COMPILER {
 
         GETTER(fields, getFields) { return fields; }
 
-        std::string getNodeJson();
+        std::string getNodeJson() override;
     };
 
     class varNode : public utilsInterface {
@@ -257,7 +255,7 @@ namespace TOY_COMPILER {
 
         GETTER(varType, getVarType) { return varType; }
 
-        std::string getNodeJson();
+        std::string getNodeJson() override;
     };
 
     class varDecl : public abstractTypeDeclNode {
@@ -274,7 +272,7 @@ namespace TOY_COMPILER {
 
         GETTER(decls, getDecls) { return decls; }
 
-        std::string getNodeJson();
+        std::string getNodeJson() override;
     };
 
     class typeDefDecl : public abstractTypeDeclNode {
@@ -288,7 +286,7 @@ namespace TOY_COMPILER {
 
         GETTER(new_type, getNewType) { return new_type; }
 
-        std::string getNodeJson();
+        std::string getNodeJson() override;
     };
 
     class parameter : public utilsInterface {
@@ -309,7 +307,7 @@ namespace TOY_COMPILER {
 
         GETTER(simple_type, getSimpleType) { return simple_type; }
 
-        std::string getNodeJson();
+        std::string getNodeJson() override;
     };
 
     class variableNode : public abstractExpr {
@@ -323,7 +321,7 @@ namespace TOY_COMPILER {
 
         GETTER(id, getId) { return id; }
 
-        std::string getNodeJson();
+        std::string getNodeJson() override;
     };
 
     class mathExpr : public abstractExpr {
@@ -346,7 +344,7 @@ namespace TOY_COMPILER {
 
         GETTER(type, getOp) { return type; }
 
-        std::string getNodeJson();
+        std::string getNodeJson() override;
     };
 
     class stmtList : public abstractStmt {
@@ -360,7 +358,7 @@ namespace TOY_COMPILER {
 
         GETTER(m_stmtList, getStmtList) { return m_stmtList; }
 
-        std::string getNodeJson();
+        std::string getNodeJson() override;
     };
 
     class ifStmt : public abstractStmt {
@@ -382,7 +380,7 @@ namespace TOY_COMPILER {
 
         GETTER(elseStmt, getElseStmt) { return elseStmt; }
 
-        std::string getNodeJson();
+        std::string getNodeJson() override;
     };
 
     class repeatStmt : public abstractStmt {
@@ -401,7 +399,7 @@ namespace TOY_COMPILER {
 
         GETTER(stmtlist, getStmtList) { return stmtlist; }
 
-        std::string getNodeJson();
+        std::string getNodeJson() override;
     };
 
     class whileStmt : public abstractStmt {
@@ -419,7 +417,7 @@ namespace TOY_COMPILER {
 
         GETTER(stmtlist, getStmtlist) { return stmtlist; }
 
-        std::string getNodeJson();
+        std::string getNodeJson() override;
     };
 
     class forStmt : public abstractStmt {
@@ -448,7 +446,7 @@ namespace TOY_COMPILER {
 
         GETTER(stmt, getStmtlist) { return stmt; }
 
-        std::string getNodeJson();
+        std::string getNodeJson() override;
     };
 
     class caseNode : public utilsInterface {
@@ -459,7 +457,7 @@ namespace TOY_COMPILER {
         // if case_
         caseNode(abstractExpr *c, abstractStmt *s) : case_{c}, stmt{s} {}
 
-        std::string getNodeJson();
+        std::string getNodeJson() override;
     };
 
     class caseStmt : public abstractStmt {
@@ -481,7 +479,7 @@ namespace TOY_COMPILER {
 
         GETTER(case_expr_list, getCases) { return case_expr_list; }
 
-        std::string getNodeJson();
+        std::string getNodeJson() override;
     };
 
     class gotoStmt : public abstractStmt {
@@ -495,7 +493,7 @@ namespace TOY_COMPILER {
 
         int getLabel() const { return label; }
 
-        std::string getNodeJson();
+        std::string getNodeJson() override;
     };
 
     class assignStmt : public abstractStmt {
@@ -515,7 +513,7 @@ namespace TOY_COMPILER {
 
         GETTER(rhs, getRhs) { return rhs; }
 
-        std::string getNodeJson();
+        std::string getNodeJson() override;
     };
 
     class functionCall : public abstractExpr {
@@ -533,7 +531,7 @@ namespace TOY_COMPILER {
 
         GETTER(args, getArgs) { return args; }
 
-        std::string getNodeJson();
+        std::string getNodeJson() override;
     };
 
     class functionNode : public abstractAST {
@@ -566,10 +564,10 @@ namespace TOY_COMPILER {
 
         GETTER(retval, getRetval) { return retval; }
 
-        std::string getNodeJson();
+        std::string getNodeJson() override;
     };
 
-    class rootProgram : public abstractAST, public abstractSubroutine {
+    class rootProgram :public abstractSubroutine {
     public:
         std::vector<functionNode *> funcs;
         stmtList stmts;
@@ -590,7 +588,7 @@ namespace TOY_COMPILER {
 
         GETTER(decls, getDecls) { return decls; }
 
-        std::string getNodeJson();
+        std::string getNodeJson() override;
     };
 } // namespace TOY_COMPILER
 

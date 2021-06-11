@@ -213,7 +213,8 @@ std::string TOY_COMPILER::functionNode::getNodeJson() {
 std::string TOY_COMPILER::rootProgram::getNodeJson() {
     std::vector<std::string> children;
     auto f = [&](utilsInterface * n) {
-        children.push_back(n->getNodeJson());
+        if (n)
+            children.push_back(n->getNodeJson());
     };
 
     for_each(decls.begin(), decls.end(), f);
@@ -221,4 +222,8 @@ std::string TOY_COMPILER::rootProgram::getNodeJson() {
     children.push_back(stmts.getNodeJson());
 
     return getJsonString("rootProgram", children);
+}
+
+std::string TOY_COMPILER::utilsInterface::getNodeJson() {
+    return "";
 }
