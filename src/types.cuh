@@ -109,17 +109,11 @@ namespace TOY_COMPILER {
         SEMI
     };
 
-    enum symbolType {
-        VAR_S,
-        CONST_S,
-        RECORD_S,
-        RANGE_S,
-        FUNCTION_S,
-        NAME_S,
-        ARRAY_S,
-        ELEMENT_S,
-        SIMPLE_S
-    };
+	enum iType {
+		RANGE_AS,
+		NAME_AS
+	};
+
 
 };     // namespace TOY_COMPILER
 #endif // TOY_COMPILER_TYPES_CUH
