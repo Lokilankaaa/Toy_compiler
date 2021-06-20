@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.14)
 project(toy_compiler CXX)
 
 set(CMAKE_CXX_STANDARD 14)
-set(SRC_FILE "src/" "src/ast.cpp")
+#set(SRC_FILE "src" s/tt.h)
 
 if (CMAKE_HOST_SYSTEM_NAME MATCHES "Darwin")
     execute_process(
@@ -28,15 +28,17 @@ if (CMAKE_HOST_SYSTEM_NAME MATCHES "Darwin")
     endif ()
 endif ()
 
-include_directories("/usr/local/Cellar/llvm/11.0.0/include/")
-
-set(LLVM_DIR "/usr/local/Cellar/llvm/11.0.0/lib/cmake/llvm")
-
 find_package(BISON REQUIRED)
 find_package(FLEX REQUIRED)
-find_package(LLVM REQUIRED)
+find_package(LLVM REQUIRED CONFIG)
 
-link_directories(${LLVM_LIBRARY_DIRS})
+message(STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}")
+message(STATUS "Using LLVMConfig.cmake in: ${LLVM_DIR}")
+
+include_directories(${LLVM_INCLUDE_DIRS})
+
+separate_arguments(LLVM_DEFINITIONS_LIST NATIVE_COMMAND ${LLVM_DEFINITIONS})
+add_definitions(${LLVM_DEFINITIONS_LIST})
 
 BISON_TARGET(parser
         ${CMAKE_CURRENT_SOURCE_DIR}/src/parser.y
@@ -48,8 +50,13 @@ ADD_FLEX_BISON_DEPENDENCY(lexer parser)
 
 add_compile_options(-w)
 
-add_executable(toy_compiler main.cpp ${SRC_FILE} ${FLEX_lexer_OUTPUTS} ${BISON_parser_OUTPUTS})
+add_executable(toy_compiler main.cpp
+        src/ast.cc src/ast.h src/IR.cpp src/IR.h src/scanner.h src/symtab.cpp src/symtab.h src/tt.h src/types.cuh
+        ${FLEX_lexer_OUTPUTS} ${BISON_parser_OUTPUTS})
 
-target_link_libraries(toy_compiler LLVM)
+llvm_map_components_to_libnames(llvm_libs support core irreader)
+
+# Link against LLVM libraries
+target_link_libraries(toy_compiler ${llvm_libs})
 
 

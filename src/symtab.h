@@ -1,4 +1,6 @@
-#pragma once
+#ifndef TOY_COMPILER_SYMTAB_H
+#define TOY_COMPILER_SYMTAB_H
+
 #include <iostream>
 #include <string>
 #include "types.cuh"
@@ -10,7 +12,17 @@
 #define SPL_TABLE std::map<std::string, class SymbolTable*>
 
 namespace TOY_COMPILER {
-	class GlobalSymbol {
+
+    class abstractStmt;
+    class abstractAST;
+    class literal;
+    class Record_Struct;
+    class Array_Struct;
+    class Name_Struct;
+    class Range_Struct;
+    class Type_Struct;
+
+    class GlobalSymbol {
 	public:
 		std::map<std::string, class SymbolTable*> SymTable;	//string is the id of the function, use id to find table
 		std::map<int, abstractStmt*> Label;
@@ -60,7 +72,8 @@ namespace TOY_COMPILER {
 		Symbol(TOY_COMPILER::valType valType, std::string TypeName);
 		Symbol(TOY_COMPILER::valType valType);
 
-		Symbol(std::string name);	//create a symbol only with name, for the element of name declaration
+		Symbol(std::string name);	//create a symbo
+		// l only with name, for the element of name declaration
 		Symbol();
 
 		int addMem(Symbol s) {	//used to add member
@@ -140,3 +153,4 @@ namespace TOY_COMPILER {
 	};
 }
 /*in the semantic class, I have a map for <string, SymbolTable*> to save the tables for the functions*/
+#endif

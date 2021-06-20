@@ -9,11 +9,10 @@
 #include <iostream>
 #include <utility>
 #include <vector>
-#include"IR.h"
+#include "IR.h"
 #include <climits>
 
 #define GETTER(var, method_name) decltype(var) &method_name()
-
 namespace TOY_COMPILER {
     class utilsInterface {
         int lineno;
@@ -565,7 +564,7 @@ namespace TOY_COMPILER {
 
         std::string getNodeJson();
 
-		Type_Struct codeGen(IR & generator)
+		Type_Struct codeGen(IR & generator);
     };
 
     class assignStmt : public abstractStmt {
@@ -612,7 +611,7 @@ namespace TOY_COMPILER {
 
 		Type_Struct SysProcWrite(IR & generator, bool isLineBreak);
 
-		Type_Struct functionCall::SysProcRead(IR & generator)
+		Type_Struct functionCall::SysProcRead(IR & generator);
     };
 
     class functionNode : public abstractAST {

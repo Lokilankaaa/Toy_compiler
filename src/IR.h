@@ -5,9 +5,8 @@
 #include <vector>
 #include <map>
 #include <string>
-#include"ast.h"
-#include"semantic.h"
-#include"symtab.h"
+#include "ast.h"
+#include "symtab.h"
 
 #include <llvm/IR/BasicBlock.h>
 #include <llvm/IR/Module.h>
@@ -32,9 +31,13 @@
 #include <llvm/Support/DynamicLibrary.h>
 #include <llvm/Target/TargetMachine.h>
 	//#include <llvm/Support/Debug.h>
-#include "ast.h"
 
 namespace TOY_COMPILER {
+
+    class rootProgram;
+
+    static llvm::LLVMContext TheContext;
+    static llvm::IRBuilder<> TheBuilder(TheContext);
 
 	class Function {
 	public:
@@ -119,20 +122,13 @@ namespace TOY_COMPILER {
 		std::vector<Function> funcStack;
 
 
-
-		static llvm::LLVMContext TheContext;
-		llvm::LLVMContext &context = TheContext;
-		static llvm::IRBuilder<> TheBuilder(context);
-
-
-
 		IR()
 		{
 			TheModule = std::unique_ptr<llvm::Module>(new llvm::Module("main", TheContext));
 			TheAddrSpace = TheModule->getDataLayout().getAllocaAddrSpace();
 		}
 
-		void generate(Program& astRoot);
+		void generate(rootProgram* astRoot);
 		llvm::GenericValue run();
 		llvm::ExecutionEngine* genExeEngine();
 
@@ -301,7 +297,6 @@ namespace TOY_COMPILER {
 			return NULL;
 		}
 
-
 		Type_Struct* findType(const std::string &name) {
 			for (auto it = funcStack.rbegin(); it != funcStack.rend(); it++)
 			{
@@ -380,50 +375,50 @@ namespace TOY_COMPILER {
 			return func;
 		}
 
-		void generate(TOY_COMPILER::rootProgram *root)
-		{
-			std::cout << "[INFO]" << "IR generation begin..." << endl;
-			root->codeGen(*this);
-			std::cout << "[INFO]" << "IR generation finished." << endl;
-
-			//    llvm::legacy::PassManager pm;
-			//    pm.add(createPrintModulePass(llvm::outs()));
-			//    pm.run(*TheModule);
-				// TheModule->dump();
-			TheModule->print(llvm::errs(), nullptr);
-		}
-
-		llvm::GenericValue run()
-		{
-			std::cout << "[INFO]" << "IR running begin..." << std::endl;
-			llvm::ExecutionEngine* ee = genExeEngine();
-			std::vector<llvm::GenericValue> args;
-			llvm::GenericValue res = ee->runFunction(mainFunction, args);
-			std::cout << "[INFO]" << "IR running finished." << endl;
-			return res;
-		}
-
-		llvm::ExecutionEngine* genExeEngine()
-		{
-			std::string errStr;
-			auto RTDyldMM = std::unique_ptr<llvm::SectionMemoryManager>(new llvm::SectionMemoryManager());
-			llvm::ExecutionEngine* ee = llvm::EngineBuilder(std::move(TheModule))
-				//        .setEngineKind(llvm::EngineKind::Interpreter)
-				.setEngineKind(llvm::EngineKind::JIT)
-				.setErrorStr(&errStr)
-				.setVerifyModules(true)
-				.setMCJITMemoryManager(move(RTDyldMM))
-				.setOptLevel(llvm::CodeGenOpt::Default)
-				.create();
-			if (!ee)
-			{
-				throw std::logic_error("[ERROR]Create Engine Error: " + errStr);
-			}
-			ee->addModule(std::move(TheModule));
-			ee->finalizeObject();
-			return ee;
-		}
-
 	};
+
+    void IR::generate(rootProgram *root)
+    {
+        std::cout << "[INFO]" << "IR generation begin..." << std::endl;
+        root->codeGen(*this);
+        std::cout << "[INFO]" << "IR generation finished." << std::endl;
+
+        //    llvm::legacy::PassManager pm;
+        //    pm.add(createPrintModulePass(llvm::outs()));
+        //    pm.run(*TheModule);
+        // TheModule->dump();
+        TheModule->print(llvm::errs(), nullptr);
+    }
+
+    llvm::GenericValue IR::run()
+    {
+        std::cout << "[INFO]" << "IR running begin..." << std::endl;
+        llvm::ExecutionEngine* ee = genExeEngine();
+        std::vector<llvm::GenericValue> args;
+        llvm::GenericValue res = ee->runFunction(mainFunction, args);
+        std::cout << "[INFO]" << "IR running finished." << std::endl;
+        return res;
+    }
+
+    llvm::ExecutionEngine* IR::genExeEngine()
+    {
+        std::string errStr;
+        auto RTDyldMM = std::unique_ptr<llvm::SectionMemoryManager>(new llvm::SectionMemoryManager());
+        llvm::ExecutionEngine* ee = llvm::EngineBuilder(std::move(TheModule))
+                //        .setEngineKind(llvm::EngineKind::Interpreter)
+                .setEngineKind(llvm::EngineKind::JIT)
+                .setErrorStr(&errStr)
+                .setVerifyModules(true)
+                .setMCJITMemoryManager(move(RTDyldMM))
+                .setOptLevel(llvm::CodeGenOpt::Default)
+                .create();
+        if (!ee)
+        {
+            throw std::logic_error("[ERROR]Create Engine Error: " + errStr);
+        }
+        ee->addModule(std::move(TheModule));
+        ee->finalizeObject();
+        return ee;
+    }
 }
 #endif

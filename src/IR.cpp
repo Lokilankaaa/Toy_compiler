@@ -4,7 +4,7 @@
 
 namespace TOY_COMPILER {
 
-
+    using namespace std;
 
 	template <typename T>
 	void printT(T* vt)
@@ -62,8 +62,6 @@ namespace TOY_COMPILER {
 		}
 	}
 
-
-
 	Type_Struct BinaryOp(llvm::Value* lValue, TOY_COMPILER::opType op, llvm::Value * rValue)
 	{
 		Type_Struct resType;
@@ -100,7 +98,6 @@ namespace TOY_COMPILER {
 		return resType;
 	}
 
-	
 	Type_Struct simpleDecl::codeGen(IR & generator) {
 		Type_Struct ts;
 		switch (this->getval_type())
@@ -143,8 +140,6 @@ namespace TOY_COMPILER {
 		return ts;
 	}
 
-
-
 	Type_Struct constNode::codeGen(IR & generator) {
 		std::string name = this->getId();
 		Type_Struct *ts = new Type_Struct;
@@ -185,7 +180,6 @@ namespace TOY_COMPILER {
 		return this->getType()->codeGen();
 	}
 
-
 	Type_Struct namesDecl::codeGen(IR & generator) {
 		if (this->getIsNamelist()) {
 			Type_Struct ts;
@@ -202,7 +196,6 @@ namespace TOY_COMPILER {
 			return *(generator.findType(name));
 		}
 	}
-
 
 	Type_Struct rangeDecl::codeGen(IR & generator) {
 		Range_Struct *rs = new Range_Struct;
@@ -249,7 +242,6 @@ namespace TOY_COMPILER {
 		}
 		return ts;
 	}
-
 
 	Type_Struct arrayDecl::codeGen(IR & generator) {
 		Type_Struct itype = this->getSimpleType()->codeGen();
@@ -307,15 +299,12 @@ namespace TOY_COMPILER {
 		return ts;
 	}
 
-
 	int64_t getActualValue(llvm::Value *v)
 	{
 		llvm::Constant *constValue = llvm::cast<llvm::GlobalVariable>(v)->getInitializer();
 		llvm::ConstantInt *constInt = llvm::cast<llvm::ConstantInt>(constValue);
 		return constInt->getSExtValue();
 	}
-
-
 
 	Type_Struct varNode::codeGen(IR & generator) {
 		Type_Struct type = this->getVarType()->codeGen();
@@ -340,8 +329,6 @@ namespace TOY_COMPILER {
 		}
 		return type;
 	}
-
-
 
 	Type_Struct varDecl::codeGen(IR & generator) {
 		Type_Struct ts;
@@ -574,7 +561,6 @@ namespace TOY_COMPILER {
 		return ts;
 	}
 
-
 	Type_Struct functionCall::SysProcWrite(IR & generator, bool isLineBreak)
 	{
 		std::string formatStr = "";
@@ -647,7 +633,6 @@ namespace TOY_COMPILER {
 		TheBuilder.CreateCall(generator.scanf, params, "scanf");
 		return Type_Struct(VOID);
 	}
-
 
 	llvm::Value *ifStmt::codeGen(IR & generator) {
 		this->forward(generator);
@@ -817,7 +802,6 @@ namespace TOY_COMPILER {
 		this->backward(generator);
 		return nullptr;
 	}
-
 
 	void utilsInterface::forward(IR & generator)
 	{
