@@ -25,7 +25,6 @@
         class Scanner;
     }
     #include "ast.h"
-    #include "symtab.h"
 
 // The following definitions is missing when %locations isn't used
 # ifndef YY_NULLPTR

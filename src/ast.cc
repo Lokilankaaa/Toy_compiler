@@ -1,7 +1,6 @@
 //
 // Created by 薛伟 on 2021/6/11.
 //
-
 #include "ast.h"
 #include <algorithm>
 
@@ -221,4 +220,20 @@ std::string TOY_COMPILER::rootProgram::getNodeJson() {
     children.push_back(stmts.getNodeJson());
 
     return getJsonString("rootProgram", children);
+}
+
+llvm::Value *TOY_COMPILER::rootProgram::codeGen(IR& generator) {
+
+    //Const declareation part
+    for (auto & decl : this->getDecls())
+    {
+        decl->codeGen(generator);
+    }
+    //Routine declareation part
+    for (auto & funcs : this->getFuncs()) {
+        funcs->codeGen(generator);
+    }
+    //Routine body
+    llvm::Value *res=this->getStmts().codeGen(generator);
+    return res;
 }

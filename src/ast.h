@@ -9,11 +9,36 @@
 #include <iostream>
 #include <utility>
 #include <vector>
-#include "IR.h"
 #include <climits>
+
+#include <llvm/IR/BasicBlock.h>
+#include <llvm/IR/Module.h>
+#include <llvm/IR/Function.h>
+#include <llvm/IR/LLVMContext.h>
+#include <llvm/IR/LegacyPassManager.h>
+#include <llvm/IR/CallingConv.h>
+#include <llvm/IR/IRPrintingPasses.h>
+#include <llvm/IR/IRBuilder.h>
+#include <llvm/IR/GlobalVariable.h>
+#include <llvm/IRReader/IRReader.h>
+#include <llvm/IR/ValueSymbolTable.h>
+#include <llvm/ExecutionEngine/MCJIT.h>
+#include <llvm/ExecutionEngine/Interpreter.h>
+#include <llvm/ExecutionEngine/GenericValue.h>
+#include <llvm/ExecutionEngine/SectionMemoryManager.h>
+#include <llvm/Support/SourceMgr.h>
+#include <llvm/Support/ManagedStatic.h>
+#include <llvm/Support/TargetSelect.h>
+#include <llvm/Support/MemoryBuffer.h>
+#include <llvm/Support/raw_ostream.h>
+#include <llvm/Support/DynamicLibrary.h>
+#include <llvm/Target/TargetMachine.h>
 
 #define GETTER(var, method_name) decltype(var) &method_name()
 namespace TOY_COMPILER {
+    class Type_Struct;
+    class IR;
+
     class utilsInterface {
         int lineno;
 
@@ -33,17 +58,15 @@ namespace TOY_COMPILER {
 
     class abstractAST : public utilsInterface {
     public:
-
         abstractAST *father = nullptr;
         TOY_COMPILER::ASTType n_type;
-		virtual Type_Struct *codeGen(IR & generator);
+		virtual Type_Struct codeGen(IR & generator) = 0;
     };
 
 // mark class
     class abstractSubroutine {
     public:
-		virtual llvm::Value *codeGen(IR & generator);
-
+		virtual Type_Struct codeGen(IR & generator) = 0;
         std::string getNodeJson() { return ""; }
     };
 
@@ -221,7 +244,7 @@ namespace TOY_COMPILER {
 
         GETTER(isnamelist, getIsNamelist) { return isnamelist; }
 
-		Type_Struct namesDecl::codeGen(IR & generator)
+		Type_Struct codeGen(IR & genertor);
 	};
 
     class arrayDecl : public abstractTypeDeclNode {
@@ -242,7 +265,7 @@ namespace TOY_COMPILER {
 
         GETTER(type_decl, getTypeDecl) { return type_decl; }
 
-		Type_Struct arrayDecl::codeGen(IR & generator);
+		Type_Struct codeGen(IR & generator);
     };
 
     class field : public utilsInterface {
@@ -399,8 +422,6 @@ namespace TOY_COMPILER {
 
 		Type_Struct ArrayReference(IR & generator);
 
-		Type_Struct RecordReference::codeGen(IR & generator);
-
 		Type_Struct RecordReference(IR & generator);
 	};
 
@@ -462,7 +483,7 @@ namespace TOY_COMPILER {
 
         std::string getNodeJson();
 
-		Type_Struct codeGen(IR & generator)
+		Type_Struct codeGen(IR & generator);
     };
 
     class whileStmt : public abstractStmt {
@@ -482,7 +503,7 @@ namespace TOY_COMPILER {
 
         std::string getNodeJson();
 
-		Type_Struct codeGen(IR & generator)
+		Type_Struct codeGen(IR & generator);
     };
 
     class forStmt : public abstractStmt {
@@ -513,7 +534,7 @@ namespace TOY_COMPILER {
 
         std::string getNodeJson();
 
-		Type_Struct codeGen(IR & generator)
+		Type_Struct codeGen(IR & generator);
     };
 
     class caseNode : public utilsInterface {
@@ -611,7 +632,7 @@ namespace TOY_COMPILER {
 
 		Type_Struct SysProcWrite(IR & generator, bool isLineBreak);
 
-		Type_Struct functionCall::SysProcRead(IR & generator);
+		Type_Struct SysProcRead(IR & generator);
     };
 
     class functionNode : public abstractAST {

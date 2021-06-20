@@ -51,7 +51,7 @@ ADD_FLEX_BISON_DEPENDENCY(lexer parser)
 add_compile_options(-w)
 
 add_executable(toy_compiler main.cpp
-        src/ast.cc src/ast.h src/IR.cpp src/IR.h src/scanner.h src/symtab.cpp src/symtab.h src/tt.h src/types.cuh
+        src/ast.cc src/ast.h src/IR.cpp src/IR.h src/scanner.h src/tt.h src/types.cuh
         ${FLEX_lexer_OUTPUTS} ${BISON_parser_OUTPUTS})
 
 llvm_map_components_to_libnames(llvm_libs support core irreader)

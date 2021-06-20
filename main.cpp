@@ -1,10 +1,8 @@
 #include <iostream>
-#include "src/symtab.h"
 #include "src/ast.h"
 #include "src/scanner.h"
 #include "src/parser.tab.hh"
 
-TOY_COMPILER::GlobalSymbol *globalsymtab;
 TOY_COMPILER::rootProgram *root;
 
 int main() {
@@ -12,7 +10,6 @@ int main() {
     std::string out_file = "../vis.json";
     std::ifstream in_file(filename);
     auto scanner = new TOY_COMPILER::Scanner(&in_file);
-//    globalsymtab = new TOY_COMPILER::GlobalSymbol();
     auto parser = new TOY_COMPILER::Parser(*scanner);
     parser->parse();
 

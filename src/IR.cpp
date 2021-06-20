@@ -422,21 +422,6 @@ namespace TOY_COMPILER {
 		return function;
 	}
 
-	llvm::Value *rootProgram::codeGen(IR & generator) {
-
-		//Const declareation part
-		for (auto & decl : this->getDecls())
-		{
-			decl->codeGen(generator);
-		}
-		//Routine declareation part
-		for (auto & funcs : this->getFuncs()) {
-			funcs->codeGen(generator);
-		}
-		//Routine body
-		llvm::Value *res=this->getStmts().codeGen(generator);
-		return res;
-	}
 
 	llvm::Value *rootProgram::init(IR & generator) {
 		//Main function prototype

@@ -6,35 +6,15 @@
 #include <map>
 #include <string>
 #include "ast.h"
-#include "symtab.h"
-
-#include <llvm/IR/BasicBlock.h>
-#include <llvm/IR/Module.h>
-#include <llvm/IR/Function.h>
-#include <llvm/IR/LLVMContext.h>
-#include <llvm/IR/LegacyPassManager.h>
-#include <llvm/IR/CallingConv.h>
-#include <llvm/IR/IRPrintingPasses.h>
-#include <llvm/IR/IRBuilder.h>
-#include <llvm/IR/GlobalVariable.h>
-#include <llvm/IRReader/IRReader.h>
-#include <llvm/IR/ValueSymbolTable.h>
-#include <llvm/ExecutionEngine/MCJIT.h>
-#include <llvm/ExecutionEngine/Interpreter.h>
-#include <llvm/ExecutionEngine/GenericValue.h>
-#include <llvm/ExecutionEngine/SectionMemoryManager.h>
-#include <llvm/Support/SourceMgr.h>
-#include <llvm/Support/ManagedStatic.h>
-#include <llvm/Support/TargetSelect.h>
-#include <llvm/Support/MemoryBuffer.h>
-#include <llvm/Support/raw_ostream.h>
-#include <llvm/Support/DynamicLibrary.h>
-#include <llvm/Target/TargetMachine.h>
-	//#include <llvm/Support/Debug.h>
 
 namespace TOY_COMPILER {
 
-    class rootProgram;
+//    class rootProgram;
+    class Record_Struct;
+    class Array_Struct;
+    class Name_Struct;
+    class Range_Struct;
+    class Type_Struct;
 
     static llvm::LLVMContext TheContext;
     static llvm::IRBuilder<> TheBuilder(TheContext);
@@ -46,7 +26,7 @@ namespace TOY_COMPILER {
 		std::map<std::string, Name_Struct*> nameMap;
 		std::map<std::string, Range_Struct*> rangeMap;
 		std::map<std::string, Type_Struct*> typeMap;
-		std::map<std::string, Type_Struct *>functionMap;
+		std::map<std::string, Type_Struct*>functionMap;
 
 		llvm::Function *Func;
 		Function(llvm::Function *Func){
@@ -56,6 +36,30 @@ namespace TOY_COMPILER {
 
 	class SPLStruct {
 	};
+
+    class Type_Struct: public SPLStruct {
+    public:
+        std::string name;
+        valType type;
+        bool istype;
+        bool isconst;
+        SPLStruct *Struct;
+        llvm::Type *llvm;
+        expValue value;
+        llvm::Value *llvmValue;
+
+        Type_Struct() {
+            this->type = ERROR;
+            this->isconst = 0;
+            this->istype = 0;
+        }
+
+        Type_Struct(valType val) {
+            this->type = val;
+            this->isconst = 0;
+            this->istype = 0;
+        }
+    };
 
 	class Array_Struct: public SPLStruct {
 	public:
@@ -72,30 +76,6 @@ namespace TOY_COMPILER {
 		int begin;
 		int end;
 		int size;
-	};
-
-	class Type_Struct:public SPLStruct {
-	public:
-		std::string name;
-		valType type;
-		bool istype;
-		bool isconst;
-		SPLStruct *Struct;
-		llvm::Type *llvm;
-		expValue value;
-		llvm::Value *llvmValue;
-
-		Type_Struct() {
-			this->type = ERROR;
-			this->isconst = 0;
-			this->istype = 0;
-		}
-
-		Type_Struct(valType val) {
-			this->type = val;
-			this->isconst = 0;
-			this->istype = 0;
-		}
 	};
 
 	class Record_Struct:public SPLStruct {
@@ -120,7 +100,6 @@ namespace TOY_COMPILER {
 		llvm::Function *printf, *scanf;
 		std::vector<std::string> error;
 		std::vector<Function> funcStack;
-
 
 		IR()
 		{
@@ -183,7 +162,6 @@ namespace TOY_COMPILER {
 			}
 			return NULL;
 		}
-
 
 		Range_Struct* findRange(std::string &name) {
 			for (auto it = funcStack.rbegin(); it != funcStack.rend(); it++)
@@ -323,12 +301,12 @@ namespace TOY_COMPILER {
 				if (type!=NULL)
 				{
 					if (type->isconst) {
-						switch (((Const_Struct*)type->Struct)->type)
+						switch (type->type)
 						{
-						case INTEGER: return TheBuilder.getInt32(((Const_Struct*)type->Struct)->value.int_value);
-						case REAL: return llvm::ConstantFP::get(TheBuilder.getDoubleTy(), ((Const_Struct*)type->Struct)->value.real_value);
-						case CHAR: return TheBuilder.getInt8(((Const_Struct*)type->Struct)->value.char_value);
-						case BOOLEAN: return TheBuilder.getInt1(((Const_Struct*)type->Struct)->value.bool_value);
+						case INTEGER: return TheBuilder.getInt32(type->value.int_value);
+						case REAL: return llvm::ConstantFP::get(TheBuilder.getDoubleTy(), (type->value.real_value));
+						case CHAR: return TheBuilder.getInt8(type->value.char_value);
+						case BOOLEAN: return TheBuilder.getInt1(type->value.bool_value);
 						}
 					}else result = it->Func->getValueSymbolTable()->lookup(name);
 					std::cout << "Find " << name << " in " << std::string(it->Func->getName()) << std::endl;
