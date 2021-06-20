@@ -2,18 +2,27 @@
 #include "IR.h"
 #include<string>
 
+extern std::map<int, TOY_COMPILER::abstractStmt*> Label;
+
 namespace TOY_COMPILER {
-
-    using namespace std;
-
+	
 	template <typename T>
 	void printT(T* vt)
 	{
-		string str;
+		std::string str;
 		llvm::raw_string_ostream stream(str);
 		vt->print(stream);
-		cout << str << endl;
+		std::cout << str << std::endl;
 	}
+
+    std::string to_string(int num) {
+        std::string res = "";
+        while (num != 0) {
+            res =(char)(num%10 + 0x30)+res;
+            num = num / 10;
+        }
+        return res;
+    }
 
 	llvm::AllocaInst *CreateEntryBlockAlloca(llvm::Function *TheFunction, llvm::StringRef VarName, llvm::Type* type)
 	{
@@ -42,7 +51,7 @@ namespace TOY_COMPILER {
 		}
 	}
 
-	Type_Struct literal::codeGen()
+	Type_Struct literal::codeGen(IR & generator)
 	{
 		Type_Struct ts;
 		switch (this->getType()->d_type)
@@ -62,10 +71,13 @@ namespace TOY_COMPILER {
 		}
 	}
 
+
+
 	Type_Struct BinaryOp(llvm::Value* lValue, TOY_COMPILER::opType op, llvm::Value * rValue)
 	{
 		Type_Struct resType;
 		bool flag = lValue->getType()->isDoubleTy() || rValue->getType()->isDoubleTy();
+		resType.type = (flag)? REAL:INTEGER;
 		switch (op)
 		{
 		case PLUS: resType.llvmValue = flag ? TheBuilder.CreateFAdd(lValue, rValue, "addtmpf") : TheBuilder.CreateAdd(lValue, rValue, "addtmpi");
@@ -76,21 +88,28 @@ namespace TOY_COMPILER {
 			break;
 		case DIV: resType.llvmValue = TheBuilder.CreateSDiv(lValue, rValue, "tmpDiv");
 			break;
-		case GE: resType.llvmValue = TheBuilder.CreateICmpSGE(lValue, rValue, "tmpSGE");
+		case GE: resType.type = BOOLEAN;
+			resType.llvmValue = TheBuilder.CreateICmpSGE(lValue, rValue, "tmpSGE");
 			break;
-		case GT: resType.llvmValue = TheBuilder.CreateICmpSGT(lValue, rValue, "tmpSGT");
+		case GT: resType.type = BOOLEAN;
+			resType.llvmValue = TheBuilder.CreateICmpSGT(lValue, rValue, "tmpSGT");
 			break;
-		case LT: resType.llvmValue = TheBuilder.CreateICmpSLT(lValue, rValue, "tmpSLT");
+		case LT: resType.type = BOOLEAN;
+			resType.llvmValue = TheBuilder.CreateICmpSLT(lValue, rValue, "tmpSLT");
 			break;
-		case LE: resType.llvmValue = TheBuilder.CreateICmpSLE(lValue, rValue, "tmpSLE");
+		case LE: resType.type = BOOLEAN;
+			resType.llvmValue = TheBuilder.CreateICmpSLE(lValue, rValue, "tmpSLE");
 			break;
-		case EQUAL: resType.llvmValue = TheBuilder.CreateICmpEQ(lValue, rValue, "tmpEQ");
+		case EQUAL: resType.type = BOOLEAN;
+			resType.llvmValue = TheBuilder.CreateICmpEQ(lValue, rValue, "tmpEQ");
 			break;
-		case UNEQUAL: resType.llvmValue = TheBuilder.CreateICmpNE(lValue, rValue, "tmpNE");
+		case UNEQUAL: resType.type = BOOLEAN;
+			resType.llvmValue = TheBuilder.CreateICmpNE(lValue, rValue, "tmpNE");
 			break;
 		case OR: resType.llvmValue = TheBuilder.CreateOr(lValue, rValue, "tmpOR");
 			break;
-		case MOD: resType.llvmValue = TheBuilder.CreateSRem(lValue, rValue, "tmpSREM");
+		case MOD: resType.type = INTEGER;
+			resType.llvmValue = TheBuilder.CreateSRem(lValue, rValue, "tmpSREM");
 			break;
 		case AND: resType.llvmValue = TheBuilder.CreateAnd(lValue, rValue, "tmpAND");
 			break;
@@ -98,6 +117,7 @@ namespace TOY_COMPILER {
 		return resType;
 	}
 
+	
 	Type_Struct simpleDecl::codeGen(IR & generator) {
 		Type_Struct ts;
 		switch (this->getval_type())
@@ -140,6 +160,8 @@ namespace TOY_COMPILER {
 		return ts;
 	}
 
+
+
 	Type_Struct constNode::codeGen(IR & generator) {
 		std::string name = this->getId();
 		Type_Struct *ts = new Type_Struct;
@@ -159,7 +181,7 @@ namespace TOY_COMPILER {
 	Type_Struct recordDecl::codeGen(IR & generator) {
 		Type_Struct ts;
 		Record_Struct *rs = new Record_Struct;
-		llvm::StructType* structType = llvm::StructType::create(context);
+		llvm::StructType* structType = llvm::StructType::create(TheContext);
 		std::vector<llvm::Type*> elements;
 		for (auto & field : this->getFields()) {
 			Type_Struct etype = field->codeGen(generator);
@@ -177,8 +199,9 @@ namespace TOY_COMPILER {
 	}
 
 	Type_Struct field::codeGen(IR & generator) {
-		return this->getType()->codeGen();
+		return this->getType()->codeGen(generator);
 	}
+
 
 	Type_Struct namesDecl::codeGen(IR & generator) {
 		if (this->getIsNamelist()) {
@@ -196,6 +219,7 @@ namespace TOY_COMPILER {
 			return *(generator.findType(name));
 		}
 	}
+
 
 	Type_Struct rangeDecl::codeGen(IR & generator) {
 		Range_Struct *rs = new Range_Struct;
@@ -244,9 +268,9 @@ namespace TOY_COMPILER {
 	}
 
 	Type_Struct arrayDecl::codeGen(IR & generator) {
-		Type_Struct itype = this->getSimpleType()->codeGen();
+		Type_Struct itype = this->getSimpleType()->codeGen(generator);
 		Type_Struct ts;
-		Type_Struct etype = this->getTypeDecl()->codeGen();
+		Type_Struct etype = this->getTypeDecl()->codeGen(generator);
 		Array_Struct *as = new Array_Struct();
 		ts.Struct = as;
 		ts.type = ARRAY;
@@ -299,6 +323,7 @@ namespace TOY_COMPILER {
 		return ts;
 	}
 
+
 	int64_t getActualValue(llvm::Value *v)
 	{
 		llvm::Constant *constValue = llvm::cast<llvm::GlobalVariable>(v)->getInitializer();
@@ -307,7 +332,7 @@ namespace TOY_COMPILER {
 	}
 
 	Type_Struct varNode::codeGen(IR & generator) {
-		Type_Struct type = this->getVarType()->codeGen();
+		Type_Struct type = this->getVarType()->codeGen(generator);
 		for (auto & id : *(this->getNames())){
 			Type_Struct *ts = new Type_Struct(type);
 			ts->name = id;
@@ -319,7 +344,7 @@ namespace TOY_COMPILER {
 	}
 
 	Type_Struct varNode::codeGenType(IR & generator) {
-		Type_Struct type = this->getVarType()->codeGen();
+		Type_Struct type = this->getVarType()->codeGen(generator);
 		type.istype = 1;
 		for (auto & id : *(this->getNames())) {
 			Type_Struct *ts = new Type_Struct(type);
@@ -329,6 +354,8 @@ namespace TOY_COMPILER {
 		}
 		return type;
 	}
+
+
 
 	Type_Struct varDecl::codeGen(IR & generator) {
 		Type_Struct ts;
@@ -350,7 +377,7 @@ namespace TOY_COMPILER {
 		Type_Struct ts=this->getSimpleType()->codeGen(generator);
 	}
 
-	llvm::Value *functionNode::codeGen(IR & generator) {
+	Type_Struct functionNode::codeGen(IR & generator) {
 		//Prototype
 		std::vector<llvm::Type*> argTypes;
 		for (auto & para : *this->getParams())
@@ -392,7 +419,7 @@ namespace TOY_COMPILER {
 
 		//Return value
 		llvm::Value* returnInst = NULL;
-		if (!this->getIsProcedure()) {
+		if (!this->isprocedure) {
 			Type_Struct *returnType = new Type_Struct(this->getRetval()->codeGen(generator));
 			returnType->name = this->getId();
 			generator.InsertType(this->getId(),returnType);
@@ -409,21 +436,35 @@ namespace TOY_COMPILER {
 		this->getBody()->codeGen(generator);
 
 		//Return 
-		if (this->getIsProcedure()) {
+		if (this->isprocedure) {
 			TheBuilder.CreateRetVoid();
 		}else {
 			TheBuilder.CreateRet(returnInst);
 		}
 
-
 		//Pop back
 		generator.popFunction();
 		TheBuilder.SetInsertPoint(&(generator.getCurFunction())->getBasicBlockList().back());
-		return function;
+		return Type_Struct(function);
 	}
 
+	Type_Struct rootProgram::codeGen(IR & generator) {
 
-	llvm::Value *rootProgram::init(IR & generator) {
+		//Const declareation part
+		for (auto & decl : this->getDecls())
+		{
+			decl->codeGen(generator);
+		}
+		//Routine declareation part
+		for (auto & funcs : this->getFuncs()) {
+			funcs->codeGen(generator);
+		}
+		//Routine body
+		Type_Struct res=this->getStmts().codeGen(generator);
+		return res;
+	}
+
+	Type_Struct rootProgram::init(IR & generator) {
 		//Main function prototype
 		std::vector<llvm::Type*> argTypes;
 		llvm::FunctionType * funcType = llvm::FunctionType::get(TheBuilder.getVoidTy(), makeArrayRef(argTypes), false);
@@ -435,21 +476,24 @@ namespace TOY_COMPILER {
 		//Create System functions
 		generator.printf = generator.createPrintf();
 		generator.scanf = generator.createScanf();
+		for (auto & label : Label) {
+			label.second->label = label.first;
+		}
 		//Code generate
 		this->codeGen(generator);
 		TheBuilder.CreateRetVoid();
 		generator.popFunction();
 
-		return nullptr;
+		return Type_Struct((llvm::Value*)nullptr);
 	}
 
-	llvm::Value *assignStmt::codeGen(IR & generator) {
+	Type_Struct assignStmt::codeGen(IR & generator) {
 		llvm::Value *res = nullptr;
 		this->forward(generator);
-		res = TheBuilder.CreateStore(this->getRhs->codeGen(generator).llvmValue, generator.findValue(this->getLhs->codeGen(generator))); 
+		res = TheBuilder.CreateStore(this->getRhs()->codeGen(generator).llvmValue, generator.findValue(this->getLhs()->codeGen(generator).name));
 	
 		this->backward(generator);
-		return res;
+		return Type_Struct(res);
 	}
 
 	Type_Struct mathExpr::codeGen(IR & generator) {
@@ -524,7 +568,6 @@ namespace TOY_COMPILER {
 	}
 
 	Type_Struct functionCall::codeGen(IR & generator){
-		LOG_I("Function Call");
 		this->forward(generator);
 		if (this->getFunc_name() == "write")SysProcWrite(generator,false);
 		if (this->getFunc_name() == "writeln")SysProcWrite(generator, true);
@@ -546,11 +589,12 @@ namespace TOY_COMPILER {
 		return ts;
 	}
 
+
 	Type_Struct functionCall::SysProcWrite(IR & generator, bool isLineBreak)
 	{
 		std::string formatStr = "";
 		std::vector<llvm::Value*> params;
-		if (this->getArgs()->size != 1)std::cout << "wrong argument for write/writeln" << std::endl;
+		if (this->getArgs()->size() != 1) std::cout << "wrong argument for write/writeln" << std::endl;
 		Type_Struct arg = (*this->getArgs())[0]->codeGen(generator);
 		switch (arg.type)
 		{
@@ -619,7 +663,8 @@ namespace TOY_COMPILER {
 		return Type_Struct(VOID);
 	}
 
-	llvm::Value *ifStmt::codeGen(IR & generator) {
+
+	Type_Struct ifStmt::codeGen(IR & generator) {
 		this->forward(generator);
 
 		llvm::Value *condValue = this->getCond()->codeGen(generator).llvmValue, *thenValue = nullptr, *elseValue = nullptr;
@@ -649,10 +694,11 @@ namespace TOY_COMPILER {
 		TheBuilder.SetInsertPoint(mergeBB);
 
 		this->backward(generator);
-		return branch;
+		
+		return Type_Struct(branch);
 	}
 
-	llvm::Value *repeatStmt::codeGen(IR & generator) {
+	Type_Struct repeatStmt::codeGen(IR & generator) {
 		this->forward(generator);
 
 		llvm::Function *TheFunction = generator.getCurFunction();
@@ -676,10 +722,10 @@ namespace TOY_COMPILER {
 		//After
 		TheBuilder.SetInsertPoint(afterBB);
 		this->backward(generator);
-		return branch;
+		return Type_Struct(branch);
 	}
 
-	llvm::Value *whileStmt::codeGen(IR & generator){
+	Type_Struct whileStmt::codeGen(IR & generator){
 		this->forward(generator);
 		llvm::Function *TheFunction = generator.getCurFunction();
 		llvm::BasicBlock *condBB = llvm::BasicBlock::Create(TheContext, "cond", TheFunction);
@@ -705,7 +751,7 @@ namespace TOY_COMPILER {
 		return branch;
 	}
 
-	llvm::Value *forStmt::codeGen(IR & generator) {
+	Type_Struct forStmt::codeGen(IR & generator) {
 		this->forward(generator);
 		//Init
 		llvm::Function *TheFunction = generator.getCurFunction();
@@ -746,10 +792,10 @@ namespace TOY_COMPILER {
 		//After
 		TheBuilder.SetInsertPoint(afterBB);
 		this->backward(generator);
-		return branch;
+		return Type_Struct(branch);
 	}
 
-	llvm::Value *caseStmt::codeGen(IR & generator) {
+	Type_Struct caseStmt::codeGen(IR & generator) {
 		this->forward(generator);
 
 		llvm::Value *cmpValue = this->getCond()->codeGen(generator).llvmValue, *condValue = nullptr;
@@ -785,8 +831,9 @@ namespace TOY_COMPILER {
 		//After
 		TheBuilder.SetInsertPoint(afterBB);
 		this->backward(generator);
-		return nullptr;
+		return Type_Struct((llvm::Value *)nullptr);
 	}
+
 
 	void utilsInterface::forward(IR & generator)
 	{
@@ -816,7 +863,7 @@ namespace TOY_COMPILER {
 		}
 	}
 
-	llvm::Value *gotoStmt::codeGen(IR & generator) {
+	Type_Struct gotoStmt::codeGen(IR & generator) {
 		this->forward(generator);
 		llvm::Value *res = nullptr;
 		if (generator.labelBlock[this->getLabel()] == nullptr)
@@ -830,12 +877,12 @@ namespace TOY_COMPILER {
 		//    }
 		//    TheBuilder.SetInsertPoint(this->afterBB);
 		this->backward(generator);
-		return res;
+		return Type_Struct(res);
 	}
 
-	llvm::Value *stmtList::codeGen(IR & generator) {
+	Type_Struct stmtList::codeGen(IR & generator) {
 		this->forward(generator);
-		llvm::Value *lastValue = nullptr;
+		Type_Struct lastValue;
 		for (auto & stmt : this->getStmtList())
 		{
 			lastValue = stmt->codeGen(generator);
@@ -844,12 +891,5 @@ namespace TOY_COMPILER {
 		return lastValue;
 	}
 
-	std::string to_string(int num) {
-		std::string res = "";
-		while (num != 0) {
-			res =(char)(num%10 + 0x30)+res;
-			num = num / 10;
-		}
-		return res;
-	}
+
 }

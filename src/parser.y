@@ -48,10 +48,8 @@
     /* include for all driver functions */
     #include "tt.h"
 
-    extern TOY_COMPILER::GlobalSymbol *globalsymtab;
-
     extern TOY_COMPILER::rootProgram * root;
-
+    extern std::map<int, TOY_COMPILER::abstractStmt*>  Label;
 #undef yylex
 #define yylex scanner.yylex
 }
@@ -603,7 +601,7 @@ stmt:
         INTEGER  COLON  non_label_stmt 
         {
             $$ = $3;
-            //globalsymtab->Label.insert($1, $3);
+            Label.insert({$1, $3});
         }
         |  non_label_stmt {$$ = $1;}
         ;

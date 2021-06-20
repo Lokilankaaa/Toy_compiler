@@ -47,7 +47,7 @@ namespace TOY_COMPILER {
 
         int getLineno() { return lineno; }
 
-        virtual std::string getNodeJson();
+        virtual std::string getNodeJson() = 0;
 
 		int label;
 
@@ -73,7 +73,7 @@ namespace TOY_COMPILER {
     class abstractStmt : public abstractAST {
     public:
         abstractStmt() { n_type = TOY_COMPILER::STMT; }
-		virtual Type_Struct codeGen(IR & generator);
+		virtual Type_Struct codeGen(IR & generator) = 0;
     };
 
     class abstractExpr : public abstractStmt {
@@ -86,19 +86,19 @@ namespace TOY_COMPILER {
         TOY_COMPILER::expValue m_value;
         TOY_COMPILER::valType res_type;
 
-		virtual Type_Struct codeGen(IR & generator);
+		virtual Type_Struct codeGen(IR& generator) = 0;
     };
 
     class abstractTypeDeclNode : public abstractAST {
     public:
         abstractTypeDeclNode() { n_type = TOY_COMPILER::SIMPLEDCEL; }
-		virtual Type_Struct codeGen();
+		virtual Type_Struct codeGen(IR& generator) = 0;
     };
 
 // mark class
     class abstractSimpleDecl : public abstractTypeDeclNode {
 	public:
-		virtual Type_Struct codeGen(IR & generator);
+		virtual Type_Struct codeGen(IR& generator) = 0;
     };
 
     class literal : public abstractExpr {
