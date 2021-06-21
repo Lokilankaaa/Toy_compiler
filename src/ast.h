@@ -107,18 +107,8 @@ namespace TOY_COMPILER {
         TOY_COMPILER::const_valueType *_t;
 
     public:
-        literal(TOY_COMPILER::expValue *v, TOY_COMPILER::const_valueType *t) : _t{t} {
+        literal(TOY_COMPILER::expValue *v, TOY_COMPILER::const_valueType *t) : _t{t}, _value(v) {
             n_type = TOY_COMPILER::LITERAL;
-            _value = new TOY_COMPILER::expValue;
-            if (_t->sys_type == MAXINT) {
-                _value->int_value = INT_MAX;
-            } else if (_t->sys_type == TRUE) {
-                _value->bool_value = true;
-            } else if (_t->sys_type == FALSE) {
-                _value->bool_value = false;
-            } else {
-                _value = v;
-            }
         }
 
         std::string getNodeJson();
