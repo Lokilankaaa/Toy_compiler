@@ -107,7 +107,7 @@ namespace TOY_COMPILER {
         TOY_COMPILER::const_valueType *_t;
 
     public:
-        literal(TOY_COMPILER::expValue *v, TOY_COMPILER::const_valueType *t) : _t{t}, _value(v) {
+        literal(TOY_COMPILER::expValue *v, TOY_COMPILER::const_valueType *t) : _t{t}, _value{v} {
             n_type = TOY_COMPILER::LITERAL;
         }
 

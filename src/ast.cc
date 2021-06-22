@@ -57,6 +57,10 @@ std::string TOY_COMPILER::constDecl::getNodeJson() {
     return getJsonString("consetDecl", children);
 }
 
+llvm::Value *TOY_COMPILER::constDecl::codeGen() {
+    return utilsInterface::codeGen();
+}
+
 std::string TOY_COMPILER::simpleDecl::getNodeJson() {
     return getJsonString("simpleDecl");
 }
