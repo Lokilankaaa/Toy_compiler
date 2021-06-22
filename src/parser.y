@@ -25,7 +25,6 @@
         class Scanner;
     }
     #include "ast.h"
-    #include "symtab.h"
 
 // The following definitions is missing when %locations isn't used
 # ifndef YY_NULLPTR
@@ -48,8 +47,6 @@
     #include <tuple>
     /* include for all driver functions */
     #include "tt.h"
-
-    extern TOY_COMPILER::GlobalSymbol *globalsymtab;
 
     extern TOY_COMPILER::rootProgram * root;
 

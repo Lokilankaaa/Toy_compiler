@@ -353,6 +353,10 @@ llvm::Value *TOY_COMPILER::rootProgram::codeGen() {
     return utilsInterface::codeGen();
 }
 
+llvm::Value *TOY_COMPILER::constDecl::codeGen() {
+    return utilsInterface::codeGen();
+}
+
 std::string TOY_COMPILER::utilsInterface::getNodeJson() {
     return "";
 }

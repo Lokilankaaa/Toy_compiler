@@ -1,10 +1,8 @@
 #include <iostream>
-#include "src/symtab.h"
 #include "src/ast.h"
 #include "src/scanner.h"
 #include "src/parser.tab.hh"
 
-TOY_COMPILER::GlobalSymbol *globalsymtab;
 TOY_COMPILER::rootProgram *root;
 
 int main() {
