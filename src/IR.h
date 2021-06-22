@@ -120,6 +120,7 @@ namespace TOY_COMPILER {
         void generate(TOY_COMPILER::rootProgram *root)
         {
             std::cout << "[INFO]" << "IR generation begin..." << std::endl;
+            root->init(*this);
             root->codeGen(*this);
             std::cout << "[INFO]" << "IR generation finished." << std::endl;
 
