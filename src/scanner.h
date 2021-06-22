@@ -6,7 +6,7 @@
 #define TOY_COMPILER_SCANNER_H
 
 #if !defined(yyFlexLexerOnce)
-#include "FlexLexer.h"
+#include <FlexLexer.h>
 #endif
 
 #include <fstream>
@@ -16,7 +16,7 @@
 
 namespace TOY_COMPILER  {
     class Scanner: public yyFlexLexer {
-      public:
+    public:
     public:
         Scanner(std::istream *in) : yyFlexLexer(in){};
 

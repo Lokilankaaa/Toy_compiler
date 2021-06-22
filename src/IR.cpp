@@ -453,11 +453,13 @@ namespace TOY_COMPILER {
 		//Const declareation part
 		for (auto & decl : this->getDecls())
 		{
-			decl->codeGen(generator);
+		    if(decl)
+			    decl->codeGen(generator);
 		}
 		//Routine declareation part
 		for (auto & funcs : this->getFuncs()) {
-			funcs->codeGen(generator);
+		    if (funcs)
+			    funcs->codeGen(generator);
 		}
 		//Routine body
 		Type_Struct res=this->getStmts().codeGen(generator);
