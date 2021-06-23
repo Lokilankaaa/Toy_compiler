@@ -2,7 +2,8 @@ cmake_minimum_required(VERSION 3.14)
 project(toy_compiler CXX)
 
 set(CMAKE_CXX_STANDARD 14)
-#set(SRC_FILE "src" s/tt.h)
+#set(SRC_FILE "src" "src/ast.cc")
+message("system: ${CMAKE_SYSTEM_PREFIX_PATH}")
 
 if (CMAKE_HOST_SYSTEM_NAME MATCHES "Darwin")
     execute_process(
@@ -54,9 +55,9 @@ add_executable(toy_compiler main.cpp
         src/ast.cc src/ast.h src/IR.cpp src/IR.h src/scanner.h src/tt.h src/types.cuh
         ${FLEX_lexer_OUTPUTS} ${BISON_parser_OUTPUTS})
 
-llvm_map_components_to_libnames(llvm_libs support core irreader)
+# llvm_map_components_to_libnames(llvm_libs support core irreader)
 
 # Link against LLVM libraries
-target_link_libraries(toy_compiler ${llvm_libs})
+target_link_libraries(toy_compiler LLVM)
 
 
