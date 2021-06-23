@@ -57,6 +57,10 @@ std::string TOY_COMPILER::constDecl::getNodeJson() {
     return getJsonString("consetDecl", children);
 }
 
+//llvm::Value *TOY_COMPILER::constDecl::codeGen() {
+//    return utilsInterface::codeGen();
+//}
+
 std::string TOY_COMPILER::simpleDecl::getNodeJson() {
     return getJsonString("simpleDecl");
 }
@@ -211,8 +215,9 @@ std::string TOY_COMPILER::functionNode::getNodeJson() {
 
 std::string TOY_COMPILER::rootProgram::getNodeJson() {
     std::vector<std::string> children;
-    auto f = [&](utilsInterface * n) {
-        children.push_back(n->getNodeJson());
+    auto f = [&](utilsInterface *n) {
+        if (n)
+            children.push_back(n->getNodeJson());
     };
 
     for_each(decls.begin(), decls.end(), f);

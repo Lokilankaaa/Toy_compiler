@@ -375,6 +375,7 @@ namespace TOY_COMPILER {
 
 	Type_Struct parameter::codeGen(IR & generator) {
 		Type_Struct ts=this->getSimpleType()->codeGen(generator);
+		return ts;
 	}
 
 	Type_Struct functionNode::codeGen(IR & generator) {
@@ -390,11 +391,13 @@ namespace TOY_COMPILER {
 		Type_Struct rts = this->getRetval()->codeGen(generator);
 		llvm::FunctionType *funcType = llvm::FunctionType::get(rts.llvm, argTypes, false);
 		llvm::Function *function = llvm::Function::Create(funcType, llvm::GlobalValue::InternalLinkage, this->getId(), generator.TheModule.get());
-		generator.pushFunction(function);
+        llvm::BasicBlock * basicBlock = llvm::BasicBlock::Create(TheContext, "entrypoint", function, 0);
+
+        generator.pushFunction(function);
+        TheBuilder.SetInsertPoint(basicBlock);
 
 
-
-		//Parameters
+        //Parameters
 		llvm::Function::arg_iterator argIt = function->arg_begin();
 		int index = 1;
 		for (auto & args : *(this->getParams()))
@@ -419,12 +422,16 @@ namespace TOY_COMPILER {
 
 		//Return value
 		llvm::Value* returnInst = NULL;
-		if (!this->isprocedure) {
-			Type_Struct *returnType = new Type_Struct(this->getRetval()->codeGen(generator));
-			returnType->name = this->getId();
-			generator.InsertType(this->getId(),returnType);
-			returnInst= CreateEntryBlockAlloca(generator.getCurFunction(), id, returnType->llvm);
-		}
+        if (!this->isprocedure) {
+            Type_Struct *returnType = new Type_Struct(this->getRetval()->codeGen(generator));
+            returnType->name = this->getId();
+            generator.InsertType(this->getId(),returnType);
+            returnInst= CreateEntryBlockAlloca(generator.getCurFunction(), id, returnType->llvm);
+        }else{
+            Type_Struct *returnType = new Type_Struct(VOID);
+            returnType->name = this->getId();
+            generator.InsertType(this->getId(),returnType);
+        }
 
 
 
@@ -453,11 +460,13 @@ namespace TOY_COMPILER {
 		//Const declareation part
 		for (auto & decl : this->getDecls())
 		{
-			decl->codeGen(generator);
+		    if(decl)
+			    decl->codeGen(generator);
 		}
 		//Routine declareation part
 		for (auto & funcs : this->getFuncs()) {
-			funcs->codeGen(generator);
+		    if (funcs)
+			    funcs->codeGen(generator);
 		}
 		//Routine body
 		Type_Struct res=this->getStmts().codeGen(generator);

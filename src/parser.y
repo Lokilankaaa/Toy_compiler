@@ -49,7 +49,7 @@
     #include "tt.h"
 
     extern TOY_COMPILER::rootProgram * root;
-    extern std::map<int, TOY_COMPILER::abstractStmt*>  Label;
+
 #undef yylex
 #define yylex scanner.yylex
 }
@@ -150,7 +150,8 @@
 %type   <typeDefDecl *> type_part type_decl_list  
 %type   <abstractSimpleDecl *> simple_type_decl
 %type   <arrayDecl*> array_type_decl
-%type   <recordDecl *> record_type_decl field_decl_list
+%type   <recordDecl *> record_type_decl
+%type   <std::vector<field*> *> field_decl_list
 %type   <field*> field_decl
 %type   <parameter *> para_type_list
 %type   <std::vector<parameter *>*> para_decl_list parameters
@@ -188,7 +189,17 @@ routine:
 sub_routine:
         routine_head  routine_body
         {
-
+            if($1.first && $1.second) {
+                $$ = new rootProgram();
+                $$->getDecls() = std::move(*($1.first));
+                $$->getFuncs() = std::move(*($1.second));
+                $$->getStmts() = std::move(*($2));
+                $$->setLineno(@1.begin.line);
+            } else if($2) {
+                $$ = new rootProgram();
+                $$->getStmts() = std::move(*($2));
+                $$->setLineno(@2.begin.line);
+            }
         }
         ;
 
@@ -203,6 +214,10 @@ routine_head:
             decls->push_back($3);
             decls->push_back($4);
             $$ = std::make_pair(decls, $5);
+        }
+        |
+        {
+            $$ = std::make_pair(nullptr, nullptr);
         }
         ;
 
@@ -404,7 +419,8 @@ array_type_decl:
 record_type_decl:
         RECORD  field_decl_list  _END
         {
-            $$ = $2;
+            $$ = new recordDecl();
+            $$->getFields() = *($2);
         }
         ;
 
@@ -412,13 +428,12 @@ field_decl_list:
         field_decl_list  field_decl
         {
             $$ = $1;
-            $$->addRecord(*$2);
+            $$->push_back($2);
         }
         |  field_decl
         {
-            $$ = new recordDecl();
-            $$->addRecord(*$1);
-            $$->setLineno(@$.begin.line);
+            $$ = new std::vector<field *>;
+            $$->push_back($1);
         }
         ;
 
@@ -601,7 +616,7 @@ stmt:
         INTEGER  COLON  non_label_stmt 
         {
             $$ = $3;
-            Label.insert({$1, $3});
+            //globalsymtab->Label.insert($1, $3);
         }
         |  non_label_stmt {$$ = $1;}
         ;

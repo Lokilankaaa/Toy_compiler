@@ -139,6 +139,12 @@ real        { yylval->build<int>(4); return token::SYS_TYPE; }
     /* identifier */
 [A-Za-z][A-Za-z0-9_]*   { yylval->build<std::string>(yytext); return token::ID; }
 
+    /* comments (C-like) */
+"//".*\n                { loc->lines(); }
+"/*"                    { BEGIN COMMENT; }
+<COMMENT>"*/"           { BEGIN INITIAL; }
+<COMMENT>([^*]|\n)+|.   { }
+
     /* update line number */
 \n                      { loc->lines(); }
 

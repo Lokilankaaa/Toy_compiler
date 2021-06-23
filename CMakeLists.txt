@@ -5,6 +5,8 @@ set(CMAKE_CXX_STANDARD 14)
 #set(SRC_FILE "src" "src/ast.cc")
 message("system: ${CMAKE_SYSTEM_PREFIX_PATH}")
 
+set(LLVM_DIR "/usr/local/Cellar/llvm/11.0.0/lib/cmake/llvm")
+
 if (CMAKE_HOST_SYSTEM_NAME MATCHES "Darwin")
     execute_process(
             COMMAND brew --prefix bison
@@ -37,6 +39,7 @@ message(STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}")
 message(STATUS "Using LLVMConfig.cmake in: ${LLVM_DIR}")
 
 include_directories(${LLVM_INCLUDE_DIRS})
+#include_directories("include")
 
 separate_arguments(LLVM_DEFINITIONS_LIST NATIVE_COMMAND ${LLVM_DEFINITIONS})
 add_definitions(${LLVM_DEFINITIONS_LIST})
@@ -55,9 +58,5 @@ add_executable(toy_compiler main.cpp
         src/ast.cc src/ast.h src/IR.cpp src/IR.h src/scanner.h src/tt.h src/types.cuh
         ${FLEX_lexer_OUTPUTS} ${BISON_parser_OUTPUTS})
 
-# llvm_map_components_to_libnames(llvm_libs support core irreader)
-
 # Link against LLVM libraries
 target_link_libraries(toy_compiler LLVM)
-
-
