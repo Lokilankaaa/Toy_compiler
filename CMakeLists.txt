@@ -6,6 +6,8 @@ set(CMAKE_CXX_STANDARD 14)
 
 set(LLVM_DIR "/usr/local/Cellar/llvm/11.0.0/lib/cmake/llvm")
 
+message("system: ${CMAKE_SYSTEM_PREFIX_PATH}")
+
 if (CMAKE_HOST_SYSTEM_NAME MATCHES "Darwin")
     execute_process(
             COMMAND brew --prefix bison

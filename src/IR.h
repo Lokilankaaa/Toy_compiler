@@ -288,7 +288,7 @@ namespace TOY_COMPILER {
 			if (result != it->typeMap.end())
 			{
 				std::cout << "Find " << name << " in " << std::string(it->Func->getName()) << std::endl;
-				return result->second;
+				return result->second
 			}
 			else
 			{

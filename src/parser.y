@@ -180,7 +180,8 @@ routine:
         {
             $$ = new rootProgram();
             $$->getDecls() = std::move(*($1.first));
-            $$->getFuncs() = std::move(*($1.second));
+            if($1.second)
+                $$->getFuncs() = std::move(*($1.second));
             $$->getStmts() = std::move(*($2));
             $$->setLineno(@1.begin.line);
         }

@@ -2,6 +2,7 @@ program hello;
 var
 	f : integer;
 	k : integer;
+/*
 function go(var b : integer; a : integer): integer;
 var
 	fk : integer;
@@ -19,12 +20,13 @@ begin
 	;
 end
 ;
+*/
 
 begin
 	k := 0;
-	f := 30 + 5 * 10;
-	f := go(k , 5);
-	write("%d", f);
-	write("%d", k);
+	f := k + 5 * 10;
+	//f := go(k , 5);
+	//write("%d", f);
+	//write("%d", k);
 end
 .
