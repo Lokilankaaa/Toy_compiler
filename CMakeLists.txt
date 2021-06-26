@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 14)
 #set(SRC_FILE "src" "src/ast.cc")
 message("system: ${CMAKE_SYSTEM_PREFIX_PATH}")
 
-set(LLVM_DIR "/usr/local/Cellar/llvm/11.0.0/lib/cmake/llvm")
+#set(LLVM_DIR "/usr/local/Cellar/llvm/11.0.0/lib/cmake/llvm")
 
 message("system: ${CMAKE_SYSTEM_PREFIX_PATH}")
 

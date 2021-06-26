@@ -43,18 +43,22 @@ namespace TOY_COMPILER {
         int lineno;
 
     public:
+        int label = -1;
         void setLineno(int l) { lineno = l; }
+
+        void setLabel(int l) {label = l;}
+
+        int getLabel() { return label;}
 
         int getLineno() { return lineno; }
 
         virtual std::string getNodeJson() = 0;
 
-		int label;
 
-		void forward(IR & generator);
-		void backward(IR & generator);
-		llvm::BasicBlock *afterBB;
-	};
+        void forward(IR & generator);
+        void backward(IR & generator);
+        llvm::BasicBlock *afterBB;
+    };
 
     class abstractAST : public utilsInterface {
     public:

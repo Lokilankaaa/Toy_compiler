@@ -5,7 +5,11 @@
 extern std::map<int, TOY_COMPILER::abstractStmt*> Label;
 
 namespace TOY_COMPILER {
-	
+
+    void codeGenLog(std::string str)
+    {
+        std::cout << "codeGen:" << str << std::endl;
+    }
 	template <typename T>
 	void printT(T* vt)
 	{
@@ -374,11 +378,13 @@ namespace TOY_COMPILER {
 	}
 
 	Type_Struct parameter::codeGen(IR & generator) {
+        codeGenLog("parameter");
 		Type_Struct ts=this->getSimpleType()->codeGen(generator);
 		return ts;
 	}
 
 	Type_Struct functionNode::codeGen(IR & generator) {
+        codeGenLog("functionNode");
 		//Prototype
 		std::vector<llvm::Type*> argTypes;
 		for (auto & para : *this->getParams())
@@ -407,7 +413,7 @@ namespace TOY_COMPILER {
 				/*if (args->isVar)
 				{
 					//Check value
-	//                alloc = generator.findValue(arg->getName());
+//	                alloc = generator.findValue(arg->getName());
 					function->addAttribute(index, llvm::Attribute::NonNull);
 					alloc = TheBuilder.CreateGEP(argIt++, TheBuilder.getInt32(0), arg->getName());
 				}*/
@@ -456,7 +462,7 @@ namespace TOY_COMPILER {
 	}
 
 	Type_Struct rootProgram::codeGen(IR & generator) {
-
+        codeGenLog("rootProgram");
 		//Const declareation part
 		for (auto & decl : this->getDecls())
 		{
@@ -497,6 +503,7 @@ namespace TOY_COMPILER {
 	}
 
 	Type_Struct assignStmt::codeGen(IR & generator) {
+        codeGenLog("assignStmt");
 		llvm::Value *res = nullptr;
 		this->forward(generator);
 		res = TheBuilder.CreateStore(this->getRhs()->codeGen(generator).llvmValue, generator.findValue(this->getLhs()->codeGen(generator).name));
@@ -506,6 +513,7 @@ namespace TOY_COMPILER {
 	}
 
 	Type_Struct mathExpr::codeGen(IR & generator) {
+        codeGenLog("mathExpr");
 		opType op = this->getOp();
 		Type_Struct left = this->getLeftChild()->codeGen(generator);
 		Type_Struct right = this->getRightChild()->codeGen(generator);
@@ -577,14 +585,16 @@ namespace TOY_COMPILER {
 	}
 
 	Type_Struct functionCall::codeGen(IR & generator){
+        codeGenLog("functionCall");
 		this->forward(generator);
-		if (this->getFunc_name() == "write")SysProcWrite(generator,false);
-		if (this->getFunc_name() == "writeln")SysProcWrite(generator, true);
-		if (this->getFunc_name() == "read")SysProcRead(generator);
+		if (this->getFunc_name() == "write") return SysProcWrite(generator,false);
+		if (this->getFunc_name() == "writeln")return SysProcWrite(generator, true);
+		if (this->getFunc_name() == "read") return SysProcRead(generator);
 		llvm::Function *function = generator.TheModule->getFunction(this->getFunc_name());
 		if (function == nullptr)
 		{
 			std::cout << "No Function " << this->getFunc_name() << std::endl;
+			exit(0);
 		}
 		std::vector<llvm::Value*> args;
 		for (auto & arg : *(this->getArgs()))
@@ -674,6 +684,7 @@ namespace TOY_COMPILER {
 
 
 	Type_Struct ifStmt::codeGen(IR & generator) {
+        codeGenLog("ifStmt");
 		this->forward(generator);
 
 		llvm::Value *condValue = this->getCond()->codeGen(generator).llvmValue, *thenValue = nullptr, *elseValue = nullptr;
@@ -708,6 +719,7 @@ namespace TOY_COMPILER {
 	}
 
 	Type_Struct repeatStmt::codeGen(IR & generator) {
+        codeGenLog("repeatStmt");
 		this->forward(generator);
 
 		llvm::Function *TheFunction = generator.getCurFunction();
@@ -735,6 +747,7 @@ namespace TOY_COMPILER {
 	}
 
 	Type_Struct whileStmt::codeGen(IR & generator){
+        codeGenLog("whileStmt");
 		this->forward(generator);
 		llvm::Function *TheFunction = generator.getCurFunction();
 		llvm::BasicBlock *condBB = llvm::BasicBlock::Create(TheContext, "cond", TheFunction);
@@ -761,6 +774,7 @@ namespace TOY_COMPILER {
 	}
 
 	Type_Struct forStmt::codeGen(IR & generator) {
+        codeGenLog("forStmt");
 		this->forward(generator);
 		//Init
 		llvm::Function *TheFunction = generator.getCurFunction();
@@ -773,8 +787,7 @@ namespace TOY_COMPILER {
 		llvm::BasicBlock *loopBB = llvm::BasicBlock::Create(TheContext, "loop", TheFunction);
 		llvm::BasicBlock *afterBB = llvm::BasicBlock::Create(TheContext, "afterLoop", TheFunction);
 
-		//Cond
-		TheBuilder.CreateBr(condBB);
+		//Co		TheBuilder.CreateBr(condBB);
 		TheBuilder.SetInsertPoint(condBB);
 		//    curValue = TheBuilder.CreateLoad(varValue, this->var->getName());
 		curValue = TheBuilder.CreateStore(startValue, varValue);
@@ -805,6 +818,7 @@ namespace TOY_COMPILER {
 	}
 
 	Type_Struct caseStmt::codeGen(IR & generator) {
+        codeGenLog("casetmt");
 		this->forward(generator);
 
 		llvm::Value *cmpValue = this->getCond()->codeGen(generator).llvmValue, *condValue = nullptr;
@@ -873,6 +887,7 @@ namespace TOY_COMPILER {
 	}
 
 	Type_Struct gotoStmt::codeGen(IR & generator) {
+        codeGenLog("gotoStmt");
 		this->forward(generator);
 		llvm::Value *res = nullptr;
 		if (generator.labelBlock[this->getLabel()] == nullptr)
@@ -890,9 +905,9 @@ namespace TOY_COMPILER {
 	}
 
 	Type_Struct stmtList::codeGen(IR & generator) {
+	    codeGenLog("stmtList");
 		this->forward(generator);
-		Type_Struct lastValue;
-		for (auto & stmt : this->getStmtList())
+		Type_Struct lastValue;for (auto & stmt : this->getStmtList())
 		{
 			lastValue = stmt->codeGen(generator);
 		}

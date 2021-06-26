@@ -18,9 +18,9 @@ int main() {
     std::ofstream out(out_file);
     out << str;
 
-//    llvm::InitializeNativeTarget();
-//    llvm::InitializeNativeTargetAsmPrinter();
-//    llvm::InitializeNativeTargetAsmParser();
+    llvm::InitializeNativeTarget();
+    llvm::InitializeNativeTargetAsmPrinter();
+    llvm::InitializeNativeTargetAsmParser();
 
     TOY_COMPILER::IR generator;
     generator.generate(root);

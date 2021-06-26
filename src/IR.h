@@ -5,6 +5,7 @@
 #include <vector>
 #include <map>
 #include <string>
+#include <algorithm>
 #include "ast.h"
 
 static llvm::LLVMContext TheContext;
@@ -121,7 +122,7 @@ namespace TOY_COMPILER {
         {
             std::cout << "[INFO]" << "IR generation begin..." << std::endl;
             root->init(*this);
-            root->codeGen(*this);
+//            root->codeGen(*this);
             std::cout << "[INFO]" << "IR generation finished." << std::endl;
 
             //    llvm::legacy::PassManager pm;

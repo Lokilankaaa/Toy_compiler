@@ -1,9 +1,9 @@
 program hello;
-var
-	f : integer;
-	k : integer;
+//var
+//	f : integer;
+//	k : integer;
 /*
-function go(var b : integer; a : integer): integer;
+function go(b : integer; a : integer): integer;
 var
 	fk : integer;
 	t : real;
@@ -23,10 +23,11 @@ end
 */
 
 begin
-	k := 0;
-	f := k + 5 * 10;
+	//k := 0;
+	//f := 10;
+	//f := k + 5 * 10 * f;
 	//f := go(k , 5);
-	//write("%d", f);
-	//write("%d", k);
+	write(3);
+	//write(k);
 end
 .

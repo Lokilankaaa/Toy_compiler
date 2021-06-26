@@ -179,7 +179,8 @@ routine:
         routine_head  routine_body
         {
             $$ = new rootProgram();
-            $$->getDecls() = std::move(*($1.first));
+            if($1.first)
+                $$->getDecls() = std::move(*($1.first));
             if($1.second)
                 $$->getFuncs() = std::move(*($1.second));
             $$->getStmts() = std::move(*($2));
@@ -618,6 +619,7 @@ stmt:
         {
             $$ = $3;
             //globalsymtab->Label.insert($1, $3);
+            $$->setLabel($1);
         }
         |  non_label_stmt {$$ = $1;}
         ;
