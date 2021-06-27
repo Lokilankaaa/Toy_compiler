@@ -142,6 +142,8 @@ namespace TOY_COMPILER {
 	}
 
 	Type_Struct variableNode::codeGen(IR & generator){
+        codeGenLog("variableNode");
+        // variableNode is just the container
 		Type_Struct ts = *generator.findType(this->getId());
 		if (ts.isconst == 1) {
 			switch (ts.type)
@@ -160,11 +162,15 @@ namespace TOY_COMPILER {
 				return ts;
 			}
 		}
-		else ts.llvmValue= TheBuilder.CreateLoad(generator.findValue(this->getId()), this->getId());
+		else ts.llvmValue = TheBuilder.CreateLoad(generator.findValue(this->getId()), this->getId());
+//        else
+//        {
+//            llvm::Value* addr = generator.findValue(this->getId());
+////            new llvm::LoadInst(addr->getType(), addr, "tmp", false, TheBuilder.GetInsertBlock());
+//            ts.llvmValue = TheBuilder.CreateLoad(addr->getType(), addr, this->getId());
+//        }
 		return ts;
 	}
-
-
 
 	Type_Struct constNode::codeGen(IR & generator) {
 		std::string name = this->getId();
@@ -402,10 +408,10 @@ namespace TOY_COMPILER {
         generator.pushFunction(function);
         TheBuilder.SetInsertPoint(basicBlock);
 
-
         //Parameters
 		llvm::Function::arg_iterator argIt = function->arg_begin();
 		int index = 1;
+		llvm::Value* addr = NULL;
 		for (auto & args : *(this->getParams()))
 		{
 			for (auto & arg : args->getNames())
@@ -417,12 +423,14 @@ namespace TOY_COMPILER {
 					function->addAttribute(index, llvm::Attribute::NonNull);
 					alloc = TheBuilder.CreateGEP(argIt++, TheBuilder.getInt32(0), arg->getName());
 				}*/
+                addr = CreateEntryBlockAlloca(function, arg, args->getSimpleType()->codeGen(generator).llvm);
 				llvm::Value *llvm_a = argIt++;
-				llvm_a->setName(arg);
+//				llvm_a->setName(addr);
 				Type_Struct *ts = new Type_Struct(args->codeGen(generator));
 				ts->name = arg;
 				ts->istype = 0;
 				generator.InsertType(arg,ts);
+                TheBuilder.CreateStore(llvm_a, addr);
 			}
 		}
 
@@ -431,19 +439,19 @@ namespace TOY_COMPILER {
         if (!this->isprocedure) {
             Type_Struct *returnType = new Type_Struct(this->getRetval()->codeGen(generator));
             returnType->name = this->getId();
-            generator.InsertType(this->getId(),returnType);
-            returnInst= CreateEntryBlockAlloca(generator.getCurFunction(), id, returnType->llvm);
+            generator.InsertType(this->getId(), returnType);
+            generator.InsertFunction(this->getId(), returnType);
+            auto res = CreateEntryBlockAlloca(generator.getCurFunction(), id, returnType->llvm);
         }else{
             Type_Struct *returnType = new Type_Struct(VOID);
             returnType->name = this->getId();
             generator.InsertType(this->getId(),returnType);
+            generator.InsertFunction(this->getId(), returnType);
         }
 
-
-
 		//Block
-		llvm::BasicBlock *newBlock = llvm::BasicBlock::Create(TheContext, "entrypoint", function, nullptr);
-		TheBuilder.SetInsertPoint(newBlock);
+//		llvm::BasicBlock *newBlock = llvm::BasicBlock::Create(TheContext, "entrypoint", function, nullptr);
+//		TheBuilder.SetInsertPoint(newBlock);
 
 		//Sub routine
 		this->getBody()->codeGen(generator);
@@ -452,6 +460,7 @@ namespace TOY_COMPILER {
 		if (this->isprocedure) {
 			TheBuilder.CreateRetVoid();
 		}else {
+            returnInst = TheBuilder.CreateLoad(generator.findValue(this->getId()), this->getId());
 			TheBuilder.CreateRet(returnInst);
 		}
 
@@ -603,11 +612,11 @@ namespace TOY_COMPILER {
 		}
 		llvm::Value *res = TheBuilder.CreateCall(function, args, "calltmp");
 		this->backward(generator);
-		Type_Struct ts=*generator.findFunction(this->getFunc_name());
+//		Type_Struct ts = *generator.findFunction(this->getFunc_name());
+        Type_Struct ts;
 		ts.llvmValue = res;
 		return ts;
 	}
-
 
 	Type_Struct functionCall::SysProcWrite(IR & generator, bool isLineBreak)
 	{

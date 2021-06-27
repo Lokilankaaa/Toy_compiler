@@ -1,1 +1,1 @@
-{ "name" : "rootProgram", "children" : [ { "name" : "stmtList", "children" : [ { "name" : "functionCall" }  ] }  ] }
+{ "name" : "rootProgram", "children" : [ { "name" : "varDecls", "children" : [ { "name" : "varNode" }, { "name" : "varNode" }  ] }, { "name" : "functionDecl", "children" : [ id, paralist, , returnValue  ] }, { "name" : "stmtList", "children" : [ { "name" : "assignStmt" }, { "name" : "assignStmt" }, { "name" : "assignStmt" }, { "name" : "functionCall" }, { "name" : "functionCall" }  ] }  ] }

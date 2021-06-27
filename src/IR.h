@@ -190,11 +190,11 @@ namespace TOY_COMPILER {
 		}
 
 		int InsertFunction(std::string &name, Type_Struct* type) { //to insert a function return into the map
-			Type_Struct *check = checkType(name);
-			if (check != NULL) {
-				std::cout << "Deplicate Varaible:" << name;
-				return -1;
-			}
+//			Type_Struct *check = checkType(name);
+//			if (check != NULL) {
+//				std::cout << "Deplicate Varaible:" << name;
+//				return -1;
+//			}
 			funcStack.back().functionMap.insert(std::map<std::string, Type_Struct*>::value_type(name, type));
 			return 0;
 		}

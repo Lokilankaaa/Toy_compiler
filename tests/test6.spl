@@ -16,6 +16,6 @@ end
 
 begin
 	ans := gcd(9 , 36) * gcd(3 , 6);
-	write("%d", ans);
+	write(ans);
 end
 .
