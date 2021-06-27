@@ -58,6 +58,7 @@ namespace TOY_COMPILER {
 	Type_Struct literal::codeGen(IR & generator)
 	{
 		Type_Struct ts;
+		ts.isconst = 1;
 		switch (this->getType()->d_type)
 		{
 		case INTEGER:ts.type = INTEGER;
@@ -136,7 +137,7 @@ namespace TOY_COMPILER {
 			ts.llvm=llvm::Type::getInt8Ty(TheContext);
 			return ts;
 		case BOOLEAN:ts.type = BOOLEAN;
-			llvm::Type::getInt1Ty(TheContext);
+			ts.llvm=llvm::Type::getInt1Ty(TheContext);
 			return ts;
 		}
 	}
@@ -278,6 +279,7 @@ namespace TOY_COMPILER {
 	}
 
 	Type_Struct arrayDecl::codeGen(IR & generator) {
+        codeGenLog("arrayDecl");
 		Type_Struct itype = this->getSimpleType()->codeGen(generator);
 		Type_Struct ts;
 		Type_Struct etype = this->getTypeDecl()->codeGen(generator);
@@ -292,7 +294,7 @@ namespace TOY_COMPILER {
 			as->size = ((Name_Struct*)itype.Struct)->elements.size();
 			as->elementType = etype;
 			break;
-		case RANGEDECL:
+		case RANGE:
 			as->indexType = itype;
 			as->arrayType = RANGE_AS;
 			as->begin = ((Range_Struct *)itype.Struct)->begin;
@@ -537,9 +539,10 @@ namespace TOY_COMPILER {
 		Type_Struct right = this->getRightChild()->codeGen(generator);
 		Type_Struct ts;
 
-		llvm::Value* arrayValue =left.llvmValue, *indexValue;
+		llvm::Value* arrayValue = left.llvmValue;
+		llvm::Value* indexValue;
 		if (left.type != ARRAY) {
-			std::cout << "varaibe " << left.name << " is not array!"<<std::endl;
+			std::cout << "variable " << left.name << " is not array!"<<std::endl;
 			return Type_Struct();
 		}
 		Array_Struct *as = (Array_Struct *)left.Struct;
@@ -547,7 +550,7 @@ namespace TOY_COMPILER {
 			if (right.isconst) {
 				indexValue = TheBuilder.getInt32(GetValue(right) - (as->begin));
 			}else
-			indexValue= BinaryOp(right.llvmValue, MINUS, TheBuilder.getInt32(as->begin));
+                indexValue= BinaryOp(right.llvmValue, MINUS, TheBuilder.getInt32(as->begin));
 		}
 		else {
 			for (int i = 0; i < ((Name_Struct *)as->indexType.Struct)->elements.size();i++) {

@@ -241,6 +241,7 @@ const_part:
 const_expr_list:
         const_expr_list  ID  EQUAL  const_value  SEMI
         {
+            $$=$1;
             $$->addConstDecl($2, $4);
         }
         |  ID  EQUAL  const_value  SEMI

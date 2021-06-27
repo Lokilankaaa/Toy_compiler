@@ -20,8 +20,8 @@ end
 
 begin
     c := 'a';
-    write("%c", c);
-    arr[3] := 4;
+    write(c);
+    //arr[3] := 4;
     x := 20 / 5;
     y := x - 2;
     z := y + x;
@@ -33,7 +33,7 @@ begin
     x := findMin(x, y);
 	while x < 15 do begin
 	    x := x + 1;
-	    write("%d", x);
+	    write(x);
 	end;
 end
 .

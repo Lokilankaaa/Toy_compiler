@@ -2,6 +2,7 @@ program hello;
 var	
 	f : integer;
 	k : integer;
+
 function go(var b : integer; a : integer): integer;
 var 
 	fk : integer;

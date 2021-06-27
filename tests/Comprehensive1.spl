@@ -1,0 +1,62 @@
+/*
+1. function
+2. if
+3. while
+4. +, -, *, /
+5. write, writeln
+6. integer, real, char
+*/
+
+program hello;
+const
+    ci = 3;
+var
+	f : integer;
+	k : integer;
+	c : char;
+	r : real;
+
+
+function go(b : integer; a : integer): integer;
+var
+	fk : integer;
+	t : real;
+
+begin
+	if a > 0 then
+	begin
+		go := a * 2;
+	end
+	else
+	begin
+		go := 1;
+	end
+	;
+end
+;
+
+begin
+    writeln(ci);
+
+	k := 0;
+	while k < 5 do begin
+	    writeln(k);
+	    k := k + 1;
+	end;
+	writeln(k);
+
+	f := k + 5 * 10 - 10 / k + ci;
+	writeln(f);
+
+	f := go(5, k);
+	writeln(f);
+
+	c := 'H';
+	writeln(c);
+
+	r := 0.003;
+	writeln(r);
+	r := r + 1.1;
+	writeln(r);
+end
+.

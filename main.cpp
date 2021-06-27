@@ -7,7 +7,7 @@
 TOY_COMPILER::rootProgram *root;
 std::map<int, TOY_COMPILER::abstractStmt*>  Label;
 int main() {
-    std::string filename = "../tests/test1.spl";
+    std::string filename = "../tests/Record.spl";
     std::string out_file = "../vis.json";
     std::ifstream in_file(filename);
     auto scanner = new TOY_COMPILER::Scanner(&in_file);
@@ -27,3 +27,21 @@ int main() {
 
     return 0;
 }
+
+/* to do:
+ * array reference
+ * record
+ * read
+ * goto
+ * for, repeat
+ */
+
+/* done:
+ * 1. built in
+ * 2. write, writeln
+ * 3. const, var
+ * 4. function, recursive function
+ * 5. if, case
+ * 6. :=, +, -, *, /, mod, >, <, =
+ * 7. while
+ */
