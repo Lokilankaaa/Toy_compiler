@@ -525,7 +525,11 @@ namespace TOY_COMPILER {
         codeGenLog("mathExpr");
 		opType op = this->getOp();
 		Type_Struct left = this->getLeftChild()->codeGen(generator);
-		Type_Struct right = this->getRightChild()->codeGen(generator);
+		Type_Struct right;
+		if(op != DOT)
+        {
+		    right = this->getRightChild()->codeGen(generator);
+        }
 		Type_Struct ts;
 		if (op == LBRB)
         {
@@ -534,7 +538,13 @@ namespace TOY_COMPILER {
             return ts;
         }
 
-		if (op == DOT) return RecordReference(generator);
+		if (op == DOT)
+        {
+		    ts = RecordReference(generator);
+		    ts.llvmValue = TheBuilder.CreateLoad(ts, "recRef");
+            return ts;
+        }
+
 		return BinaryOp(left.llvmValue, this->getOp(), right.llvmValue);
 	}
 
@@ -591,12 +601,16 @@ namespace TOY_COMPILER {
 
 	Type_Struct mathExpr::RecordReference(IR & generator) {
 		Type_Struct left = this->getLeftChild()->codeGen(generator);
-		Type_Struct right = this->getRightChild()->codeGen(generator);
+		Type_Struct right;
+		right.name = ((variableNode *)(this->getRightChild()))->getId();
 		Type_Struct ts;
 
-		llvm::Value* arrayValue = left.llvmValue, *indexValue;
+//		llvm::Value* arrayValue = left.llvmValue;
+		llvm::Value* arrayValue = generator.findValue(left.name);
+		llvm::Value* indexValue;
+
 		if (left.type != RECORD) {
-			std::cout << "varaibe " << left.name << " is not array!" << std::endl;
+			std::cout << "variable " << left.name << " is not array!" << std::endl;
 			return Type_Struct();
 		}
 		Record_Struct *rs = (Record_Struct *)left.Struct;
@@ -778,7 +792,7 @@ namespace TOY_COMPILER {
 		//Cond
 		TheBuilder.SetInsertPoint(condBB);
 		llvm::Value *condValue = this->getCond()->codeGen(generator).llvmValue;
-		condValue = TheBuilder.CreateICmpNE(condValue, llvm::ConstantInt::get(llvm::Type::getInt1Ty(TheContext), 0, true), "repeateCond");
+		condValue = TheBuilder.CreateICmpNE(condValue, llvm::ConstantInt::get(llvm::Type::getInt1Ty(TheContext), 1, true), "repeateCond");
 		auto branch = TheBuilder.CreateCondBr(condValue, loopBB, afterBB);
 
 		//After

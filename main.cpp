@@ -7,7 +7,7 @@
 TOY_COMPILER::rootProgram *root;
 std::map<int, TOY_COMPILER::abstractStmt*>  Label;
 int main() {
-    std::string filename = "../tests/LoopTest.spl";
+    std::string filename = "../tests/Record.spl";
     std::string out_file = "../vis.json";
     std::ifstream in_file(filename);
     auto scanner = new TOY_COMPILER::Scanner(&in_file);
@@ -30,9 +30,6 @@ int main() {
 
 /* to do:
  * function reference
- * array reference
- * record
- * for, repeat
  */
 
 /* done:
@@ -42,6 +39,7 @@ int main() {
  * 4. function, recursive function
  * 5. if, case
  * 6. :=, +, -, *, /, mod, >, <, =
- * 7. while
+ * 7. while, for, repeat
  * 8. goto
+ * 9. record
  */

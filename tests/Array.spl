@@ -1,0 +1,24 @@
+program hello;
+var
+	arr : array [0 .. 5] of integer;
+
+begin
+    arr[0] := 100;
+    arr[1] := 100;
+    arr[2] := 100;
+    arr[3] := 100;
+    arr[4] := 100;
+
+    writeln(arr[0]);
+    writeln(arr[1]);
+    writeln(arr[2]);
+    writeln(arr[3]);
+    writeln(arr[4]);
+
+    read(arr[0]);
+    writeln(arr[0]);
+end
+.
+
+
+
