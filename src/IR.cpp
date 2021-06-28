@@ -508,8 +508,15 @@ namespace TOY_COMPILER {
         codeGenLog("assignStmt");
 		llvm::Value *res = nullptr;
 		this->forward(generator);
-		res = TheBuilder.CreateStore(this->getRhs()->codeGen(generator).llvmValue, generator.findValue(this->getLhs()->codeGen(generator).name));
-	
+        if(this->getLhs()->n_type == MATHEXPR)
+        {
+            res = TheBuilder.CreateStore(this->getRhs()->codeGen(generator).llvmValue, ((mathExpr *)(this->getLhs()))->codeGenLeft(generator).llvmValue);
+        }
+        else
+        {
+            res = TheBuilder.CreateStore(this->getRhs()->codeGen(generator).llvmValue, generator.findValue(this->getLhs()->codeGen(generator).name));
+        }
+
 		this->backward(generator);
 		return Type_Struct(res);
 	}
@@ -519,10 +526,29 @@ namespace TOY_COMPILER {
 		opType op = this->getOp();
 		Type_Struct left = this->getLeftChild()->codeGen(generator);
 		Type_Struct right = this->getRightChild()->codeGen(generator);
-		if (op == LBRB)return ArrayReference(generator);
-		if (op == DOT)return RecordReference(generator);
+		Type_Struct ts;
+		if (op == LBRB)
+        {
+		    ts = ArrayReference(generator);
+		    ts.llvmValue = TheBuilder.CreateLoad(ts,"arrRef");
+            return ts;
+        }
+
+		if (op == DOT) return RecordReference(generator);
 		return BinaryOp(left.llvmValue, this->getOp(), right.llvmValue);
 	}
+
+	Type_Struct mathExpr::codeGenLeft(IR & generator)
+    {
+        codeGenLog("codeGenLeft");
+        opType op = this->getOp();
+        if (op == LBRB)
+        {
+            return ArrayReference(generator);
+        }
+        if (op == DOT) return RecordReference(generator);
+    }
+
 
 	Type_Struct mathExpr::ArrayReference(IR & generator)
 	{
@@ -530,7 +556,8 @@ namespace TOY_COMPILER {
 		Type_Struct right = this->getRightChild()->codeGen(generator);
 		Type_Struct ts;
 
-		llvm::Value* arrayValue = left.llvmValue;
+//		llvm::Value* arrayValue = left.llvmValue;
+        llvm::Value* arrayValue = generator.findValue(left.name);
 		llvm::Value* indexValue;
 		if (left.type != ARRAY) {
 			std::cout << "variable " << left.name << " is not array!"<<std::endl;
@@ -637,6 +664,7 @@ namespace TOY_COMPILER {
 			break;
 		}
 		params.push_back(arg.llvmValue);
+//        params.push_back(TheBuilder.CreateLoad(arg.llvmValue, "arr_Test"));
 		if (isLineBreak)
 		{
 			formatStr += "\n";
@@ -657,11 +685,20 @@ namespace TOY_COMPILER {
 	{
 		std::string formatStr = "";
 		std::vector<llvm::Value*> params;
-		Type_Struct arg = (*this->getArgs())[0]->codeGen(generator);
-		llvm::Value *argAddr, *argValue;
+        llvm::Value *argAddr, *argValue;
+		Type_Struct arg;
+        if((*this->getArgs())[0]->n_type == MATHEXPR)
+        {
+            arg = ((mathExpr *)(*this->getArgs())[0])->codeGenLeft(generator);
+            argAddr = arg.llvmValue;
+        }
+        else
+        {
+            arg = (*this->getArgs())[0]->codeGen(generator);
+            argAddr = generator.findValue(arg.name);
+        }
 		//Just common variable
 //		argAddr = arg.llvmValue;
-        argAddr = generator.findValue(arg.name);
 		switch (arg.type)
 		{
 		case INTEGER:
@@ -791,10 +828,12 @@ namespace TOY_COMPILER {
 		llvm::BasicBlock *loopBB = llvm::BasicBlock::Create(TheContext, "loop", TheFunction);
 		llvm::BasicBlock *afterBB = llvm::BasicBlock::Create(TheContext, "afterLoop", TheFunction);
 
-		//Co		TheBuilder.CreateBr(condBB);
+		TheBuilder.CreateBr(condBB);
 		TheBuilder.SetInsertPoint(condBB);
 		//    curValue = TheBuilder.CreateLoad(varValue, this->var->getName());
-		curValue = TheBuilder.CreateStore(startValue, varValue);
+//		curValue = TheBuilder.CreateStore(startValue, varValue);
+        curValue = TheBuilder.CreateLoad(varValue, "tmp");
+//        curValue = this->->codeGen(generator);
 		if (this->getDirection())
 		{
 			condValue = TheBuilder.CreateICmpSLE(curValue, endValue);

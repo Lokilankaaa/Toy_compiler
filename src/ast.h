@@ -414,6 +414,8 @@ namespace TOY_COMPILER {
 
 		Type_Struct codeGen(IR & generator);
 
+        Type_Struct codeGenLeft(IR & generator);
+
 		Type_Struct ArrayReference(IR & generator);
 
 		Type_Struct RecordReference(IR & generator);
