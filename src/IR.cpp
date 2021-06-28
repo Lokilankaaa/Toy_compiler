@@ -19,15 +19,6 @@ namespace TOY_COMPILER {
 		std::cout << str << std::endl;
 	}
 
-    std::string to_string(int num) {
-        std::string res = "";
-        while (num != 0) {
-            res =(char)(num%10 + 0x30)+res;
-            num = num / 10;
-        }
-        return res;
-    }
-
 	llvm::AllocaInst *CreateEntryBlockAlloca(llvm::Function *TheFunction, llvm::StringRef VarName, llvm::Type* type)
 	{
 		llvm::IRBuilder<> TmpB(&TheFunction->getEntryBlock(), TheFunction->getEntryBlock().begin());
@@ -877,11 +868,11 @@ namespace TOY_COMPILER {
 		{
 			if (generator.labelBlock[this->label] == nullptr)
 			{
-				generator.labelBlock[this->label] = llvm::BasicBlock::Create(TheContext, "Label_" + to_string(label), TheFunction);
+				generator.labelBlock[this->label] = llvm::BasicBlock::Create(TheContext, "Label_" + std::to_string(this->label), TheFunction);
 			}
 			if (this->afterBB == nullptr)
 			{
-				this->afterBB = llvm::BasicBlock::Create(TheContext, "afterLabel_" + to_string(this->label), TheFunction);
+				this->afterBB = llvm::BasicBlock::Create(TheContext, "afterLabel_" + std::to_string(this->label), TheFunction);
 			}
 			TheBuilder.CreateBr(generator.labelBlock[this->label]);
 			TheBuilder.SetInsertPoint(generator.labelBlock[this->label]);
@@ -890,9 +881,10 @@ namespace TOY_COMPILER {
 
 	void utilsInterface::backward(IR & generator)
 	{
-		if (this->label >= 0 && afterBB != nullptr)
+//		if (this->label >= 0 && afterBB != nullptr)
+        if (afterBB != nullptr)
 		{
-			TheBuilder.SetInsertPoint(generator.labelBlock[this->label]);
+//			TheBuilder.SetInsertPoint(generator.labelBlock[this->label]);
 			TheBuilder.CreateBr(this->afterBB);
 			TheBuilder.SetInsertPoint(this->afterBB);
 		}
@@ -904,14 +896,10 @@ namespace TOY_COMPILER {
 		llvm::Value *res = nullptr;
 		if (generator.labelBlock[this->getLabel()] == nullptr)
 		{
-			generator.labelBlock[this->getLabel()] = llvm::BasicBlock::Create(TheContext, "Label_" + to_string(this->getLabel()), generator.getCurFunction());
+			generator.labelBlock[this->getLabel()] = llvm::BasicBlock::Create(TheContext, "Label_" + std::to_string(this->getLabel()), generator.getCurFunction());
 		}
 		res = TheBuilder.CreateBr(generator.labelBlock[this->getLabel()]);
-		//    if (this->afterBB == nullptr)
-		//    {
-		//        this->afterBB = llvm::BasicBlock::Create(TheContext, "afterLabel_" + to_string(this->toLabel), generator.getCurFunction());
-		//    }
-		//    TheBuilder.SetInsertPoint(this->afterBB);
+
 		this->backward(generator);
 		return Type_Struct(res);
 	}
