@@ -870,10 +870,11 @@ namespace TOY_COMPILER {
 			{
 				generator.labelBlock[this->label] = llvm::BasicBlock::Create(TheContext, "Label_" + std::to_string(this->label), TheFunction);
 			}
-			if (this->afterBB == nullptr)
+			/*if (this->afterBB == nullptr)
 			{
 				this->afterBB = llvm::BasicBlock::Create(TheContext, "afterLabel_" + std::to_string(this->label), TheFunction);
 			}
+			 */
 			TheBuilder.CreateBr(generator.labelBlock[this->label]);
 			TheBuilder.SetInsertPoint(generator.labelBlock[this->label]);
 		}
