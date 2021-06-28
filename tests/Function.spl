@@ -1,0 +1,25 @@
+program hello;
+
+var
+    i : integer;
+    c : integer;
+
+function go(a : integer; var b: integer): integer;
+begin
+    a := a + 1;
+    b := b - 1;
+end
+;
+
+begin
+    i := 0;
+    c := 0;
+    writeln(i);
+    writeln(c);
+
+    go(i, c);
+
+    writeln(i);
+    writeln(c);
+end
+.

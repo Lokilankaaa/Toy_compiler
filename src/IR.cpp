@@ -390,7 +390,14 @@ namespace TOY_COMPILER {
 		{
 			Type_Struct pts = para->codeGen(generator);
 			for (auto & name : para->getNames()) {
-				argTypes.push_back(pts.llvm);
+			    if(para->getPassBy() == REFER)
+                {
+			        argTypes.push_back(toLLVMPtrType(pts.type));
+                }
+			    else
+                {
+                    argTypes.push_back(pts.llvm);
+                }
 			}
 		}
 		Type_Struct rts = this->getRetval()->codeGen(generator);
@@ -405,25 +412,33 @@ namespace TOY_COMPILER {
 		llvm::Function::arg_iterator argIt = function->arg_begin();
 		int index = 1;
 		llvm::Value* addr = NULL;
+		llvm::Value* alloc = NULL;
 		for (auto & args : *(this->getParams()))
 		{
 			for (auto & arg : args->getNames())
 			{
-				/*if (args->isVar)
+				if (args->getPassBy() == REFER)
 				{
 					//Check value
-//	                alloc = generator.findValue(arg->getName());
-					function->addAttribute(index, llvm::Attribute::NonNull);
-					alloc = TheBuilder.CreateGEP(argIt++, TheBuilder.getInt32(0), arg->getName());
-				}*/
-                addr = CreateEntryBlockAlloca(function, arg, args->getSimpleType()->codeGen(generator).llvm);
-				llvm::Value *llvm_a = argIt++;
-//				llvm_a->setName(addr);
-				Type_Struct *ts = new Type_Struct(args->codeGen(generator));
-				ts->name = arg;
-				ts->istype = 0;
-				generator.InsertType(arg,ts);
-                TheBuilder.CreateStore(llvm_a, addr);
+					//alloc = generator.findValue(arg);
+//					function->addAttribute(index, llvm::Attribute::NonNull);
+					alloc = TheBuilder.CreateGEP(argIt++, TheBuilder.getInt32(0), arg);
+                    Type_Struct *ts = new Type_Struct(args->codeGen(generator));
+                    ts->pass = true;
+                    ts->name = arg;
+                    ts->istype = 0;
+                    generator.InsertType(arg,ts);
+				}
+				else
+                {
+                    addr = CreateEntryBlockAlloca(function, arg, args->getSimpleType()->codeGen(generator).llvm);
+                    llvm::Value *llvm_a = argIt++;
+                    Type_Struct *ts = new Type_Struct(args->codeGen(generator));
+                    ts->name = arg;
+                    ts->istype = 0;
+                    generator.InsertType(arg,ts);
+                    TheBuilder.CreateStore(llvm_a, addr);
+                }
 			}
 		}
 
@@ -458,6 +473,7 @@ namespace TOY_COMPILER {
 		}
 
 		//Pop back
+//		generator.passMap.insert(this->getId(), new Function(*(generator.funcStack.back()))));
 		generator.popFunction();
 		TheBuilder.SetInsertPoint(&(generator.getCurFunction())->getBasicBlockList().back());
 		return Type_Struct(function);
@@ -641,9 +657,17 @@ namespace TOY_COMPILER {
 			exit(0);
 		}
 		std::vector<llvm::Value*> args;
+		llvm::Function::arg_iterator argIt = function->arg_begin();
 		for (auto & arg : *(this->getArgs()))
 		{
-			args.push_back(arg->codeGen(generator));
+            if(argIt->hasNonNullAttr())
+            {
+                args.push_back(generator.findValue(((variableNode*)arg)->getId()));
+            }
+            else
+            {
+                args.push_back(arg->codeGen(generator));
+            }
 		}
 		llvm::Value *res = TheBuilder.CreateCall(function, args, "calltmp");
 		this->backward(generator);

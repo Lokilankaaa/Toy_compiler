@@ -48,6 +48,7 @@ namespace TOY_COMPILER {
         llvm::Type *llvm;	//the type information, generator when declaration, can be used
         expValue value;	//the value for const
         llvm::Value *llvmValue;	//the llvm value, used to pass some llvm value *
+        bool pass = false;
         //not record the variable value, you need to find from llvm function
 
         Type_Struct() {
@@ -111,6 +112,7 @@ namespace TOY_COMPILER {
 		llvm::Function *printf, *scanf;
 		std::vector<std::string> error;
 		llvm::Function *mainFunction;
+		std::map<std::string, Function*> passMap;
 
 		IR()
 		{
