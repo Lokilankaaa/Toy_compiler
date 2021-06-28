@@ -7,7 +7,7 @@
 TOY_COMPILER::rootProgram *root;
 std::map<int, TOY_COMPILER::abstractStmt*>  Label;
 int main() {
-    std::string filename = "../tests/Comprehensive1.spl";
+    std::string filename = "../tests/SysCall.spl";
     std::string out_file = "../vis.json";
     std::ifstream in_file(filename);
     auto scanner = new TOY_COMPILER::Scanner(&in_file);

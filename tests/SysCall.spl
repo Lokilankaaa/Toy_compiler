@@ -1,0 +1,22 @@
+program hello;
+var
+	i : integer;
+	r : real;
+	c : char;
+
+
+begin
+	read(c);
+	writeln(c);
+
+	read(i);
+	writeln(i);
+
+	read(r);
+	write(r);
+
+end
+.
+
+
+

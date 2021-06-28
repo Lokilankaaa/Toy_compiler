@@ -660,7 +660,8 @@ namespace TOY_COMPILER {
 		Type_Struct arg = (*this->getArgs())[0]->codeGen(generator);
 		llvm::Value *argAddr, *argValue;
 		//Just common variable
-		argAddr = arg.llvmValue;
+//		argAddr = arg.llvmValue;
+        argAddr = generator.findValue(arg.name);
 		switch (arg.type)
 		{
 		case INTEGER:
