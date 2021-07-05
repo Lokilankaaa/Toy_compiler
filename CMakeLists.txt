@@ -1,5 +1,5 @@
-cmake_minimum_required(VERSION 3.14)
-project(toy_compiler CXX)
+cmake_minimum_required(VERSION 3.10)
+project(executable/toy_compiler CXX)
 
 set(CMAKE_CXX_STANDARD 14)
 #set(SRC_FILE "src" "src/ast.cc")
@@ -56,9 +56,9 @@ ADD_FLEX_BISON_DEPENDENCY(lexer parser)
 
 add_compile_options(-w)
 
-add_executable(toy_compiler main.cpp
+add_executable(executable/toy_compiler main.cpp
         src/ast.cc src/ast.h src/IR.cpp src/IR.h src/scanner.h src/tt.h src/types.cuh
         ${FLEX_lexer_OUTPUTS} ${BISON_parser_OUTPUTS})
 
 # Link against LLVM libraries
-target_link_libraries(toy_compiler LLVM)
+target_link_libraries(executable/toy_compiler LLVM)
