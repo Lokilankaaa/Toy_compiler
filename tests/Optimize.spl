@@ -1,0 +1,9 @@
+program hello;
+
+var
+    i : integer;
+
+begin
+   i := 1 + 5;
+end
+.

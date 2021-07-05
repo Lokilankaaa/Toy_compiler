@@ -28,6 +28,7 @@ namespace TOY_COMPILER {
 		std::map<std::string, Range_Struct*> rangeMap;
 		std::map<std::string, Type_Struct*> typeMap;
 		std::map<std::string, Type_Struct*> functionMap;
+        std::map<std::string, std::vector<Type_Struct *>*> functionarg;
 
 		llvm::Function *Func;
 		Function(llvm::Function *Func){
@@ -48,7 +49,7 @@ namespace TOY_COMPILER {
         llvm::Type *llvm;	//the type information, generator when declaration, can be used
         expValue value;	//the value for const
         llvm::Value *llvmValue;	//the llvm value, used to pass some llvm value *
-        bool pass = false;
+        bool pass = false ;
         //not record the variable value, you need to find from llvm function
 
         Type_Struct() {
@@ -191,6 +192,11 @@ namespace TOY_COMPILER {
 			return 0;
 		}
 
+        int InsertFuncArg(std::string &name, std::vector<Type_Struct *>* args) { //to insert a arg into the map
+            funcStack.end()[-2].functionarg.insert(std::map<std::string, std::vector<Type_Struct *>*>::value_type(name, args));
+            return 0;
+        }
+
 		int InsertFunction(std::string &name, Type_Struct* type) { //to insert a function return into the map
 //			Type_Struct *check = checkType(name);
 //			if (check != NULL) {
@@ -200,6 +206,23 @@ namespace TOY_COMPILER {
 			funcStack.back().functionMap.insert(std::map<std::string, Type_Struct*>::value_type(name, type));
 			return 0;
 		}
+
+        std::vector<Type_Struct *>* findArg(std::string &name){
+            for (auto it = funcStack.rbegin(); it != funcStack.rend(); it++)
+            {
+                auto result = it->functionarg.find(name);
+                if (result != it->functionarg.end())
+                {
+                    std::cout << "Find " << name << " in " << std::string(it->Func->getName()) << std::endl;
+                    return result->second;
+                }
+                else
+                {
+                    std::cout << "Not Find " << name << " in " << std::string(it->Func->getName()) << std::endl;
+                }
+            }
+            return NULL;
+        }
 
 		Array_Struct* findArray(const std::string &name) {	//find a array in all functions
 			for (auto it = funcStack.rbegin(); it != funcStack.rend(); it++)
@@ -217,7 +240,6 @@ namespace TOY_COMPILER {
 			}
 			return NULL;
 		}
-
 
 		Range_Struct* findRange(std::string &name) { //find a range in all functions
 			for (auto it = funcStack.rbegin(); it != funcStack.rend(); it++)
@@ -415,7 +437,5 @@ namespace TOY_COMPILER {
 		}
 
 	};
-
-
 }
 #endif

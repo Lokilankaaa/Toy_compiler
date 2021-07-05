@@ -2,14 +2,17 @@ program LoopTest;
 
 var 
     i : integer;
+    c : char;
 
 begin
+    c := '-';
 
     for i := 1 to 3 do
     begin
         writeln(i);
     end
     ;
+    writeln(c);
 
     while i > 0 do 
     begin 
@@ -17,12 +20,15 @@ begin
         i := i - 1;
     end
     ;
+    writeln(c);
 
     i := 0;
     repeat
         writeln(i);
         i := i + 1;
     until i > 5;
+    writeln(c);
 
+    writeln(i);
 end
 .

@@ -7,7 +7,6 @@ var
         height : integer;
         end;
 
-
 begin
     m.age := 10;
     m.height := 160;

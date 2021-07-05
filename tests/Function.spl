@@ -3,11 +3,13 @@ program hello;
 var
     i : integer;
     c : integer;
+    r : integer;
 
 function go(a : integer; var b: integer): integer;
 begin
     a := a + 1;
     b := b - 1;
+    go := a + b;
 end
 ;
 
@@ -17,9 +19,10 @@ begin
     writeln(i);
     writeln(c);
 
-    go(i, c);
+    r := go(i, c);
 
     writeln(i);
     writeln(c);
+    writeln(r);
 end
 .
