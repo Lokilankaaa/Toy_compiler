@@ -1,4 +1,4 @@
-# Toy_complier
+# Toy_compiler
 
 ## 项目介绍
 
